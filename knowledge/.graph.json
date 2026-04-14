@@ -1,0 +1,189 @@
+{
+  "nodes": [
+    {
+      "id": "lesson_20260414_001_absolute_spread_filter_breaks_cross_symbol",
+      "path": "knowledge/lessons/lesson_20260414_001_absolute_spread_filter_breaks_cross_symbol.md",
+      "tags": [
+        "lesson",
+        "dsl",
+        "spread",
+        "cross_symbol",
+        "failure"
+      ],
+      "title": "lesson_20260414_001_absolute_spread_filter_breaks_cross_symbol",
+      "source": "strat_20260414_0001_obi_momentum_tight",
+      "metric": "return_pct=-0.79 trades=334 fees=64476"
+    },
+    {
+      "id": "lesson_20260414_002_obi_momentum_has_no_edge_over_spread_cost_at_tick_horizon",
+      "path": "knowledge/lessons/lesson_20260414_002_obi_momentum_has_no_edge_over_spread_cost_at_tick_horizon.md",
+      "tags": [
+        "lesson",
+        "turnover",
+        "fees",
+        "edge",
+        "failure"
+      ],
+      "title": "lesson_20260414_002_obi_momentum_has_no_edge_over_spread_cost_at_tick_horizon",
+      "source": "strat_20260414_0002_obi_momentum_bps",
+      "metric": "return_pct=-0.86 trades=292 fees=65405"
+    },
+    {
+      "id": "lesson_20260414_003_tax_heavy_korean_market_tight_spread_entry_filter_increases_turnover_fees_dominate_pnl",
+      "path": "knowledge/lessons/lesson_20260414_003_tax_heavy_korean_market_tight_spread_entry_filter_increases_turnover_fees_dominate_pnl.md",
+      "tags": [
+        "lesson",
+        "fees",
+        "tax",
+        "turnover",
+        "korea",
+        "tight-spread",
+        "obi"
+      ],
+      "title": "lesson_20260414_003_tax_heavy_korean_market_tight_spread_entry_filter_increases_turnover_fees_dominate_pnl",
+      "source": "strat_20260414_0003_tight_spread_ofi_momentum",
+      "metric": "return_pct=-0.9504 trades=372 fees=71744"
+    },
+    {
+      "id": "pattern_krx_fee_hurdle_dominates_tick_edge",
+      "path": "knowledge/patterns/pattern_krx_fee_hurdle_dominates_tick_edge.md",
+      "tags": [
+        "pattern",
+        "fees",
+        "tax",
+        "korea",
+        "turnover",
+        "tick-scale",
+        "lot-size"
+      ],
+      "title": "pattern_krx_fee_hurdle_dominates_tick_edge",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "lesson_20260414_004_per_symbol_minimum_spread_must_exceed_physical_tick_price_floor",
+      "path": "knowledge/lessons/lesson_20260414_004_per_symbol_minimum_spread_must_exceed_physical_tick_price_floor.md",
+      "tags": [
+        "lesson",
+        "spread",
+        "calibration",
+        "tick_size",
+        "entry_gate",
+        "005930",
+        432
+      ],
+      "title": "lesson_20260414_004_per_symbol_minimum_spread_must_exceed_physical_tick_price_floor",
+      "source": "strat_20260414_0004_duration_extended_trend_005930",
+      "metric": "return_pct=0.0 trades=0 fees=0.0"
+    },
+    {
+      "id": "pattern_spec_calibration_failure_wastes_iteration",
+      "path": "knowledge/patterns/pattern_spec_calibration_failure_wastes_iteration.md",
+      "tags": [
+        "pattern",
+        "calibration",
+        "tick_size",
+        "entry_gate",
+        "confirmation-lag",
+        "dsl",
+        "spread",
+        "distribution",
+        "imbalance"
+      ],
+      "title": "pattern_spec_calibration_failure_wastes_iteration",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "lesson_20260414_005_mean_reversion_entry_fires_after_reversal_exhausted_ret50_confirmation_too_late",
+      "path": "knowledge/lessons/lesson_20260414_005_mean_reversion_entry_fires_after_reversal_exhausted_ret50_confirmation_too_late.md",
+      "tags": [
+        "lesson",
+        "mean-reversion",
+        "entry-latency",
+        "hold-time",
+        "005930",
+        "confirmation-lag"
+      ],
+      "title": "lesson_20260414_005_mean_reversion_entry_fires_after_reversal_exhausted_ret50_confirmation_too_late",
+      "source": "strat_20260414_0006_mean_reversion_005930",
+      "metric": "return_pct=-0.0391 trades=14 fees=2711.7"
+    },
+    {
+      "id": "lesson_20260414_006_etf_universe_blocked_by_dataset_scope_kospi_equity_only",
+      "path": "knowledge/lessons/lesson_20260414_006_etf_universe_blocked_by_dataset_scope_kospi_equity_only.md",
+      "tags": [
+        "lesson",
+        "dataset",
+        "etf",
+        "universe",
+        "data-gap",
+        "kospi"
+      ],
+      "title": "lesson_20260414_006_etf_universe_blocked_by_dataset_scope_kospi_equity_only",
+      "source": "strat_20260414_0007_etf_obi_momentum_069500",
+      "metric": "return_pct=0.0 trades=0 fees=0.0"
+    },
+    {
+      "id": "lesson_20260414_007_lob_imbalance_acceleration_fires_at_peak_not_onset",
+      "path": "knowledge/lessons/lesson_20260414_007_lob_imbalance_acceleration_fires_at_peak_not_onset.md",
+      "tags": [
+        "lesson",
+        "lob",
+        "imbalance",
+        "acceleration",
+        "signal-timing",
+        "anti-edge"
+      ],
+      "title": "lesson_20260414_007_lob_imbalance_acceleration_fires_at_peak_not_onset",
+      "source": "strat_20260414_0009_lob_pressure_acceleration_reversion",
+      "metric": "return_pct=-0.0721 trades=30 fees=5807.55 win_rate=0"
+    },
+    {
+      "id": "lesson_20260414_008_signal_threshold_outside_observed_distribution_fires_zero_ticks_mode_c_calibration_failure",
+      "path": "knowledge/lessons/lesson_20260414_008_signal_threshold_outside_observed_distribution_fires_zero_ticks_mode_c_calibration_failure.md",
+      "tags": [
+        "lesson",
+        "calibration",
+        "imbalance",
+        "threshold",
+        "distribution",
+        "zero-trades",
+        "mode-c"
+      ],
+      "title": "lesson_20260414_008_signal_threshold_outside_observed_distribution_fires_zero_ticks_mode_c_calibration_failure",
+      "source": "strat_20260414_0010_imbalance_exhaustion_fade",
+      "metric": "return_pct=0.0 trades=0 fees=0.0"
+    }
+  ],
+  "edges": [
+    {
+      "src": "lesson_20260414_002_obi_momentum_has_no_edge_over_spread_cost_at_tick_horizon",
+      "dst": "lesson_20260414_001_absolute_spread_filter_breaks_cross_symbol"
+    },
+    {
+      "src": "lesson_20260414_003_tax_heavy_korean_market_tight_spread_entry_filter_increases_turnover_fees_dominate_pnl",
+      "dst": "lesson_20260414_002_obi_momentum_has_no_edge_over_spread_cost_at_tick_horizon"
+    },
+    {
+      "src": "lesson_20260414_003_tax_heavy_korean_market_tight_spread_entry_filter_increases_turnover_fees_dominate_pnl",
+      "dst": "pattern_krx_fee_hurdle_dominates_tick_edge"
+    },
+    {
+      "src": "lesson_20260414_004_per_symbol_minimum_spread_must_exceed_physical_tick_price_floor",
+      "dst": "pattern_spec_calibration_failure_wastes_iteration"
+    },
+    {
+      "src": "lesson_20260414_005_mean_reversion_entry_fires_after_reversal_exhausted_ret50_confirmation_too_late",
+      "dst": "pattern_spec_calibration_failure_wastes_iteration"
+    },
+    {
+      "src": "lesson_20260414_007_lob_imbalance_acceleration_fires_at_peak_not_onset",
+      "dst": "pattern_spec_calibration_failure_wastes_iteration"
+    },
+    {
+      "src": "lesson_20260414_008_signal_threshold_outside_observed_distribution_fires_zero_ticks_mode_c_calibration_failure",
+      "dst": "pattern_spec_calibration_failure_wastes_iteration"
+    }
+  ]
+}

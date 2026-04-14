@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tick Strategy Framework — 구조 및 사용법</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --fg: #1a1a1a;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --accent-soft: #dbeafe;
+    --green: #16a34a;
+    --green-soft: #f0fdf4;
+    --purple: #9333ea;
+    --purple-soft: #faf5ff;
+    --amber: #d97706;
+    --amber-soft: #fef3c7;
+    --border: #e5e7eb;
+    --code-bg: #f3f4f6;
+    --code-fg: #1f2937;
+    --dark-bg: #1e293b;
+    --dark-fg: #e2e8f0;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 56px 24px 96px; }
+  h1 { font-size: 36px; margin: 0 0 8px; letter-spacing: -0.02em; font-weight: 800; }
+  h2 { font-size: 24px; margin: 56px 0 18px; padding-bottom: 10px; border-bottom: 2px solid var(--accent); letter-spacing: -0.01em; font-weight: 700; }
+  h3 { font-size: 17px; margin: 28px 0 10px; color: var(--accent); font-weight: 700; }
+  p { margin: 8px 0 16px; }
+  .lead { color: var(--muted); font-size: 17px; margin: 0 0 12px; }
+  .meta { color: var(--muted); font-size: 13px; margin: 0 0 24px; }
+  .meta code { font-size: 12px; }
+
+  code, pre { font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  :not(pre) > code { background: var(--code-bg); color: var(--code-fg); padding: 2px 6px; border-radius: 4px; font-size: 12.5px; }
+  pre {
+    background: var(--dark-bg);
+    color: var(--dark-fg);
+    padding: 16px 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 12.5px;
+    line-height: 1.55;
+    margin: 12px 0 20px;
+  }
+  pre code { background: transparent; padding: 0; color: inherit; font-size: 12.5px; }
+  .cm { color: #94a3b8; }  /* comment */
+  .kw { color: #f472b6; }  /* keyword */
+  .str { color: #86efac; } /* string */
+  .num { color: #fbbf24; } /* number */
+  .fn { color: #60a5fa; }  /* func */
+
+  .diagram {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 12px 0 24px;
+    overflow-x: auto;
+  }
+  .diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+  .caption { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 8px; }
+
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 24px; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--code-bg); font-weight: 700; font-size: 13px; }
+  td code { font-size: 12px; }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 8px 0 24px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 8px 0 24px; }
+  @media (max-width: 760px) {
+    .grid2, .grid3 { grid-template-columns: 1fr; }
+  }
+  .card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .card h4 { margin: 0 0 6px; font-size: 14px; color: var(--accent); font-weight: 700; }
+  .card p { font-size: 13px; color: var(--muted); margin: 0; }
+
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--accent-soft); color: var(--accent); margin-right: 4px; }
+  .badge.ok { background: #dcfce7; color: #166534; }
+  .badge.warn { background: var(--amber-soft); color: #92400e; }
+  .badge.purple { background: var(--purple-soft); color: var(--purple); }
+
+  ul.clean { padding-left: 20px; margin: 8px 0 20px; }
+  ul.clean li { margin: 4px 0; }
+
+  footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12.5px; text-align: center; }
+
+  hr.section { border: none; border-top: 1px dashed var(--border); margin: 40px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Tick Strategy Framework</h1>
+  <p class="lead">KIS 10단 호가 데이터(<code>H0STASP0</code>)에 대해 전략을 자율적으로 생성 → 백테스트 → 학습하는 Claude Code 기반 루프.</p>
+  <p class="meta">
+    <span class="badge">8 phases</span>
+    <span class="badge ok">end-to-end 검증 완료</span>
+    <span class="badge purple">Obsidian 호환 knowledge</span>
+    · <code>/home/dgu/tick/proj_claude_tick_finance</code>
+  </p>
+
+  <!-- ==================== 개요 ==================== -->
+  <h2>1. 개요</h2>
+  <p>이 프레임워크는 <b>세 가지 설계 원칙</b>을 따릅니다.</p>
+  <div class="grid3">
+    <div class="card"><h4>토큰 최적화</h4><p>연산·iteration·파일 I/O는 전부 순수 Python(<code>engine/</code>) + CLI 스크립트(<code>scripts/</code>)가 처리합니다. Sub-agent는 결과 JSON만 읽습니다.</p></div>
+    <div class="card"><h4>분업화</h4><p>5개 전용 sub-agent가 이데이션 → 스펙 작성 → 코드 확장 → 백테스트 → 피드백 단계를 각자 담당합니다.</p></div>
+    <div class="card"><h4>지식 누적</h4><p>각 이터레이션의 교훈은 <code>knowledge/lessons/</code>에 Obsidian 호환 MD로 저장되고, networkx 기반 그래프로 탐색됩니다.</p></div>
+  </div>
+
+  <!-- ==================== 아키텍처 ==================== -->
+  <h2>2. 아키텍처 및 자율 루프</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 960 580" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+        </marker>
+        <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+        </marker>
+        <marker id="arrow-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#d97706"/>
+        </marker>
+      </defs>
+
+      <!-- Layer 1: Claude Layer -->
+      <rect x="30" y="30" width="900" height="170" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+      <text x="50" y="58" font-size="14" font-weight="800" fill="#1e3a8a" font-family="system-ui">Claude Layer</text>
+      <text x="165" y="58" font-size="11" fill="#64748b" font-family="system-ui">sub-agents (.claude/agents) · slash commands (.claude/commands) · skills (.claude/skills)</text>
+
+      <!-- agents -->
+      <g font-family="system-ui">
+        <g transform="translate(50,78)">
+          <rect width="160" height="68" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5"/>
+          <text x="80" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#1e40af">strategy-ideator</text>
+          <text x="80" y="40" font-size="10.5" text-anchor="middle" fill="#475569">seed → idea JSON</text>
+          <text x="80" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">search_knowledge.py</text>
+        </g>
+        <g transform="translate(226,78)">
+          <rect width="160" height="68" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5"/>
+          <text x="80" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#1e40af">spec-writer</text>
+          <text x="80" y="40" font-size="10.5" text-anchor="middle" fill="#475569">idea → spec.yaml</text>
+          <text x="80" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">new_strategy.py · validate_spec.py</text>
+        </g>
+        <g transform="translate(402,78)">
+          <rect width="160" height="68" rx="8" fill="white" stroke="#fcd34d" stroke-width="1.5" stroke-dasharray="4 2"/>
+          <text x="80" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#92400e">code-generator</text>
+          <text x="80" y="40" font-size="10.5" text-anchor="middle" fill="#475569">new primitive 필요시</text>
+          <text x="80" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">edit engine/signals.py</text>
+        </g>
+        <g transform="translate(578,78)">
+          <rect width="160" height="68" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5"/>
+          <text x="80" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#1e40af">backtest-runner</text>
+          <text x="80" y="40" font-size="10.5" text-anchor="middle" fill="#475569">spec → report JSON</text>
+          <text x="80" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">python -m engine.runner</text>
+        </g>
+        <g transform="translate(754,78)">
+          <rect width="160" height="68" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5"/>
+          <text x="80" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#1e40af">feedback-analyst</text>
+          <text x="80" y="40" font-size="10.5" text-anchor="middle" fill="#475569">report → lesson</text>
+          <text x="80" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">write_lesson.py</text>
+        </g>
+      </g>
+
+      <!-- chain arrows -->
+      <g fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arrow)">
+        <line x1="210" y1="112" x2="226" y2="112"/>
+        <line x1="386" y1="112" x2="402" y2="112"/>
+        <line x1="562" y1="112" x2="578" y2="112"/>
+        <line x1="738" y1="112" x2="754" y2="112"/>
+      </g>
+
+      <!-- feedback loop -->
+      <path d="M 834 150 Q 834 180 480 180 Q 130 180 130 150" stroke="#d97706" stroke-width="2" fill="none" stroke-dasharray="5 3" marker-end="url(#arrow-amber)"/>
+      <text x="480" y="175" font-size="11" fill="#d97706" text-anchor="middle" font-family="system-ui" font-weight="600">next_idea_seed — 완전 자율 루프</text>
+
+      <!-- Layer 2: Engine -->
+      <rect x="30" y="240" width="900" height="130" rx="14" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+      <text x="50" y="268" font-size="14" font-weight="800" fill="#14532d" font-family="system-ui">Engine Layer</text>
+      <text x="125" y="268" font-size="11" fill="#64748b" font-family="system-ui">pure Python · token cost = 0 · 모든 계산·I/O는 여기서 완결</text>
+
+      <g font-family="system-ui">
+        <g transform="translate(50,284)">
+          <rect width="170" height="68" rx="8" fill="white" stroke="#86efac" stroke-width="1.5"/>
+          <text x="85" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#166534">data_loader</text>
+          <text x="85" y="40" font-size="10.5" text-anchor="middle" fill="#475569">CSV → Snapshot iter</text>
+          <text x="85" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">multi-symbol chronological</text>
+        </g>
+        <g transform="translate(236,284)">
+          <rect width="170" height="68" rx="8" fill="white" stroke="#86efac" stroke-width="1.5"/>
+          <text x="85" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#166534">simulator</text>
+          <text x="85" y="40" font-size="10.5" text-anchor="middle" fill="#475569">matching + fee + latency</text>
+          <text x="85" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">KRX 0.15bps + 18bps tax</text>
+        </g>
+        <g transform="translate(422,284)">
+          <rect width="170" height="68" rx="8" fill="white" stroke="#86efac" stroke-width="1.5"/>
+          <text x="85" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#166534">signals · dsl</text>
+          <text x="85" y="40" font-size="10.5" text-anchor="middle" fill="#475569">11 primitives + AST eval</text>
+          <text x="85" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">SpecStrategy interpreter</text>
+        </g>
+        <g transform="translate(608,284)">
+          <rect width="170" height="68" rx="8" fill="white" stroke="#86efac" stroke-width="1.5"/>
+          <text x="85" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#166534">runner</text>
+          <text x="85" y="40" font-size="10.5" text-anchor="middle" fill="#475569">CLI orchestrator</text>
+          <text x="85" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">--spec --out --summary</text>
+        </g>
+        <g transform="translate(794,284)">
+          <rect width="120" height="68" rx="8" fill="white" stroke="#86efac" stroke-width="1.5"/>
+          <text x="60" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#166534">metrics</text>
+          <text x="60" y="40" font-size="10.5" text-anchor="middle" fill="#475569">BacktestReport</text>
+          <text x="60" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">→ JSON</text>
+        </g>
+      </g>
+
+      <!-- Layer 3: Data & Knowledge -->
+      <rect x="30" y="410" width="900" height="130" rx="14" fill="#faf5ff" stroke="#9333ea" stroke-width="2"/>
+      <text x="50" y="438" font-size="14" font-weight="800" fill="#581c87" font-family="system-ui">Data &amp; Knowledge</text>
+      <text x="185" y="438" font-size="11" fill="#64748b" font-family="system-ui">외부 데이터 · 전략 저장소 · Obsidian 호환 knowledge vault</text>
+
+      <g font-family="system-ui">
+        <g transform="translate(70,458)">
+          <rect width="250" height="68" rx="8" fill="white" stroke="#d8b4fe" stroke-width="1.5"/>
+          <text x="125" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#6b21a8">H0STASP0 CSVs</text>
+          <text x="125" y="40" font-size="10.5" text-anchor="middle" fill="#475569">10단 호가 + 잔량 + 누적거래량</text>
+          <text x="125" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">open-trading-api/data/realtime/</text>
+        </g>
+        <g transform="translate(355,458)">
+          <rect width="250" height="68" rx="8" fill="white" stroke="#d8b4fe" stroke-width="1.5"/>
+          <text x="125" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#6b21a8">strategies/&lt;id&gt;/</text>
+          <text x="125" y="40" font-size="10.5" text-anchor="middle" fill="#475569">spec.yaml + report.json</text>
+          <text x="125" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">strat_YYYYMMDD_NNNN_&lt;slug&gt;</text>
+        </g>
+        <g transform="translate(640,458)">
+          <rect width="250" height="68" rx="8" fill="white" stroke="#d8b4fe" stroke-width="1.5"/>
+          <text x="125" y="22" font-size="12.5" font-weight="700" text-anchor="middle" fill="#6b21a8">knowledge/ (Obsidian)</text>
+          <text x="125" y="40" font-size="10.5" text-anchor="middle" fill="#475569">lessons · patterns · seeds</text>
+          <text x="125" y="55" font-size="9.5" text-anchor="middle" fill="#94a3b8">graph.py (networkx index)</text>
+        </g>
+      </g>
+
+      <!-- inter-layer arrows -->
+      <g fill="none" stroke="#6b7280" stroke-width="1.8" marker-end="url(#arrow-gray)">
+        <line x1="135" y1="146" x2="135" y2="283"/>
+        <line x1="658" y1="146" x2="658" y2="283"/>
+        <line x1="834" y1="146" x2="834" y2="283"/>
+        <line x1="135" y1="352" x2="135" y2="458"/>
+        <line x1="500" y1="352" x2="500" y2="458"/>
+        <line x1="834" y1="352" x2="834" y2="458"/>
+      </g>
+      <text x="150" y="225" font-size="10" fill="#6b7280" font-family="system-ui">search</text>
+      <text x="672" y="225" font-size="10" fill="#6b7280" font-family="system-ui">engine.runner</text>
+      <text x="848" y="225" font-size="10" fill="#6b7280" font-family="system-ui">write_lesson</text>
+      <text x="150" y="400" font-size="10" fill="#6b7280" font-family="system-ui">read CSV</text>
+      <text x="515" y="400" font-size="10" fill="#6b7280" font-family="system-ui">read/write</text>
+      <text x="849" y="400" font-size="10" fill="#6b7280" font-family="system-ui">MD I/O</text>
+    </svg>
+    <div class="caption">[그림 1] 3-layer 아키텍처와 자율 피드백 루프</div>
+  </div>
+
+  <h3>레이어 설명</h3>
+  <ul class="clean">
+    <li><b>Claude Layer</b> — 실제 <i>지능</i>이 필요한 부분만. 각 sub-agent는 CLI 스크립트를 호출하고 JSON을 파싱합니다. 절대 raw 데이터를 직접 iterate하지 않습니다.</li>
+    <li><b>Engine Layer</b> — <code>pandas</code>/<code>numpy</code> 기반 순수 Python. Claude가 개입하지 않는 전 영역이며, 토큰 비용 = 0입니다.</li>
+    <li><b>Data &amp; Knowledge</b> — 외부 CSV, 생성된 전략, 그리고 Obsidian 호환 MD 지식 베이스. <code>knowledge/graph.py</code>가 프런트매터·<code>[[wikilink]]</code>를 파싱해 networkx 그래프로 인덱싱합니다.</li>
+  </ul>
+
+  <!-- ==================== 엔진 파이프라인 ==================== -->
+  <h2>3. 엔진 파이프라인</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 960 410" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#16a34a"/>
+        </marker>
+      </defs>
+
+      <!-- spec yaml -->
+      <g font-family="system-ui">
+        <g transform="translate(30,30)">
+          <rect width="150" height="70" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+          <text x="75" y="24" font-size="13" font-weight="700" text-anchor="middle" fill="#92400e">spec.yaml</text>
+          <text x="75" y="42" font-size="10" text-anchor="middle" fill="#78350f">name · universe</text>
+          <text x="75" y="56" font-size="10" text-anchor="middle" fill="#78350f">signals · entry · exit</text>
+        </g>
+        <!-- csv -->
+        <g transform="translate(30,130)">
+          <rect width="150" height="70" rx="8" fill="#faf5ff" stroke="#9333ea" stroke-width="1.5"/>
+          <text x="75" y="24" font-size="13" font-weight="700" text-anchor="middle" fill="#6b21a8">H0STASP0 CSV</text>
+          <text x="75" y="42" font-size="10" text-anchor="middle" fill="#581c87">recv_ts_kst</text>
+          <text x="75" y="56" font-size="10" text-anchor="middle" fill="#581c87">ASKPn / BIDPn / RSQN</text>
+        </g>
+
+        <!-- load_spec -->
+        <g transform="translate(230,35)">
+          <rect width="170" height="60" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5"/>
+          <text x="85" y="24" font-size="12.5" font-weight="700" text-anchor="middle" fill="#1e40af">load_spec</text>
+          <text x="85" y="42" font-size="10" text-anchor="middle" fill="#64748b">engine/spec.py</text>
+        </g>
+        <!-- data_loader -->
+        <g transform="translate(230,135)">
+          <rect width="170" height="60" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5"/>
+          <text x="85" y="24" font-size="12.5" font-weight="700" text-anchor="middle" fill="#1e40af">iter_events</text>
+          <text x="85" y="42" font-size="10" text-anchor="middle" fill="#64748b">OrderBookSnapshot stream</text>
+        </g>
+
+        <!-- SpecStrategy -->
+        <g transform="translate(450,35)">
+          <rect width="190" height="60" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5"/>
+          <text x="95" y="24" font-size="12.5" font-weight="700" text-anchor="middle" fill="#1e40af">SpecStrategy</text>
+          <text x="95" y="42" font-size="10" text-anchor="middle" fill="#64748b">primitives + safe_eval</text>
+        </g>
+
+        <!-- Backtester loop box -->
+        <g transform="translate(440,115)">
+          <rect width="210" height="220" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+          <text x="105" y="28" font-size="13" font-weight="800" text-anchor="middle" fill="#14532d">Backtester.run()</text>
+          <text x="105" y="44" font-size="10" text-anchor="middle" fill="#64748b">for tick in event stream:</text>
+
+          <g transform="translate(14,58)">
+            <rect width="182" height="32" rx="6" fill="white" stroke="#86efac" stroke-width="1.2"/>
+            <text x="91" y="20" font-size="11" text-anchor="middle" font-weight="600" fill="#166534">1. _match_pending (latency-gated)</text>
+          </g>
+          <g transform="translate(14,96)">
+            <rect width="182" height="32" rx="6" fill="white" stroke="#86efac" stroke-width="1.2"/>
+            <text x="91" y="20" font-size="11" text-anchor="middle" font-weight="600" fill="#166534">2. walk_book (10단 level walk)</text>
+          </g>
+          <g transform="translate(14,134)">
+            <rect width="182" height="32" rx="6" fill="white" stroke="#86efac" stroke-width="1.2"/>
+            <text x="91" y="20" font-size="11" text-anchor="middle" font-weight="600" fill="#166534">3. FeeModel.compute (bps+tax)</text>
+          </g>
+          <g transform="translate(14,172)">
+            <rect width="182" height="32" rx="6" fill="white" stroke="#86efac" stroke-width="1.2"/>
+            <text x="91" y="20" font-size="11" text-anchor="middle" font-weight="600" fill="#166534">4. Portfolio.apply_fill</text>
+          </g>
+        </g>
+
+        <!-- side inputs to backtester -->
+        <g transform="translate(700,140)">
+          <rect width="120" height="32" rx="6" fill="white" stroke="#fca5a5" stroke-width="1.2"/>
+          <text x="60" y="20" font-size="11" text-anchor="middle" font-weight="600" fill="#991b1b">LatencyModel</text>
+        </g>
+        <g transform="translate(700,180)">
+          <rect width="120" height="32" rx="6" fill="white" stroke="#fca5a5" stroke-width="1.2"/>
+          <text x="60" y="20" font-size="11" text-anchor="middle" font-weight="600" fill="#991b1b">FeeModel</text>
+        </g>
+        <g transform="translate(700,220)">
+          <rect width="120" height="32" rx="6" fill="white" stroke="#fca5a5" stroke-width="1.2"/>
+          <text x="60" y="20" font-size="11" text-anchor="middle" font-weight="600" fill="#991b1b">Portfolio</text>
+        </g>
+
+        <!-- report -->
+        <g transform="translate(830,190)">
+          <rect width="115" height="76" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+          <text x="57" y="26" font-size="12.5" font-weight="800" text-anchor="middle" fill="#1e3a8a">report.json</text>
+          <text x="57" y="44" font-size="9.5" text-anchor="middle" fill="#1e3a8a">return_pct</text>
+          <text x="57" y="57" font-size="9.5" text-anchor="middle" fill="#1e3a8a">n_trades · fees</text>
+          <text x="57" y="69" font-size="9.5" text-anchor="middle" fill="#1e3a8a">per_symbol</text>
+        </g>
+      </g>
+
+      <!-- arrows -->
+      <g fill="none" stroke="#16a34a" stroke-width="1.8" marker-end="url(#arrow2)">
+        <line x1="180" y1="65" x2="230" y2="65"/>
+        <line x1="180" y1="165" x2="230" y2="165"/>
+        <line x1="400" y1="65" x2="450" y2="65"/>
+        <line x1="400" y1="165" x2="440" y2="165"/>
+        <line x1="545" y1="95" x2="545" y2="115"/>
+        <line x1="650" y1="225" x2="830" y2="225"/>
+        <line x1="700" y1="156" x2="650" y2="180"/>
+        <line x1="700" y1="196" x2="650" y2="200"/>
+        <line x1="700" y1="236" x2="650" y2="230"/>
+      </g>
+      <text x="205" y="60" font-size="10" fill="#15803d" font-family="system-ui">parse</text>
+      <text x="205" y="160" font-size="10" fill="#15803d" font-family="system-ui">stream</text>
+      <text x="420" y="60" font-size="10" fill="#15803d" font-family="system-ui">DSL</text>
+      <text x="420" y="160" font-size="10" fill="#15803d" font-family="system-ui">ticks</text>
+
+      <!-- legend -->
+      <g transform="translate(30,360)">
+        <rect width="14" height="14" fill="#fef3c7" stroke="#d97706"/>
+        <text x="22" y="12" font-size="11" font-family="system-ui" fill="#475569">input</text>
+        <rect x="80" width="14" height="14" fill="white" stroke="#93c5fd"/>
+        <text x="102" y="12" font-size="11" font-family="system-ui" fill="#475569">process</text>
+        <rect x="175" width="14" height="14" fill="#f0fdf4" stroke="#16a34a"/>
+        <text x="197" y="12" font-size="11" font-family="system-ui" fill="#475569">core loop</text>
+        <rect x="275" width="14" height="14" fill="white" stroke="#fca5a5"/>
+        <text x="297" y="12" font-size="11" font-family="system-ui" fill="#475569">model</text>
+        <rect x="355" width="14" height="14" fill="#dbeafe" stroke="#2563eb"/>
+        <text x="377" y="12" font-size="11" font-family="system-ui" fill="#475569">output</text>
+      </g>
+    </svg>
+    <div class="caption">[그림 2] engine/runner.py가 오케스트레이션하는 백테스트 파이프라인</div>
+  </div>
+
+  <p><b>중요 포인트</b></p>
+  <ul class="clean">
+    <li><b>Taker-only</b>: 현재 오더는 MARKET 또는 marketable LIMIT만 지원. 호가 10단을 level walk 하면서 평균체결가와 체결수량을 계산합니다.</li>
+    <li><b>Latency 모델</b>: 전략이 tick T에서 주문을 내면, <code>target_ts = T + submit_ms + jitter</code> 로 큐에 적재되고, 이후 도착한 tick의 호가와 매칭됩니다 — 미래 정보 참조 없음.</li>
+    <li><b>Fee 모델</b>: KRX 기준 — 커미션 1.5 bps (양방향) + 증권거래세 18 bps (매도만). <code>spec.yaml</code>의 <code>fees:</code>로 override 가능.</li>
+    <li><b>Resting limit</b>은 현재 미지원. 체결판 큐 포지션 모델이 필요하며, 실제 체결 프린트 데이터 통합 시점에 추가 예정.</li>
+  </ul>
+
+  <!-- ==================== Spec DSL ==================== -->
+  <h2>4. Spec DSL 문법</h2>
+  <p>전략은 YAML 선언만으로 정의됩니다. 엔진이 이를 해석하며, 별도의 Python 파일은 필요 없습니다 (새 primitive가 필요할 때만 <code>engine/signals.py</code> 확장).</p>
+
+<pre><code><span class="cm"># strategies/&lt;id&gt;/spec.yaml</span>
+<span class="kw">name</span>: obi_momentum_bps_v2
+<span class="kw">description</span>: <span class="str">"OBI + 단기 mid 상승 + 좁은 bps 스프레드 진입"</span>
+<span class="kw">capital</span>: <span class="num">10000000</span>
+
+<span class="kw">universe</span>:
+  <span class="kw">symbols</span>: [<span class="str">"005930"</span>, <span class="str">"000660"</span>]    <span class="cm"># 멀티 종목 동시</span>
+  <span class="kw">dates</span>:   [<span class="str">"20260313"</span>]
+
+<span class="kw">fees</span>:    { commission_bps: <span class="num">1.5</span>, tax_bps: <span class="num">18.0</span> }
+<span class="kw">latency</span>: { submit_ms: <span class="num">5.0</span>, jitter_ms: <span class="num">1.0</span>, seed: <span class="num">42</span> }
+
+<span class="kw">signals</span>:                            <span class="cm"># 이름 있는 primitive 호출</span>
+  obi5:    { fn: <span class="fn">obi</span>,             args: { depth: <span class="num">5</span> } }
+  ret5:    { fn: <span class="fn">mid_return_bps</span>,  args: { lookback: <span class="num">5</span> } }
+  spr_bps: <span class="fn">spread_bps</span>                <span class="cm"># 인자 없는 primitive</span>
+
+<span class="kw">entry</span>:
+  <span class="kw">when</span>: <span class="str">"obi5 &gt; 0.5 and ret5 &gt; 1.0 and spr_bps &lt; 15"</span>
+  <span class="kw">size</span>: <span class="num">1</span>
+
+<span class="kw">exit</span>:
+  <span class="kw">when</span>: <span class="str">"obi5 &lt; 0.0 or holding_ticks &gt; 80"</span>
+
+<span class="kw">risk</span>:
+  <span class="kw">max_position_per_symbol</span>: <span class="num">1</span>
+</code></pre>
+
+  <h3>사용 가능한 primitive (engine/signals.py)</h3>
+  <table>
+    <thead><tr><th>이름</th><th>반환</th><th>설명</th><th>인자</th></tr></thead>
+    <tbody>
+      <tr><td><code>mid</code></td><td>float</td><td>(best_ask + best_bid) / 2</td><td>—</td></tr>
+      <tr><td><code>spread</code></td><td>float</td><td>best_ask − best_bid (KRW)</td><td>—</td></tr>
+      <tr><td><code>spread_bps</code></td><td>float</td><td>spread / mid × 1e4 (cross-symbol 비교용)</td><td>—</td></tr>
+      <tr><td><code>best_ask</code> / <code>best_bid</code></td><td>float</td><td>top of book</td><td>—</td></tr>
+      <tr><td><code>obi</code></td><td>float</td><td>top-N 잔량 imbalance ∈ [−1, 1]</td><td><code>depth=5</code></td></tr>
+      <tr><td><code>microprice</code></td><td>float</td><td>잔량 가중 평균가</td><td>—</td></tr>
+      <tr><td><code>total_imbalance</code></td><td>float</td><td>전체 ask/bid 잔량 imbalance</td><td>—</td></tr>
+      <tr><td><code>volume_delta</code></td><td>float</td><td>ACML_VOL 차분</td><td><code>lookback=1</code></td></tr>
+      <tr><td><code>mid_return_bps</code></td><td>float</td><td>mid 수익률 (bps)</td><td><code>lookback=1</code></td></tr>
+      <tr><td><code>mid_change</code></td><td>float</td><td>mid 절대 차분 (KRW)</td><td><code>lookback=1</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>entry/exit 표현식에서 쓸 수 있는 식별자</h3>
+  <ul class="clean">
+    <li>spec.signals에 선언한 모든 이름 (위 예시의 <code>obi5</code>, <code>ret5</code>, <code>spr_bps</code>)</li>
+    <li>암묵 변수: <code>position</code> (현재 수량), <code>holding_ticks</code> (보유 tick 수), <code>mid_now</code>, <code>spread_now</code></li>
+    <li>리터럴/연산: 숫자, <code>True</code>/<code>False</code> (또는 <code>true</code>/<code>false</code>), <code>and</code>/<code>or</code>/<code>not</code>, 비교(<code>&lt; &lt;= &gt; &gt;= == !=</code>), 산술(<code>+ − * / // % **</code>), 3항(<code>x if c else y</code>), <code>min</code>/<code>max</code>/<code>abs</code></li>
+  </ul>
+  <p class="meta">⚠ DSL 평가기는 AST 화이트리스트입니다. 속성 접근, 속성 호출, 컴프리헨션, 람다는 모두 차단됩니다.</p>
+
+  <!-- ==================== 사용법 ==================== -->
+  <h2>5. 사용법</h2>
+
+  <h3>5-1. Claude Code에서 슬래시 커맨드</h3>
+  <p>Claude Code를 <code>proj_claude_tick_finance/</code>에서 실행하면 <code>.claude/agents</code>, <code>.claude/skills</code>, <code>.claude/commands</code>가 자동 로드됩니다.</p>
+<pre><code><span class="cm"># 한 이터레이션: 시드 → 전략 → 백테스트 → 레슨</span>
+/new-strategy "obi(5)가 0.5 이상이고 스프레드가 5 bps 미만일 때 long 진입"
+
+<span class="cm"># 완전 자율 루프 — N회, 시드는 이전 이터레이션의 next_idea_seed로 연결</span>
+/iterate 5 "좁은 스프레드 구간에서 order-flow imbalance momentum 캡처"</code></pre>
+
+  <h3>5-2. CLI 직접 호출 (디버깅·검증용)</h3>
+<pre><code><span class="cm"># 0) 사용 가능한 날짜/종목 조회</span>
+python -m engine.data_loader list-dates
+python -m engine.data_loader list-symbols --date 20260313
+python -m engine.data_loader summary --date 20260313 --symbol 005930
+
+<span class="cm"># 1) 새 전략 디렉터리 생성</span>
+python scripts/new_strategy.py --name my_idea \
+    --from strategies/_examples/obi_momentum.yaml
+
+<span class="cm"># 2) spec.yaml 편집 후 검증</span>
+python scripts/validate_spec.py strategies/&lt;id&gt;/spec.yaml
+
+<span class="cm"># 3) 백테스트 실행 (결과는 stdout + report.json 양쪽으로)</span>
+python -m engine.runner \
+    --spec strategies/&lt;id&gt;/spec.yaml \
+    --out  strategies/&lt;id&gt;/report.json \
+    --summary
+
+<span class="cm"># 4) 레슨 기록 + 지식 그래프 업데이트</span>
+python scripts/write_lesson.py \
+    --title <span class="str">"좁은 스프레드만으론 edge 부족"</span> \
+    --body  <span class="str">"Observation: ...\nWhy: ...\nHow to apply next: ..."</span> \
+    --tags  <span class="str">"spread,edge,failure"</span> \
+    --source strat_20260414_0001_my_idea \
+    --metric <span class="str">"return_pct=-0.5 trades=120"</span>
+python knowledge/graph.py build
+
+<span class="cm"># 5) 프로젝트 상태 조회</span>
+python scripts/list_strategies.py
+python scripts/search_knowledge.py --query spread --top 5
+python knowledge/graph.py stats
+python knowledge/graph.py related spread</code></pre>
+
+  <!-- ==================== 디렉터리 구조 ==================== -->
+  <h2>6. 디렉터리 구조</h2>
+  <div class="diagram">
+    <svg viewBox="0 0 820 540" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12.5">
+      <style>
+        .dir { fill: #2563eb; font-weight: 700; }
+        .file { fill: #1f2937; }
+        .cm { fill: #9ca3af; font-style: italic; }
+        .tree { stroke: #cbd5e1; stroke-width: 1.2; fill: none; }
+        .tag { fill: #dbeafe; stroke: #93c5fd; }
+        .tag-text { fill: #1e40af; font-size: 10px; font-weight: 700; }
+      </style>
+
+      <!-- root -->
+      <text x="20" y="24" class="dir">proj_claude_tick_finance/</text>
+
+      <!-- .claude -->
+      <text x="40" y="50" class="dir">.claude/</text>
+      <text x="720" y="50" class="cm">Claude 통합</text>
+      <text x="60" y="70" class="dir">agents/</text>
+      <text x="200" y="70" class="file">strategy-ideator.md · spec-writer.md · code-generator.md</text>
+      <text x="200" y="86" class="file">backtest-runner.md · feedback-analyst.md</text>
+      <text x="60" y="106" class="dir">skills/&lt;name&gt;/</text><text x="200" y="106" class="file">SKILL.md   </text><text x="290" y="106" class="cm">new-strategy · validate-spec · run-backtest · search-lessons · write-lesson · graph-query</text>
+      <text x="60" y="126" class="dir">commands/</text><text x="200" y="126" class="file">new-strategy.md · iterate.md</text>
+
+      <!-- engine -->
+      <text x="40" y="156" class="dir">engine/</text>
+      <text x="720" y="156" class="cm">순수 Python 엔진</text>
+      <text x="60" y="176" class="file">data_loader.py</text><text x="260" y="176" class="cm"># H0STASP0 CSV → OrderBookSnapshot</text>
+      <text x="60" y="192" class="file">simulator.py</text><text x="260" y="192" class="cm"># matching · fee · latency · portfolio · Backtester</text>
+      <text x="60" y="208" class="file">signals.py</text><text x="260" y="208" class="cm"># 11 primitives + SymbolState buffers</text>
+      <text x="60" y="224" class="file">dsl.py</text><text x="260" y="224" class="cm"># safe AST evaluator + SpecStrategy</text>
+      <text x="60" y="240" class="file">spec.py</text><text x="260" y="240" class="cm"># YAML loader → StrategySpec</text>
+      <text x="60" y="256" class="file">runner.py</text><text x="260" y="256" class="cm"># CLI: python -m engine.runner --spec ... --summary</text>
+      <text x="60" y="272" class="file">metrics.py</text><text x="260" y="272" class="cm"># BacktestReport / SymbolResult</text>
+
+      <!-- scripts -->
+      <text x="40" y="302" class="dir">scripts/</text>
+      <text x="720" y="302" class="cm">CLI 스크립트</text>
+      <text x="60" y="322" class="file">new_strategy.py</text><text x="260" y="322" class="cm"># 전략 디렉터리 생성</text>
+      <text x="60" y="338" class="file">validate_spec.py</text><text x="260" y="338" class="cm"># spec 유효성 + primitive 검증</text>
+      <text x="60" y="354" class="file">write_lesson.py</text><text x="260" y="354" class="cm"># 지식 베이스에 레슨 추가</text>
+      <text x="60" y="370" class="file">search_knowledge.py</text><text x="260" y="370" class="cm"># grep + 스니펫 반환 (JSON)</text>
+      <text x="60" y="386" class="file">list_strategies.py</text><text x="260" y="386" class="cm"># 전략 리스트 + 주요 metric</text>
+
+      <!-- strategies -->
+      <text x="40" y="416" class="dir">strategies/</text>
+      <text x="720" y="416" class="cm">생성된 전략 저장소</text>
+      <text x="60" y="436" class="dir">_examples/</text><text x="220" y="436" class="file">obi_momentum.yaml · dummy_hold.yaml · dummy_alt.yaml</text>
+      <text x="60" y="456" class="dir">strat_YYYYMMDD_NNNN_&lt;slug&gt;/</text>
+      <text x="290" y="456" class="file">spec.yaml</text><text x="400" y="456" class="cm"># 선언적 전략 정의</text>
+      <text x="290" y="472" class="file">report.json</text><text x="400" y="472" class="cm"># 백테스트 결과 메트릭</text>
+
+      <!-- knowledge -->
+      <text x="40" y="502" class="dir">knowledge/</text>
+      <text x="720" y="502" class="cm">Obsidian 호환 vault</text>
+      <text x="60" y="522" class="file">graph.py</text><text x="200" y="522" class="file">lessons/ · patterns/ · seeds/ · .graph.json</text>
+    </svg>
+    <div class="caption">[그림 3] 디렉터리 트리 (__pycache__ 생략)</div>
+  </div>
+
+  <!-- ==================== 지식 그래프 ==================== -->
+  <h2>7. 지식 베이스와 그래프</h2>
+  <p>각 레슨은 Obsidian 호환 frontmatter와 <code>[[wikilink]]</code>를 가진 MD 파일입니다. <code>knowledge/graph.py</code>가 이를 파싱하여 networkx DiGraph로 인덱싱하며, agent가 grep보다 먼저 그래프 쿼리로 관련 노드 군집을 찾습니다.</p>
+
+  <div class="diagram">
+    <svg viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#9333ea"/>
+        </marker>
+      </defs>
+
+      <!-- frontmatter card left -->
+      <g transform="translate(30,30)" font-family="'JetBrains Mono', monospace">
+        <rect width="340" height="300" rx="10" fill="#1e293b"/>
+        <text x="20" y="28" font-size="11" fill="#94a3b8">lessons/lesson_20260414_002_….md</text>
+        <line x1="14" y1="38" x2="326" y2="38" stroke="#334155" stroke-width="1"/>
+        <text x="20" y="62" font-size="11.5" fill="#94a3b8">---</text>
+        <text x="20" y="80" font-size="11.5" fill="#f472b6">id:</text><text x="56" y="80" font-size="11.5" fill="#e2e8f0">lesson_20260414_002_edge</text>
+        <text x="20" y="98" font-size="11.5" fill="#f472b6">created:</text><text x="90" y="98" font-size="11.5" fill="#fbbf24">2026-04-14T01:44:16</text>
+        <text x="20" y="116" font-size="11.5" fill="#f472b6">tags:</text><text x="64" y="116" font-size="11.5" fill="#86efac">[lesson, edge, turnover]</text>
+        <text x="20" y="134" font-size="11.5" fill="#f472b6">source:</text><text x="82" y="134" font-size="11.5" fill="#e2e8f0">strat_20260414_0002_…</text>
+        <text x="20" y="152" font-size="11.5" fill="#f472b6">metric:</text><text x="80" y="152" font-size="11.5" fill="#86efac">"return_pct=-0.86 trades=292"</text>
+        <text x="20" y="170" font-size="11.5" fill="#f472b6">links:</text>
+        <text x="40" y="188" font-size="11.5" fill="#e2e8f0">- </text><text x="56" y="188" font-size="11.5" fill="#60a5fa">"[[lesson_20260414_001_…]]"</text>
+        <text x="20" y="206" font-size="11.5" fill="#94a3b8">---</text>
+        <text x="20" y="234" font-size="12" font-weight="700" fill="#e2e8f0"># 제목</text>
+        <text x="20" y="254" font-size="11" fill="#cbd5e1">Observation: …</text>
+        <text x="20" y="270" font-size="11" fill="#cbd5e1">Why: …</text>
+        <text x="20" y="286" font-size="11" fill="#cbd5e1">How to apply next: …</text>
+      </g>
+
+      <!-- arrow to graph -->
+      <g fill="none" stroke="#9333ea" stroke-width="2" marker-end="url(#arrow3)">
+        <path d="M 380 180 Q 430 180 470 180"/>
+      </g>
+      <text x="425" y="170" font-size="11" font-family="system-ui" fill="#9333ea" text-anchor="middle" font-weight="600">parse</text>
+      <text x="425" y="198" font-size="10" font-family="system-ui" fill="#6b7280" text-anchor="middle">graph.py</text>
+
+      <!-- graph nodes right -->
+      <g font-family="system-ui">
+        <!-- lesson_002 node -->
+        <g transform="translate(500,80)">
+          <circle cx="80" cy="40" r="38" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+          <text x="80" y="36" font-size="10" text-anchor="middle" font-weight="700" fill="#1e3a8a">lesson_</text>
+          <text x="80" y="48" font-size="10" text-anchor="middle" font-weight="700" fill="#1e3a8a">20260414</text>
+          <text x="80" y="60" font-size="10" text-anchor="middle" font-weight="700" fill="#1e3a8a">_002</text>
+        </g>
+
+        <!-- edge -->
+        <g fill="none" stroke="#9333ea" stroke-width="2" marker-end="url(#arrow3)">
+          <line x1="580" y1="132" x2="580" y2="218"/>
+        </g>
+        <text x="594" y="178" font-size="11" fill="#6b21a8" font-weight="600">links</text>
+
+        <!-- lesson_001 node -->
+        <g transform="translate(500,220)">
+          <circle cx="80" cy="40" r="38" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+          <text x="80" y="36" font-size="10" text-anchor="middle" font-weight="700" fill="#78350f">lesson_</text>
+          <text x="80" y="48" font-size="10" text-anchor="middle" font-weight="700" fill="#78350f">20260414</text>
+          <text x="80" y="60" font-size="10" text-anchor="middle" font-weight="700" fill="#78350f">_001</text>
+        </g>
+
+        <!-- side description -->
+        <g transform="translate(680,70)" font-size="11.5" fill="#475569">
+          <text y="0" font-weight="700" fill="#1e3a8a">lesson_002</text>
+          <text y="16">"edge 부족"</text>
+          <text y="30" font-size="10" fill="#94a3b8">(2026-04-14 · 292 trades)</text>
+        </g>
+        <g transform="translate(680,230)" font-size="11.5" fill="#475569">
+          <text y="0" font-weight="700" fill="#78350f">lesson_001</text>
+          <text y="16">"abs spread 필터"</text>
+          <text y="30" font-size="10" fill="#94a3b8">(2026-04-14 · 334 trades)</text>
+        </g>
+      </g>
+    </svg>
+    <div class="caption">[그림 4] frontmatter를 가진 레슨 MD 파일이 networkx 그래프 노드/엣지로 변환되는 예시</div>
+  </div>
+
+  <h3>그래프 CLI</h3>
+<pre><code>python knowledge/graph.py build                          <span class="cm"># 인덱스 재구축</span>
+python knowledge/graph.py stats                          <span class="cm"># 노드/엣지/태그 통계</span>
+python knowledge/graph.py neighbors &lt;lesson_id&gt;          <span class="cm"># 인접 노드</span>
+python knowledge/graph.py related &lt;keyword&gt;              <span class="cm"># 키워드 주변 서브그래프</span>
+python knowledge/graph.py path &lt;id1&gt; &lt;id2&gt;               <span class="cm"># 최단 경로</span>
+python knowledge/graph.py orphans                        <span class="cm"># 고립 노드</span></code></pre>
+
+  <!-- ==================== 검증 결과 ==================== -->
+  <h2>8. end-to-end 검증 결과</h2>
+  <p>Phase 7에서 실제로 두 이터레이션을 돌려, <b>피드백 → 레슨 → 다음 이터레이션 반영</b>의 전체 경로가 동작함을 확인했습니다.</p>
+  <table>
+    <thead><tr><th>iter</th><th>strategy</th><th>return_pct</th><th>trades</th><th>fees</th><th>핵심 학습</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><code>obi_momentum_tight</code></td><td>−0.79%</td><td>334</td><td>64,476</td><td>절대 KRW 스프레드 필터 → 000660이 아예 거래 0회 <span class="badge warn">문제 발견</span></td></tr>
+      <tr><td>2</td><td><code>obi_momentum_bps</code></td><td>−0.86%</td><td>292</td><td>65,405</td><td>bps 필터 + 신규 <code>spread_bps</code> primitive → 000660 정상 참여 <span class="badge ok">레슨 반영 성공</span></td></tr>
+    </tbody>
+  </table>
+  <p>두 전략 모두 음수 수익률이지만, 이는 <b>프레임워크</b>의 문제가 아니라 <i>해당 전략 자체가 spread+fee를 못 이긴다</i>는 걸 정확히 감지·기록한 결과입니다. 레슨은 <code>knowledge/lessons/</code>에 저장되어 다음 이터레이션의 ideator가 참조합니다.</p>
+
+  <!-- ==================== 확장 포인트 ==================== -->
+  <h2>9. 확장 포인트 / 백로그</h2>
+  <div class="grid2">
+    <div class="card">
+      <h4>Resting limit + queue model</h4>
+      <p>현재 taker-only. 체결 프린트 데이터를 통합해 큐 포지션 모델을 구현하면 maker-side 전략까지 확장 가능.</p>
+    </div>
+    <div class="card">
+      <h4>qlib 엄밀성 체크리스트</h4>
+      <p>walk-forward, 룩어헤드 방지, out-of-sample 검증을 <code>metrics.py</code>에 후처리 단계로 연결.</p>
+    </div>
+    <div class="card">
+      <h4>Multi-day rollover</h4>
+      <p>현재 spec.universe.dates는 리스트로 지원되나, overnight 포지션 처리 정책이 아직 단순함. 전일 청산 / 전일 유지 옵션 필요.</p>
+    </div>
+    <div class="card">
+      <h4>심볼별 파라미터 오버라이드</h4>
+      <p>현 spec은 모든 종목에 동일 threshold 적용. 종목별 정규화 임계값을 허용하면 유니버스 확장 시 유리.</p>
+    </div>
+  </div>
+
+  <footer>
+    생성: 2026-04-14 · Claude Code 프레임워크 자체 검증 기준 · 편집은 <code>docs/overview.html</code> 직접 수정
+  </footer>
+</div>
+</body>
+</html>
