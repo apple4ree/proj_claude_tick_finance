@@ -4,6 +4,8 @@ created: 2026-04-14T07:40:11
 tags: [lesson, overtrading, entry-saturation, regime-descriptor, mode-d, fees, microprice]
 source: strat_20260414_0012_microprice_flat_onset_v1
 metric: "return_pct=-42.1 trades=1805 fees=3483652"
+links:
+  - "[[pattern_spec_calibration_failure_wastes_iteration]]"
 ---
 
 # Mode D overtrading: loose entry condition saturates on regime-dominated days

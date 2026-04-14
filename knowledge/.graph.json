@@ -88,7 +88,9 @@
         "dsl",
         "spread",
         "distribution",
-        "imbalance"
+        "imbalance",
+        "overtrading",
+        "mode-d"
       ],
       "title": "pattern_spec_calibration_failure_wastes_iteration",
       "source": null,
@@ -154,6 +156,68 @@
       "title": "lesson_20260414_008_signal_threshold_outside_observed_distribution_fires_zero_ticks_mode_c_calibration_failure",
       "source": "strat_20260414_0010_imbalance_exhaustion_fade",
       "metric": "return_pct=0.0 trades=0 fees=0.0"
+    },
+    {
+      "id": "lesson_20260414_009_surface_depth_obi_divergence_enters_after_absorption_not_before",
+      "path": "knowledge/lessons/lesson_20260414_009_surface_depth_obi_divergence_enters_after_absorption_not_before.md",
+      "tags": [
+        "lesson",
+        "obi",
+        "surface-depth",
+        "signal-timing",
+        "absorption",
+        "anti-edge",
+        "lob"
+      ],
+      "title": "lesson_20260414_009_surface_depth_obi_divergence_enters_after_absorption_not_before",
+      "source": "strat_20260414_0011_obi_surface_depth_divergence_momentum",
+      "metric": "return_pct=-1.4753 trades=56 fees=108233 win_rate=0 sharpe=-3.84"
+    },
+    {
+      "id": "pattern_lob_signal_fires_after_absorption",
+      "path": "knowledge/patterns/pattern_lob_signal_fires_after_absorption.md",
+      "tags": [
+        "pattern",
+        "lob",
+        "signal-timing",
+        "absorption",
+        "anti-edge",
+        "obi"
+      ],
+      "title": "pattern_lob_signal_fires_after_absorption",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "lesson_20260414_010_mode_d_overtrading_loose_entry_condition_saturates_on_regime_dominated_days",
+      "path": "knowledge/lessons/lesson_20260414_010_mode_d_overtrading_loose_entry_condition_saturates_on_regime_dominated_days.md",
+      "tags": [
+        "lesson",
+        "overtrading",
+        "entry-saturation",
+        "regime-descriptor",
+        "mode-d",
+        "fees",
+        "microprice"
+      ],
+      "title": "lesson_20260414_010_mode_d_overtrading_loose_entry_condition_saturates_on_regime_dominated_days",
+      "source": "strat_20260414_0012_microprice_flat_onset_v1",
+      "metric": "return_pct=-42.1 trades=1805 fees=3483652"
+    },
+    {
+      "id": "lesson_20260414_011_ideator_win_rate_optimism_lob_resilience_recovery_signal_was_anti_edge",
+      "path": "knowledge/lessons/lesson_20260414_011_ideator_win_rate_optimism_lob_resilience_recovery_signal_was_anti_edge.md",
+      "tags": [
+        "lesson",
+        "win-rate-estimate",
+        "lob-resilience",
+        "profit-target",
+        "signal-edge",
+        "korean-equities"
+      ],
+      "title": "lesson_20260414_011_ideator_win_rate_optimism_lob_resilience_recovery_signal_was_anti_edge",
+      "source": "strat_20260414_0013_price_dip_lob_resilience_recovery",
+      "metric": "return_pct=-2.5396 trades=28 fees=221958"
     }
   ],
   "edges": [
@@ -184,6 +248,34 @@
     {
       "src": "lesson_20260414_008_signal_threshold_outside_observed_distribution_fires_zero_ticks_mode_c_calibration_failure",
       "dst": "pattern_spec_calibration_failure_wastes_iteration"
+    },
+    {
+      "src": "lesson_20260414_009_surface_depth_obi_divergence_enters_after_absorption_not_before",
+      "dst": "pattern_lob_signal_fires_after_absorption"
+    },
+    {
+      "src": "pattern_lob_signal_fires_after_absorption",
+      "dst": "lesson_20260414_005_mean_reversion_entry_fires_after_reversal_exhausted_ret50_confirmation_too_late"
+    },
+    {
+      "src": "pattern_lob_signal_fires_after_absorption",
+      "dst": "lesson_20260414_007_lob_imbalance_acceleration_fires_at_peak_not_onset"
+    },
+    {
+      "src": "pattern_lob_signal_fires_after_absorption",
+      "dst": "lesson_20260414_009_surface_depth_obi_divergence_enters_after_absorption_not_before"
+    },
+    {
+      "src": "lesson_20260414_010_mode_d_overtrading_loose_entry_condition_saturates_on_regime_dominated_days",
+      "dst": "pattern_spec_calibration_failure_wastes_iteration"
+    },
+    {
+      "src": "lesson_20260414_011_ideator_win_rate_optimism_lob_resilience_recovery_signal_was_anti_edge",
+      "dst": "pattern_krx_fee_hurdle_dominates_tick_edge"
+    },
+    {
+      "src": "lesson_20260414_011_ideator_win_rate_optimism_lob_resilience_recovery_signal_was_anti_edge",
+      "dst": "pattern_lob_signal_fires_after_absorption"
     }
   ]
 }

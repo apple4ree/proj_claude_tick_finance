@@ -4,6 +4,8 @@ created: 2026-04-14T07:35:14
 tags: [lesson, obi, surface-depth, signal-timing, absorption, anti-edge, lob]
 source: strat_20260414_0011_obi_surface_depth_divergence_momentum
 metric: "return_pct=-1.4753 trades=56 fees=108233 win_rate=0 sharpe=-3.84"
+links:
+  - "[[pattern_lob_signal_fires_after_absorption]]"
 ---
 
 # surface-depth OBI divergence enters after absorption, not before

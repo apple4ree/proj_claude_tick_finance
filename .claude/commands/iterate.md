@@ -38,12 +38,40 @@ At each iteration boundary, decide which of these applies. Pick exactly one. (If
 
 Maintain an in-memory log of iteration outcomes. Do NOT re-read report.json files — use only the JSON each agent returns.
 
+Initialize at loop start:
+```
+consecutive_negative = 0     # 연속 return_pct < 0 카운트
+last_escape_seed = null      # 마지막으로 사용된 escape_seed
+paradigm_shift_pending = false
+seed_type = "meta"           # 첫 번째 이터레이션은 항상 "meta" (initial_seed)
+```
+
 ```
 for i in 1..N:
     state = summarize(log)            # brief, token-efficient
     action = decide_next_action(state, current_seed)
     result = execute(action)
-    log.append({iter: i, action: action.type, result: result.summary})
+
+    # --- output verification (run after each agent in new_strategy path) ---
+    # After spec-writer:
+    #   vfy = Bash("python scripts/verify_outputs.py --agent spec-writer --output '<spec_writer_json>'")
+    #   if not vfy.ok: abort iteration, log failures, do NOT run backtest
+    #
+    # After backtest-runner:
+    #   vfy = Bash("python scripts/verify_outputs.py --agent backtest-runner --output '<backtest_json>'")
+    #   if vfy.warnings contains "n_trades=0": skip feedback-analyst, go to next seed
+    #   if vfy.warnings contains "n_roundtrips=...Mode D": log warning, continue to feedback
+    #
+    # After feedback-analyst:
+    #   vfy = Bash("python scripts/verify_outputs.py --agent feedback-analyst --output '<feedback_json>'")
+    #   if vfy.warnings (missing local_seed/escape_seed): note in log, use next_idea_seed as fallback
+    #
+    # After meta-reviewer:
+    #   vfy = Bash("python scripts/verify_outputs.py --agent meta-reviewer --output '<meta_json>'")
+    #   if not vfy.ok: log failures (claimed file edits didn't happen)
+    # -----------------------------------------------------------------------
+
+    log.append({iter: i, action: action.type, seed_type: seed_type, result: result.summary})
 
     # anomaly routing
     if result.anomaly_flag:
@@ -52,7 +80,15 @@ for i in 1..N:
     # meta cadence
     if i % K == 0 and i < N:
         mr = invoke meta-reviewer with log
-        current_seed = mr.meta_seed
+        # paradigm_shift 라우팅
+        if mr.action_taken.type == "paradigm_shift":
+            paradigm_shift_pending = true
+            current_seed = mr.meta_seed
+            seed_type = "paradigm"
+        else:
+            current_seed = mr.meta_seed
+            seed_type = "meta"
+        continue  # seed_type 이미 설정됨
 
     # stop conditions
     if all of:
@@ -61,7 +97,27 @@ for i in 1..N:
         - meta-reviewer.action_taken.type == "none"
       then break  # genuinely saturated
 
-    current_seed = result.next_seed or meta_seed
+    # seed 선택 로직 (new_strategy 이터레이션만 해당)
+    feedback = result.feedback  # feedback-analyst output
+
+    if result.return_pct is not null:
+        if result.return_pct < 0:
+            consecutive_negative += 1
+        else:
+            consecutive_negative = 0
+
+    if consecutive_negative >= 2:
+        current_seed = feedback.escape_seed
+        last_escape_seed = current_seed
+        consecutive_negative = 0   # escape 시도 후 리셋
+        seed_type = "escape"
+    elif paradigm_shift_pending:
+        current_seed = meta_reviewer.meta_seed
+        paradigm_shift_pending = false
+        seed_type = "paradigm"
+    else:
+        current_seed = feedback.local_seed or feedback.next_idea_seed
+        seed_type = "local"
 ```
 
 ## Stopping conditions (STRICT)
@@ -90,12 +146,13 @@ Also stop on:
 {
   "iterations_run": <n>,
   "action_histogram": {"new_strategy": <n>, "engine_fix": <n>, "dsl_extension": <n>, "pattern_consolidation": <n>, "meta_review": <n>},
+  "seed_histogram": {"local": <n>, "escape": <n>, "paradigm": <n>, "meta": <n>},
   "stopped_reason": "completed | saturated_confirmed | consecutive_errors | user_interrupt",
   "framework_changes": [
     {"iter": <i>, "type": "<type>", "files": ["..."], "justification": "..."}
   ],
   "strategies": [
-    {"iter": <i>, "strategy_id": "...", "return_pct": ..., "n_trades": ...}
+    {"iter": <i>, "strategy_id": "...", "return_pct": ..., "n_trades": ..., "seed_type": "local | escape | paradigm | meta"}
   ],
   "best": {"strategy_id": "...", "return_pct": ...},
   "knowledge_delta": {
