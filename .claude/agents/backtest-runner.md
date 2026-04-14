@@ -1,6 +1,6 @@
 ---
 name: backtest-runner
-description: Execute a spec backtest via engine.runner and return only the key metrics. Token-minimal wrapper — never prints per_symbol by default.
+description: Execute a spec backtest via engine.runner and return only the key metrics. Token-minimal wrapper. Uses per-symbol mode automatically when spec has multiple symbols.
 tools: Bash
 model: haiku
 ---
@@ -13,19 +13,60 @@ A `strategy_id` (directory name under `strategies/`).
 
 ## Workflow
 
+**Step 1 — detect mode**: read the first few lines of `strategies/<strategy_id>/spec.yaml` to check `universe.symbols`.
+
+```bash
+grep -A2 "symbols" strategies/<strategy_id>/spec.yaml
+```
+
+**Step 2 — run backtest**:
+
+- If `symbols` contains `"top10"`, `"*"`, or **more than 1 symbol**: use `--per-symbol` mode:
+
+```bash
+python -m engine.runner \
+  --spec strategies/<strategy_id>/spec.yaml \
+  --per-symbol --summary
+```
+
+This writes `report_per_symbol.json` and prints aggregate JSON to stdout.
+
+- If `symbols` has exactly **1 symbol**: use standard mode:
+
 ```bash
 python -m engine.runner \
   --spec strategies/<strategy_id>/spec.yaml \
   --summary
 ```
 
-The runner always writes `strategies/<strategy_id>/report.json`, `trace.json`, and `report.html` as side effects — you don't need `--out`. The `--summary` flag prints the same JSON to stdout.
+This writes `report.json` and prints the full JSON to stdout.
 
-Parse the stdout JSON (do NOT re-read `report.json`, and do NOT read `trace.json` or `report.html` — those are for humans/meta-reviewer).
+Parse the stdout JSON directly — do NOT re-read any report file.
 
 ## Output (JSON only)
 
-Return exactly these fields, nothing else:
+**Per-symbol mode** — return these fields:
+
+```json
+{
+  "strategy_id": "<id>",
+  "spec_name": "<...>",
+  "mode": "per_symbol",
+  "n_symbols_traded": <int>,
+  "n_symbols_skipped": <int>,
+  "avg_return_pct": <float>,
+  "total_roundtrips": <int>,
+  "pooled_win_rate_pct": <float>,
+  "total_fees": <float>,
+  "duration_sec": <float>,
+  "anomaly_flag": "<null | description>",
+  "per_symbol_summary": "<top 3 best and worst symbols as compact string>"
+}
+```
+
+For `per_symbol_summary`, format as: `"best: 005930=+0.12%, 005380=+0.05% | worst: 000660=-0.31%, 034020=-0.18%"`.
+
+**Standard mode** — return these fields:
 
 ```json
 {
@@ -48,25 +89,22 @@ Return exactly these fields, nothing else:
   "n_partial_fills": <int>,
   "pending_at_end": <int>,
   "rejected": {"cash": <int>, "short": <int>, "no_liquidity": <int>, "non_marketable": <int>},
-  "report_html": "<path to strategies/<id>/report.html>",
+  "report_html": "<path>",
   "duration_sec": <float>,
-  "anomaly_flag": "<null | short description if any guard counter > 0>"
+  "anomaly_flag": "<null | description>"
 }
 ```
 
-Set `anomaly_flag` to a one-sentence description when ANY of these are true (orchestrator uses this to route to code-generator or meta-reviewer):
-- Any field in `rejected` is > 0
+Set `anomaly_flag` when ANY of these are true:
+- Any `rejected` counter > 0
 - `n_partial_fills` > 0
 - `pending_at_end` > 0
-- `duration_sec` > 60 (runaway)
-
-Examples: `"rejected.cash=12 — strategy exceeds starting_cash; narrow universe or increase capital"`, `"pending_at_end=3 — orders at EOD cannot match; check exit timing"`.
+- `duration_sec` > 300 (per-symbol runs can take a few minutes — flag only if > 5 min total)
 
 On error, output `{"strategy_id": "<id>", "error": "<first line of traceback>"}`.
 
 ## Hard constraints
 
-- NEVER output `per_symbol` unless the caller explicitly requests it.
-- NEVER read `report.json` — the `--summary` flag already gives you the data.
-- If the runner hangs beyond ~120s, abort with `{"error": "timeout"}`.
-- Do NOT modify any files.
+- NEVER re-read `report.json` or `report_per_symbol.json` — stdout JSON is authoritative.
+- NEVER modify any files.
+- Per-symbol timeout: allow up to 600s (10 symbols × ~60s each). If exceeded, abort with `{"error": "timeout"}`.

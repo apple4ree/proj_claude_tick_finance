@@ -4,9 +4,13 @@ Self-contained matching engine, fee/latency model, portfolio bookkeeper,
 and backtester orchestrator. Built for H0STASP0 10-level order book data.
 
 Design decisions (Phase 3):
-- **Taker-only** orders (MARKET or marketable LIMIT). Resting limit orders
-  require a queue-position model that tick data alone cannot support
-  faithfully; deferred until real trade-print data is integrated.
+- **Limit orders**: MARKET and LIMIT both supported.
+  - Marketable LIMIT: filled immediately (taker, walks book).
+  - Non-marketable LIMIT: queued as a resting order; filled when (a) price
+    crosses the limit AND (b) estimated queue_ahead reaches 0.  queue_ahead
+    is initialised to the LOB depth at the order's price level (back-of-queue)
+    and decremented each tick by the observed depth decrease at that level.
+  - Resting limits cancelled at EOD and counted in n_resting_cancelled.
 - **Latency**: orders submitted at tick T are matched against the order
   book at the first tick whose ts >= T + submit_latency. No lookahead.
 - **Fee model**: KRX — commission (bps, both sides) + transaction tax
@@ -233,6 +237,35 @@ class _PendingOrder:
     order: Order
 
 
+@dataclass
+class _RestingOrder:
+    """A non-marketable LIMIT order waiting for price to cross its limit.
+
+    queue_ahead tracks the estimated number of shares ahead of this order
+    in the queue at its price level.  Initialised to the full LOB depth at
+    that level (back-of-queue).  Decremented each tick by the decrease in
+    LOB depth at that level (proxy for queue consumption via trades/cancels).
+    The order only fills once queue_ahead <= 0 AND the price becomes
+    marketable.
+    """
+    order: Order
+    queue_ahead: int      # estimated units still ahead of us
+    prev_level_qty: int   # LOB qty at our price level on the previous tick
+
+
+def _level_qty(snap: "OrderBookSnapshot", side: str, price: int) -> int:
+    """Return the displayed LOB quantity at `price` on the given side, or 0."""
+    prices = snap.bid_px if side == BUY else snap.ask_px
+    qtys   = snap.bid_qty if side == BUY else snap.ask_qty
+    for i in range(len(prices)):
+        p = int(prices[i])
+        if p <= 0:
+            break
+        if p == price:
+            return int(qtys[i])
+    return 0
+
+
 class Backtester:
     def __init__(
         self,
@@ -247,7 +280,10 @@ class Backtester:
         self.config = config or BacktestConfig()
         self.portfolio = Portfolio(starting_cash=self.config.starting_cash)
         self.pending: list[_PendingOrder] = []
+        self.resting_limits: list[_RestingOrder] = []  # non-marketable LIMITs with queue model
+        self.n_resting_cancelled: int = 0              # resting limits cancelled at EOD
         self.last_mids: dict[str, float] = {}
+        self.last_bids: dict[str, float] = {}   # best bid px at last observed tick per symbol
         self.per_symbol: dict[str, SymbolResult] = {s: SymbolResult(symbol=s) for s in self.symbols}
         self.total_events = 0
         # Principle-enforcement counters
@@ -277,8 +313,14 @@ class Backtester:
             order = p.order
 
             if order.order_type == LIMIT and not is_marketable(snap, order.side, order.limit_price):
-                # Taker-only simplification: drop non-marketable limits.
-                self.rejected["non_marketable"] += 1
+                # Non-marketable: queue as resting order with back-of-queue initialisation.
+                # queue_ahead = current LOB depth at our price level (all orders placed
+                # before ours at the same price).  0 if our price isn't in the book yet
+                # (e.g. a SELL LIMIT far above market where we may be first in queue).
+                lq = _level_qty(snap, order.side, order.limit_price)
+                self.resting_limits.append(
+                    _RestingOrder(order=order, queue_ahead=lq, prev_level_qty=lq)
+                )
                 continue
 
             # Pre-matching inventory check for SELLs: long-only — no naked shorts.
@@ -318,14 +360,121 @@ class Backtester:
             self.portfolio.apply_fill(fill)
         self.pending = still
 
+    def _check_resting_limits(self, snap: OrderBookSnapshot) -> None:
+        """Advance queue model and fill resting limit orders when conditions are met.
+
+        Queue model (back-of-queue, LOB-depth proxy):
+          - queue_ahead initialised at order submission to the full LOB depth at the
+            order's price level on the same side (BUY → bid depth, SELL → ask depth).
+            If the price level isn't in the book yet (e.g. SELL LIMIT far above market),
+            queue_ahead = 0 and the order fills as soon as price crosses.
+          - Each tick, queue_ahead is decremented by the decrease in LOB depth at that
+            price level since the previous tick (proxy for queue consumption by trades /
+            cancellations).
+          - Fill condition: queue_ahead <= 0  AND  is_marketable.
+          - Fill price = limit_price (maker, no book walk).
+        """
+        if not self.resting_limits:
+            return
+        remaining: list[_RestingOrder] = []
+        for ro in self.resting_limits:
+            order = ro.order
+            if order.symbol != snap.symbol:
+                remaining.append(ro)
+                continue
+
+            # --- Update queue_ahead via LOB depth change at our price level ---
+            curr_qty = _level_qty(snap, order.side, order.limit_price)
+            depth_drop = ro.prev_level_qty - curr_qty
+            if depth_drop > 0:
+                ro.queue_ahead = max(0, ro.queue_ahead - depth_drop)
+            ro.prev_level_qty = curr_qty
+
+            # --- Check fill conditions ---
+            if not is_marketable(snap, order.side, order.limit_price):
+                remaining.append(ro)
+                continue
+            if ro.queue_ahead > 0:
+                remaining.append(ro)
+                continue
+
+            # Fill at limit_price (maker, no book walk)
+            filled_qty = order.qty
+            avg_px = float(order.limit_price)
+
+            if order.side == SELL:
+                pos = self.portfolio.positions.get(order.symbol)
+                pos_qty = pos.qty if pos else 0
+                if pos_qty < filled_qty:
+                    self.rejected["short"] += 1
+                    continue
+
+            fee = self.config.fee_model.compute(order.side, filled_qty, avg_px)
+
+            if order.side == BUY:
+                cost = filled_qty * avg_px + fee
+                if cost > self.portfolio.cash:
+                    self.rejected["cash"] += 1
+                    continue
+
+            fill = Fill(
+                ts_ns=snap.ts_ns,
+                symbol=order.symbol,
+                side=order.side,
+                qty=filled_qty,
+                avg_price=avg_px,
+                fee=fee,
+                tag=order.tag,
+            )
+            self.portfolio.apply_fill(fill)
+        self.resting_limits = remaining
+
+    def _eod_close(self, last_ts_ns: int) -> None:
+        """Force-close all open long positions at end of day.
+
+        Cancels pending orders first, then creates synthetic fills at the last
+        known best-bid price for every symbol with qty > 0 (bid side used
+        because a forced market sell hits the bid, not the mid).  Falls back
+        to mid only when no bid was observed.  Tagged 'exit_eod' so reports
+        can distinguish forced closes from strategy-driven exits.
+        """
+        # Cancel all queued but unfilled orders — they are stale at EOD.
+        self.pending.clear()
+        self.n_resting_cancelled += len(self.resting_limits)
+        self.resting_limits.clear()
+
+        for symbol, pos in list(self.portfolio.positions.items()):
+            if pos.qty <= 0:
+                continue
+            # Use best bid (not mid) — forced market sell hits the bid side,
+            # not the theoretical mid.  Fallback to mid only when bid is absent.
+            exit_px = self.last_bids.get(symbol) or self.last_mids.get(symbol)
+            if exit_px is None:
+                continue
+            fee = self.config.fee_model.compute(SELL, pos.qty, exit_px)
+            fill = Fill(
+                ts_ns=last_ts_ns,
+                symbol=symbol,
+                side=SELL,
+                qty=pos.qty,
+                avg_price=exit_px,
+                fee=fee,
+                tag="exit_eod",
+            )
+            self.portfolio.apply_fill(fill)
+
     def run(self) -> BacktestReport:
         import time
         t0 = time.time()
         trace_every = max(1, int(self.config.trace_every))
         for date in self.dates:
+            last_ts_ns: int = 0
             for snap in iter_events(date, self.symbols, regular_only=self.config.regular_only):
                 self.total_events += 1
                 self.last_mids[snap.symbol] = snap.mid
+                bid0 = float(snap.bid_px[0]) if snap.bid_px[0] > 0 else snap.mid
+                self.last_bids[snap.symbol] = bid0
+                last_ts_ns = snap.ts_ns
 
                 sr = self.per_symbol[snap.symbol]
                 if sr.n_events == 0:
@@ -337,6 +486,8 @@ class Backtester:
 
                 # 1) settle any orders whose latency window has elapsed
                 self._match_pending(snap)
+                # 1b) check resting limit orders for price-crossing fills
+                self._check_resting_limits(snap)
 
                 # 2) let strategy observe tick
                 ctx = Context(
@@ -358,6 +509,10 @@ class Backtester:
                         (snap.ts_ns, float(snap.mid))
                     )
 
+            # End-of-day: force-close all open positions before next date.
+            if last_ts_ns:
+                self._eod_close(last_ts_ns)
+
         # Realize per-symbol results
         for sym, sr in self.per_symbol.items():
             pos = self.portfolio.positions.get(sym)
@@ -378,6 +533,7 @@ class Backtester:
         report.duration_sec = time.time() - t0
         report.n_partial_fills = self.n_partial_fills
         report.pending_at_end = len(self.pending)
+        report.n_resting_cancelled = self.n_resting_cancelled
         report.rejected = dict(self.rejected)
         return report
 

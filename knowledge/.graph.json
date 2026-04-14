@@ -218,6 +218,310 @@
       "title": "lesson_20260414_011_ideator_win_rate_optimism_lob_resilience_recovery_signal_was_anti_edge",
       "source": "strat_20260414_0013_price_dip_lob_resilience_recovery",
       "metric": "return_pct=-2.5396 trades=28 fees=221958"
+    },
+    {
+      "id": "lesson_20260414_012_two_stage_state_machine_over_qualifies_entry_near_zero_trade_count_makes_signal_unvalidatable",
+      "path": "knowledge/lessons/lesson_20260414_012_two_stage_state_machine_over_qualifies_entry_near_zero_trade_count_makes_signal_unvalidatable.md",
+      "tags": [
+        "lesson",
+        "low-trade-count",
+        "state-machine",
+        "entry-filter",
+        "over-qualification",
+        "signal-rarity"
+      ],
+      "title": "lesson_20260414_012_two_stage_state_machine_over_qualifies_entry_near_zero_trade_count_makes_signal_unvalidatable",
+      "source": "strat_20260414_0014_vol_burst_obi_cross_momentum",
+      "metric": "return_pct=-0.3741 trades=4 fees=23408.7"
+    },
+    {
+      "id": "lesson_20260414_013_obi_sign_flip_long_only_fee_math_kills_positive_ev_at_30_20_bps_targets",
+      "path": "knowledge/lessons/lesson_20260414_013_obi_sign_flip_long_only_fee_math_kills_positive_ev_at_30_20_bps_targets.md",
+      "tags": [
+        "lesson",
+        "obi",
+        "fee_math",
+        "win_rate",
+        "breakeven",
+        "long_only",
+        "sign_flip"
+      ],
+      "title": "lesson_20260414_013_obi_sign_flip_long_only_fee_math_kills_positive_ev_at_30_20_bps_targets",
+      "source": "strat_20260414_0015_obi_flip_long_only_v1",
+      "metric": "return_pct=-10.83 trades=402 fees=904448"
+    },
+    {
+      "id": "lesson_20260414_014_mean_reversion_at_15_30_min_timescale_is_anti_edge_with_18_win_rate_and_oversized_lots_causing_cash_rejections",
+      "path": "knowledge/lessons/lesson_20260414_014_mean_reversion_at_15_30_min_timescale_is_anti_edge_with_18_win_rate_and_oversized_lots_causing_cash_rejections.md",
+      "tags": [
+        "lesson",
+        "mean-reversion",
+        "anti-edge",
+        "lot-sizing",
+        "cash-rejection",
+        "negative-ev",
+        "krx"
+      ],
+      "title": "lesson_20260414_014_mean_reversion_at_15_30_min_timescale_is_anti_edge_with_18_win_rate_and_oversized_lots_causing_cash_rejections",
+      "source": "strat_20260414_0016_rolling_mean_reversion_escape",
+      "metric": "return_pct=-8.0244 trades=144 fees=629942.9"
+    },
+    {
+      "id": "lesson_20260414_015_trailing_stop_prematurely_exits_momentum_winners_before_profit_target",
+      "path": "knowledge/lessons/lesson_20260414_015_trailing_stop_prematurely_exits_momentum_winners_before_profit_target.md",
+      "tags": [
+        "lesson",
+        "trailing_stop",
+        "exit_management",
+        "momentum",
+        "winner_cutting",
+        "005930"
+      ],
+      "title": "lesson_20260414_015_trailing_stop_prematurely_exits_momentum_winners_before_profit_target",
+      "source": "strat_20260414_0017_momentum_continuation_1000t_long",
+      "metric": "return_pct=-0.2067 trades=46 fees=9365.6 win_rate=21.7"
+    },
+    {
+      "id": "pattern_win_rate_ceiling_mandates_hold_duration",
+      "path": "knowledge/patterns/pattern_win_rate_ceiling_mandates_hold_duration.md",
+      "tags": [
+        "pattern",
+        "win-rate-estimate",
+        "fees",
+        "hold-time",
+        "anti-edge",
+        "krx",
+        "methodology",
+        "breakeven",
+        "oracle"
+      ],
+      "title": "pattern_win_rate_ceiling_mandates_hold_duration",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "lesson_20260414_016_rolling_high_breakout_enters_at_local_top_structural_exhaustion_signal",
+      "path": "knowledge/lessons/lesson_20260414_016_rolling_high_breakout_enters_at_local_top_structural_exhaustion_signal.md",
+      "tags": [
+        "lesson",
+        "rolling-breakout",
+        "exhaustion",
+        "anti-edge",
+        "momentum",
+        "005930",
+        "signal-timing",
+        "local-top"
+      ],
+      "title": "lesson_20260414_016_rolling_high_breakout_enters_at_local_top_structural_exhaustion_signal",
+      "source": "strat_20260414_0018_rolling_high_breakout_005930_escape8",
+      "metric": "return_pct=-0.5757 trades=132 fees=26923.8 win_rate=12.1"
+    },
+    {
+      "id": "pattern_all_directional_entries_fire_at_exhaustion",
+      "path": "knowledge/patterns/pattern_all_directional_entries_fire_at_exhaustion.md",
+      "tags": [
+        "pattern"
+      ],
+      "title": "pattern_all_directional_entries_fire_at_exhaustion",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "lesson_20260414_017_all_transition_based_entry_signals_fire_at_informationally_neutral_points",
+      "path": "knowledge/lessons/lesson_20260414_017_all_transition_based_entry_signals_fire_at_informationally_neutral_points.md",
+      "tags": [
+        "lesson",
+        "entry-signal",
+        "exhaustion",
+        "transition",
+        "equilibrium",
+        "fsm"
+      ],
+      "title": "lesson_20260414_017_all_transition_based_entry_signals_fire_at_informationally_neutral_points",
+      "source": "strat_20260414_0019_recovery_onset_fsm_500",
+      "metric": "return_pct=-0.4055 trades=114 fees=23254"
+    },
+    {
+      "id": "lesson_20260414_018_hold_all_day_open_entry_23pct_win_rate_invalidates_pre_pattern_60pct_oracle_projection",
+      "path": "knowledge/lessons/lesson_20260414_018_hold_all_day_open_entry_23pct_win_rate_invalidates_pre_pattern_60pct_oracle_projection.md",
+      "tags": [
+        "lesson",
+        "hold_all_day",
+        "trailing_stop",
+        "win_rate_projection",
+        "oracle_failure",
+        "no_liquidity",
+        "005930",
+        "pattern_reliability"
+      ],
+      "title": "lesson_20260414_018_hold_all_day_open_entry_23pct_win_rate_invalidates_pre_pattern_60pct_oracle_projection",
+      "source": "strat_20260414_0020_hold_all_day_trailing_stop_005930",
+      "metric": "return_pct=-0.2106 trades=26 fees=10563.5 win_rate=23.1 anomaly=rejected.no_liquidity=8"
+    },
+    {
+      "id": "pattern_exit_path_distorts_win_rate_bps_required",
+      "path": "knowledge/patterns/pattern_exit_path_distorts_win_rate_bps_required.md",
+      "tags": [
+        "pattern",
+        "win_rate",
+        "breakeven",
+        "exit_management",
+        "time_exit",
+        "resting_limit",
+        "fee_math",
+        "methodology"
+      ],
+      "title": "pattern_exit_path_distorts_win_rate_bps_required",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "lesson_20260414_019_resting_limit_win_rate_counts_time_exits_as_wins_distorting_breakeven_math",
+      "path": "knowledge/lessons/lesson_20260414_019_resting_limit_win_rate_counts_time_exits_as_wins_distorting_breakeven_math.md",
+      "tags": [
+        "lesson",
+        "win_rate",
+        "time_exit",
+        "resting_limit",
+        "breakeven_math",
+        "fee_math",
+        "exit_path"
+      ],
+      "title": "lesson_20260414_019_resting_limit_win_rate_counts_time_exits_as_wins_distorting_breakeven_math",
+      "source": "strat_20260414_0021_krx_wide_spread_resting_limit_directional",
+      "metric": "return_pct=-0.2357 trades=105 fees=111550"
+    },
+    {
+      "id": "lesson_20260414_020_symbol_heterogeneity_4_of_10_krx_symbols_structurally_below_win_rate_breakeven",
+      "path": "knowledge/lessons/lesson_20260414_020_symbol_heterogeneity_4_of_10_krx_symbols_structurally_below_win_rate_breakeven.md",
+      "tags": [
+        "lesson",
+        "universe-filter",
+        "win-rate",
+        "krx",
+        "resting-limit",
+        "symbol-heterogeneity"
+      ],
+      "title": "lesson_20260414_020_symbol_heterogeneity_4_of_10_krx_symbols_structurally_below_win_rate_breakeven",
+      "source": "strat_20260414_0022_krx_resting_limit_150bps_8000t",
+      "metric": "avg_return_pct=-0.0226 pooled_win_rate_pct=32.73 total_fees=25641.68 n_symbols=10"
+    },
+    {
+      "id": "pattern_universe_filter_per_symbol_win_rate_screen",
+      "path": "knowledge/patterns/pattern_universe_filter_per_symbol_win_rate_screen.md",
+      "tags": [
+        "pattern",
+        "universe",
+        "krx",
+        "win-rate",
+        "symbol-heterogeneity",
+        "methodology",
+        "breakeven"
+      ],
+      "title": "pattern_universe_filter_per_symbol_win_rate_screen",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "lesson_20260414_021_time_exit_suppresses_avg_win_bps_below_resting_limit_target",
+      "path": "knowledge/lessons/lesson_20260414_021_time_exit_suppresses_avg_win_bps_below_resting_limit_target.md",
+      "tags": [
+        "lesson",
+        "time_exit",
+        "resting_limit",
+        "avg_win_bps",
+        "payoff_asymmetry",
+        "krx"
+      ],
+      "title": "lesson_20260414_021_time_exit_suppresses_avg_win_bps_below_resting_limit_target",
+      "source": "strat_20260414_0023_krx_resting_limit_150bps_6sym",
+      "metric": "return_pct=-0.0076 trades=30 fees=15189.47 avg_win_bps=46.26 avg_loss_bps=-67.86 win_rate_pct=43.33"
+    },
+    {
+      "id": "lesson_20260414_022_removing_time_exit_unlocks_first_positive_return_let_resting_limits_breathe",
+      "path": "knowledge/lessons/lesson_20260414_022_removing_time_exit_unlocks_first_positive_return_let_resting_limits_breathe.md",
+      "tags": [
+        "lesson",
+        "time-exit",
+        "resting-limit",
+        "win-rate",
+        "krx",
+        "universe-filter",
+        "trade-count"
+      ],
+      "title": "lesson_20260414_022_removing_time_exit_unlocks_first_positive_return_let_resting_limits_breathe",
+      "source": "strat_20260414_0024_krx_resting_limit_no_time_exit",
+      "metric": "return_pct=0.0069 trades=30 fees=15206.49 win_rate_pct=40.0"
+    },
+    {
+      "id": "lesson_20260414_023_000660_concentration_masks_4_symbol_drag_pooled_avg_hides_a_2_symbol_viable_core",
+      "path": "knowledge/lessons/lesson_20260414_023_000660_concentration_masks_4_symbol_drag_pooled_avg_hides_a_2_symbol_viable_core.md",
+      "tags": [
+        "lesson",
+        "universe-filter",
+        "symbol-concentration",
+        432,
+        "005930",
+        "resting-limit",
+        "krx",
+        "win-rate",
+        "iteration-stagnation"
+      ],
+      "title": "lesson_20260414_023_000660_concentration_masks_4_symbol_drag_pooled_avg_hides_a_2_symbol_viable_core",
+      "source": "strat_20260414_0025_krx_resting_limit_5sym_spread18",
+      "metric": "return_pct=0.0065 trades=30 win_rate_pct=43.33 n_symbols=5"
+    },
+    {
+      "id": "lesson_20260414_024_tighter_obi_4x_return_gain_000660_payoff_magnitude_dwarfs_006800_revealing_lot_scale_asymmetry",
+      "path": "knowledge/lessons/lesson_20260414_024_tighter_obi_4x_return_gain_000660_payoff_magnitude_dwarfs_006800_revealing_lot_scale_asymmetry.md",
+      "tags": [
+        "lesson",
+        432,
+        "006800",
+        "lot-size",
+        "position-sizing",
+        "obi-threshold",
+        "universe-concentration",
+        "payoff-asymmetry",
+        "resting-limit",
+        "krx"
+      ],
+      "title": "lesson_20260414_024_tighter_obi_4x_return_gain_000660_payoff_magnitude_dwarfs_006800_revealing_lot_scale_asymmetry",
+      "source": "strat_20260414_0026_krx_resting_limit_2sym_obi35",
+      "metric": "return_pct=0.0262 trades=15 win_rate_pct=46.67 n_symbols=2"
+    },
+    {
+      "id": "pattern_005930_fee_incompatible_with_short_hold",
+      "path": "knowledge/patterns/pattern_005930_fee_incompatible_with_short_hold.md",
+      "tags": [
+        "pattern",
+        "fees",
+        "krx",
+        "oracle",
+        "breakeven",
+        "methodology",
+        "dataset",
+        "universe",
+        "anti-edge"
+      ],
+      "title": "pattern_005930_fee_incompatible_with_short_hold",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "is_oos_split",
+      "path": "knowledge/seeds/is_oos_split.md",
+      "tags": [
+        "seed",
+        "methodology",
+        "in-sample",
+        "out-of-sample",
+        "dates",
+        "universe"
+      ],
+      "title": "is_oos_split",
+      "source": null,
+      "metric": null
     }
   ],
   "edges": [
@@ -276,6 +580,130 @@
     {
       "src": "lesson_20260414_011_ideator_win_rate_optimism_lob_resilience_recovery_signal_was_anti_edge",
       "dst": "pattern_lob_signal_fires_after_absorption"
+    },
+    {
+      "src": "lesson_20260414_012_two_stage_state_machine_over_qualifies_entry_near_zero_trade_count_makes_signal_unvalidatable",
+      "dst": "pattern_spec_calibration_failure_wastes_iteration"
+    },
+    {
+      "src": "lesson_20260414_013_obi_sign_flip_long_only_fee_math_kills_positive_ev_at_30_20_bps_targets",
+      "dst": "pattern_krx_fee_hurdle_dominates_tick_edge"
+    },
+    {
+      "src": "lesson_20260414_013_obi_sign_flip_long_only_fee_math_kills_positive_ev_at_30_20_bps_targets",
+      "dst": "pattern_lob_signal_fires_after_absorption"
+    },
+    {
+      "src": "lesson_20260414_014_mean_reversion_at_15_30_min_timescale_is_anti_edge_with_18_win_rate_and_oversized_lots_causing_cash_rejections",
+      "dst": "pattern_krx_fee_hurdle_dominates_tick_edge"
+    },
+    {
+      "src": "lesson_20260414_015_trailing_stop_prematurely_exits_momentum_winners_before_profit_target",
+      "dst": "pattern_krx_fee_hurdle_dominates_tick_edge"
+    },
+    {
+      "src": "lesson_20260414_015_trailing_stop_prematurely_exits_momentum_winners_before_profit_target",
+      "dst": "pattern_win_rate_ceiling_mandates_hold_duration"
+    },
+    {
+      "src": "pattern_win_rate_ceiling_mandates_hold_duration",
+      "dst": "lesson_20260414_021_time_exit_suppresses_avg_win_bps_below_resting_limit_target"
+    },
+    {
+      "src": "pattern_win_rate_ceiling_mandates_hold_duration",
+      "dst": "lesson_20260414_022_removing_time_exit_unlocks_first_positive_return_let_resting_limits_breathe"
+    },
+    {
+      "src": "lesson_20260414_016_rolling_high_breakout_enters_at_local_top_structural_exhaustion_signal",
+      "dst": "pattern_all_directional_entries_fire_at_exhaustion"
+    },
+    {
+      "src": "lesson_20260414_016_rolling_high_breakout_enters_at_local_top_structural_exhaustion_signal",
+      "dst": "pattern_win_rate_ceiling_mandates_hold_duration"
+    },
+    {
+      "src": "pattern_all_directional_entries_fire_at_exhaustion",
+      "dst": "lesson_20260414_005_mean_reversion_entry_fires_after_reversal_exhausted_ret50_confirmation_too_late"
+    },
+    {
+      "src": "pattern_all_directional_entries_fire_at_exhaustion",
+      "dst": "lesson_20260414_007_lob_imbalance_acceleration_fires_at_peak_not_onset"
+    },
+    {
+      "src": "pattern_all_directional_entries_fire_at_exhaustion",
+      "dst": "lesson_20260414_009_surface_depth_obi_divergence_enters_after_absorption_not_before"
+    },
+    {
+      "src": "pattern_all_directional_entries_fire_at_exhaustion",
+      "dst": "lesson_20260414_011_ideator_win_rate_optimism_lob_resilience_recovery_signal_was_anti_edge"
+    },
+    {
+      "src": "pattern_all_directional_entries_fire_at_exhaustion",
+      "dst": "lesson_20260414_016_rolling_high_breakout_enters_at_local_top_structural_exhaustion_signal"
+    },
+    {
+      "src": "pattern_all_directional_entries_fire_at_exhaustion",
+      "dst": "lesson_20260414_017_all_transition_based_entry_signals_fire_at_informationally_neutral_points"
+    },
+    {
+      "src": "lesson_20260414_017_all_transition_based_entry_signals_fire_at_informationally_neutral_points",
+      "dst": "pattern_all_directional_entries_fire_at_exhaustion"
+    },
+    {
+      "src": "lesson_20260414_018_hold_all_day_open_entry_23pct_win_rate_invalidates_pre_pattern_60pct_oracle_projection",
+      "dst": "pattern_exit_path_distorts_win_rate_bps_required"
+    },
+    {
+      "src": "lesson_20260414_018_hold_all_day_open_entry_23pct_win_rate_invalidates_pre_pattern_60pct_oracle_projection",
+      "dst": "pattern_win_rate_ceiling_mandates_hold_duration"
+    },
+    {
+      "src": "lesson_20260414_019_resting_limit_win_rate_counts_time_exits_as_wins_distorting_breakeven_math",
+      "dst": "pattern_exit_path_distorts_win_rate_bps_required"
+    },
+    {
+      "src": "lesson_20260414_019_resting_limit_win_rate_counts_time_exits_as_wins_distorting_breakeven_math",
+      "dst": "pattern_win_rate_ceiling_mandates_hold_duration"
+    },
+    {
+      "src": "lesson_20260414_020_symbol_heterogeneity_4_of_10_krx_symbols_structurally_below_win_rate_breakeven",
+      "dst": "pattern_universe_filter_per_symbol_win_rate_screen"
+    },
+    {
+      "src": "pattern_universe_filter_per_symbol_win_rate_screen",
+      "dst": "lesson_20260414_024_tighter_obi_4x_return_gain_000660_payoff_magnitude_dwarfs_006800_revealing_lot_scale_asymmetry"
+    },
+    {
+      "src": "lesson_20260414_021_time_exit_suppresses_avg_win_bps_below_resting_limit_target",
+      "dst": "pattern_exit_path_distorts_win_rate_bps_required"
+    },
+    {
+      "src": "lesson_20260414_021_time_exit_suppresses_avg_win_bps_below_resting_limit_target",
+      "dst": "pattern_win_rate_ceiling_mandates_hold_duration"
+    },
+    {
+      "src": "lesson_20260414_023_000660_concentration_masks_4_symbol_drag_pooled_avg_hides_a_2_symbol_viable_core",
+      "dst": "lesson_20260414_024_tighter_obi_4x_return_gain_000660_payoff_magnitude_dwarfs_006800_revealing_lot_scale_asymmetry"
+    },
+    {
+      "src": "pattern_005930_fee_incompatible_with_short_hold",
+      "dst": "lesson_20260414_002_obi_momentum_has_no_edge_over_spread_cost_at_tick_horizon"
+    },
+    {
+      "src": "pattern_005930_fee_incompatible_with_short_hold",
+      "dst": "lesson_20260414_006_etf_universe_blocked_by_dataset_scope_kospi_equity_only"
+    },
+    {
+      "src": "pattern_005930_fee_incompatible_with_short_hold",
+      "dst": "lesson_20260414_013_obi_sign_flip_long_only_fee_math_kills_positive_ev_at_30_20_bps_targets"
+    },
+    {
+      "src": "pattern_005930_fee_incompatible_with_short_hold",
+      "dst": "lesson_20260414_014_mean_reversion_at_15_30_min_timescale_is_anti_edge_with_18_win_rate_and_oversized_lots_causing_cash_rejections"
+    },
+    {
+      "src": "pattern_005930_fee_incompatible_with_short_hold",
+      "dst": "pattern_win_rate_ceiling_mandates_hold_duration"
     }
   ]
 }

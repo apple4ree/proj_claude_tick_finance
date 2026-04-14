@@ -22,6 +22,7 @@ import numpy as np
 from engine.data_loader import OrderBookSnapshot
 from engine.simulator import (
     BUY,
+    LIMIT,
     MARKET,
     SELL,
     Backtester,
@@ -88,6 +89,7 @@ class _BacktesterFixture(Backtester):
             sr.n_events += 1
 
             self._match_pending(snap)
+            self._check_resting_limits(snap)
             ctx = Context(
                 portfolio=self.portfolio,
                 last_mids=self.last_mids,
@@ -98,6 +100,9 @@ class _BacktesterFixture(Backtester):
                 target = snap.ts_ns + self.config.latency_model.sample_ns()
                 from engine.simulator import _PendingOrder
                 self.pending.append(_PendingOrder(target_ts_ns=target, order=order))
+        # EOD: cancel resting limits
+        self.n_resting_cancelled += len(self.resting_limits)
+        self.resting_limits.clear()
         for sym, sr in self.per_symbol.items():
             pos = self.portfolio.positions.get(sym)
             if pos is not None:
@@ -117,8 +122,18 @@ class _BacktesterFixture(Backtester):
         rpt.duration_sec = time.time() - t0
         rpt.n_partial_fills = self.n_partial_fills
         rpt.pending_at_end = len(self.pending)
+        rpt.n_resting_cancelled = self.n_resting_cancelled
         rpt.rejected = dict(self.rejected)
         return rpt
+
+
+def _make_bt(snaps, strategy, *, starting_cash: float, submit_ms: float, jitter_ms: float):
+    """Convenience wrapper: build a _BacktesterFixture with given config."""
+    cfg = BacktestConfig(
+        starting_cash=starting_cash,
+        latency_model=LatencyModel(submit_ms=submit_ms, jitter_ms=jitter_ms),
+    )
+    return _BacktesterFixture(snaps, strategy, cfg)
 
 
 # ---------------------------------------------------------------------------
@@ -421,6 +436,69 @@ def check_python_strategy_path_loads():
     check("python strategy path loads", ok, f"n_trades={data.get('n_trades')}")
 
 
+def check_resting_limit_fills_on_price_cross():
+    """Non-marketable LIMIT order queues as resting and fills when price crosses."""
+    snaps = [
+        # tick 0: ASK=102, strategy submits BUY LIMIT at 101 (non-marketable)
+        make_snap(1_000_000_000, "000001", [102, 103], [10, 10], [99, 98], [10, 10]),
+        # tick 1: ASK=103 → order promoted from pending to resting_limits (still non-marketable)
+        make_snap(2_000_000_000, "000001", [103, 104], [10, 10], [99, 98], [10, 10]),
+        # tick 2: ASK=101 → price crosses limit → fills at limit_price=101
+        make_snap(3_000_000_000, "000001", [101, 102], [10, 10], [99, 98], [10, 10]),
+        make_snap(4_000_000_000, "000001", [101, 102], [10, 10], [99, 98], [10, 10]),
+    ]
+    submitted = False
+
+    class _Strat:
+        def on_tick(self, snap, ctx):
+            nonlocal submitted
+            if not submitted:
+                submitted = True
+                return [Order("000001", BUY, qty=1, order_type=LIMIT, limit_price=101, tag="resting_buy")]
+            return []
+
+    bt = _make_bt(snaps, _Strat(), starting_cash=500_000, submit_ms=0, jitter_ms=0)
+    rpt = bt.run()
+    fills = bt.portfolio.fills
+    ok = (
+        len(fills) == 1
+        and fills[0].avg_price == 101.0
+        and fills[0].tag == "resting_buy"
+    )
+    check(
+        "resting limit fills on price cross",
+        ok,
+        f"fills={len(fills)} fill_px={fills[0].avg_price if fills else None}",
+    )
+
+
+def check_resting_limit_eod_cancel():
+    """Resting limit orders that never fill are cancelled at EOD and counted."""
+    snaps = [
+        make_snap(1_000_000_000, "000001", [102, 103], [10, 10], [99, 98], [10, 10]),
+        make_snap(2_000_000_000, "000001", [103, 104], [10, 10], [99, 98], [10, 10]),
+        # price never crosses 101 → resting order never fills
+    ]
+    submitted = False
+
+    class _Strat:
+        def on_tick(self, snap, ctx):
+            nonlocal submitted
+            if not submitted:
+                submitted = True
+                return [Order("000001", BUY, qty=1, order_type=LIMIT, limit_price=101, tag="resting")]
+            return []
+
+    bt = _make_bt(snaps, _Strat(), starting_cash=500_000, submit_ms=0, jitter_ms=0)
+    rpt = bt.run()
+    ok = rpt.n_resting_cancelled == 1 and len(bt.portfolio.fills) == 0
+    check(
+        "resting limit EOD cancel",
+        ok,
+        f"n_resting_cancelled={rpt.n_resting_cancelled} fills={len(bt.portfolio.fills)}",
+    )
+
+
 def main():
     checks = [
         check_no_lookahead,
@@ -433,6 +511,8 @@ def main():
         check_partial_fill_remainder_tracked,
         check_unfilled_at_eod_reported,
         check_python_strategy_path_loads,
+        check_resting_limit_fills_on_price_cross,
+        check_resting_limit_eod_cancel,
     ]
     for fn in checks:
         try:

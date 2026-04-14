@@ -321,6 +321,335 @@ def render(strategy_dir: Path) -> Path:
     return out
 
 
+def _sym_metric_cards(sym_data: dict) -> str:
+    ret = sym_data.get("return_pct", 0)
+    ret_color = "#16a34a" if ret >= 0 else "#dc2626"
+    wr = sym_data.get("win_rate_pct", 0)
+    wr_color = "#16a34a" if wr >= 35.5 else "#dc2626"
+    cards = [
+        ("Return %", f'<span style="color:{ret_color}">{ret:+.4f}%</span>'),
+        ("Roundtrips", str(sym_data.get("n_roundtrips", 0))),
+        ("Win rate", f'<span style="color:{wr_color}">{wr:.1f}%</span>'),
+        ("Best trade", f'{sym_data.get("best_trade", 0):,.0f}'),
+        ("Worst trade", f'{sym_data.get("worst_trade", 0):,.0f}'),
+        ("Total fees", f'{sym_data.get("total_fees", 0):,.0f}'),
+    ]
+    return "".join(
+        f'<div class="card"><div class="label">{label}</div>'
+        f'<div class="value" style="font-size:15px">{val}</div></div>'
+        for label, val in cards
+    )
+
+
+def _build_comparison_chart(per_symbol: dict, starting_cash: float) -> str:
+    syms = list(per_symbol.keys())
+    returns = [per_symbol[s]["return_pct"] for s in syms]
+    win_rates = [per_symbol[s]["win_rate_pct"] for s in syms]
+    roundtrips = [per_symbol[s]["n_roundtrips"] for s in syms]
+
+    bar_colors = ["#16a34a" if r >= 0 else "#dc2626" for r in returns]
+    wr_colors = ["#16a34a" if w >= 35.5 else "#dc2626" for w in win_rates]
+
+    fig = make_subplots(
+        rows=1,
+        cols=2,
+        subplot_titles=("Return % per symbol", "Win rate % per symbol"),
+        horizontal_spacing=0.12,
+    )
+
+    fig.add_trace(
+        go.Bar(
+            y=syms,
+            x=returns,
+            orientation="h",
+            marker=dict(color=bar_colors),
+            text=[f"{r:+.4f}%" for r in returns],
+            textposition="outside",
+            hovertemplate="%{y}: %{x:+.4f}%<extra></extra>",
+            name="Return %",
+            showlegend=False,
+        ),
+        row=1,
+        col=1,
+    )
+    fig.add_trace(
+        go.Bar(
+            y=syms,
+            x=win_rates,
+            orientation="h",
+            marker=dict(color=wr_colors),
+            text=[f"{w:.1f}% ({r}rt)" for w, r in zip(win_rates, roundtrips)],
+            textposition="outside",
+            hovertemplate="%{y}: %{x:.1f}% win rate<extra></extra>",
+            name="Win rate %",
+            showlegend=False,
+        ),
+        row=1,
+        col=2,
+    )
+    # Breakeven line at 35.5%
+    fig.add_vline(
+        x=35.5,
+        line=dict(color="#f59e0b", dash="dash", width=1.5),
+        row=1,
+        col=2,
+        annotation_text="breakeven 35.5%",
+        annotation_position="top right",
+        annotation_font=dict(size=10, color="#f59e0b"),
+    )
+
+    fig.update_layout(
+        height=max(220, 50 * len(syms) + 100),
+        margin=dict(l=20, r=100, t=50, b=20),
+        font=dict(
+            family="system-ui, -apple-system, Pretendard, 'Noto Sans KR', sans-serif",
+            size=11,
+        ),
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+    )
+    fig.update_xaxes(showgrid=True, gridcolor="#e5e7eb")
+    fig.update_yaxes(showgrid=False)
+
+    return fig.to_html(
+        include_plotlyjs=False,
+        full_html=False,
+        div_id="chart-comparison",
+        config={"responsive": True},
+    )
+
+
+def _build_sym_figure(sym_data: dict, sym_trace: dict, sym: str, starting_cash: float) -> go.Figure:
+    """3-row chart (price+trades, equity, drawdown) for a single symbol."""
+    report_proxy = {
+        "starting_cash": starting_cash,
+        "return_pct": sym_data.get("return_pct", 0),
+        "total_pnl": sym_data.get("return_pct", 0) / 100 * starting_cash,
+    }
+    return _build_figure(report_proxy, sym_trace)
+
+
+_PER_SYMBOL_HTML = """<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  body {{
+    font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+    background: #fafafa;
+    color: #111827;
+    margin: 0;
+    padding: 32px 24px 56px;
+    -webkit-font-smoothing: antialiased;
+  }}
+  .wrap {{ max-width: 1280px; margin: 0 auto; }}
+  h1 {{ font-size: 24px; margin: 0 0 6px; font-weight: 800; letter-spacing: -0.015em; }}
+  .sub {{ color: #6b7280; font-size: 13px; margin-bottom: 20px; }}
+  .sub code {{ background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 12px; }}
+  .section-title {{
+    font-size: 13px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #6b7280; margin: 24px 0 10px;
+  }}
+  .cards {{
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+  }}
+  .cards-agg {{
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }}
+  @media (max-width: 900px) {{ .cards {{ grid-template-columns: repeat(3, 1fr); }} }}
+  .card {{
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 11px 14px;
+    min-width: 0;
+  }}
+  .card .label {{
+    color: #6b7280; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;
+  }}
+  .card .value {{
+    font-size: 16px; font-weight: 700; color: #1a1a1a;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }}
+  .chart-wrap {{
+    background: white; border: 1px solid #e5e7eb;
+    border-radius: 12px; padding: 10px; margin-bottom: 16px;
+  }}
+  /* Tabs */
+  .tab-bar {{
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
+  }}
+  .tab-btn {{
+    padding: 7px 18px; border: 1px solid #e5e7eb; border-radius: 8px;
+    cursor: pointer; font-size: 13px; font-weight: 600; background: white;
+    color: #374151; font-family: inherit; transition: all 0.12s;
+  }}
+  .tab-btn:hover {{ background: #f3f4f6; }}
+  .tab-btn.active {{ background: #2563eb; color: white; border-color: #2563eb; }}
+  .tab-panel {{ }}
+  /* Spec footer */
+  .meta {{ margin-top: 24px; color: #6b7280; font-size: 12px; }}
+  .meta details summary {{
+    cursor: pointer; font-weight: 600; color: #374151; padding: 6px 0;
+  }}
+  .meta pre {{
+    background: #1e293b; color: #e2e8f0; padding: 14px;
+    border-radius: 8px; font-size: 12px; overflow-x: auto; line-height: 1.5;
+  }}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>{title}</h1>
+  <div class="sub">
+    strategy <code>{strat_id}</code> ·
+    {n_traded} symbols traded · {n_skipped} skipped ·
+    {total_roundtrips} total roundtrips
+  </div>
+
+  <div class="section-title">Aggregate</div>
+  <div class="cards cards-agg">{agg_cards}</div>
+  <div class="chart-wrap">{comparison_chart}</div>
+
+  <div class="section-title">Per-symbol detail</div>
+  <div class="tab-bar">{tab_buttons}</div>
+  {tab_panels}
+
+  <div class="meta">
+    <details>
+      <summary>spec.yaml</summary>
+      <pre>{spec_escaped}</pre>
+    </details>
+  </div>
+</div>
+<script>
+  // Render all tab panels visible so Plotly initialises correctly,
+  // then hide non-active ones after page load.
+  window.addEventListener('load', function () {{
+    document.querySelectorAll('.tab-panel').forEach(function (p) {{
+      if (!p.classList.contains('active')) p.style.display = 'none';
+    }});
+  }});
+  function showTab(sym, btn) {{
+    document.querySelectorAll('.tab-panel').forEach(function (p) {{
+      p.style.display = 'none';
+    }});
+    document.querySelectorAll('.tab-btn').forEach(function (b) {{
+      b.classList.remove('active');
+    }});
+    document.getElementById('tab-' + sym).style.display = 'block';
+    btn.classList.add('active');
+    window.dispatchEvent(new Event('resize'));
+  }}
+</script>
+</body>
+</html>
+"""
+
+
+def render_per_symbol(strategy_dir: Path) -> Path:
+    """Render a tabbed multi-symbol HTML report from report_per_symbol.json.
+
+    Reads:
+        report_per_symbol.json  — aggregate + per-symbol metrics
+        trace_per_symbol.json   — equity curves, mid series, fills per symbol
+        spec.yaml               — strategy spec (shown in footer)
+
+    Writes:
+        report_per_symbol.html
+
+    Layout:
+        - Aggregate metric cards + comparison bar chart (return % and win rate per symbol)
+        - Tab per symbol: metric cards + 3-row Plotly chart (price, equity, drawdown)
+    """
+    agg = json.loads((strategy_dir / "report_per_symbol.json").read_text())
+    trace_path = strategy_dir / "trace_per_symbol.json"
+    per_traces = json.loads(trace_path.read_text()) if trace_path.exists() else {}
+    spec_text = (strategy_dir / "spec.yaml").read_text()
+
+    per_symbol = agg.get("per_symbol", {})
+    starting_cash = float(agg.get("starting_cash", 10_000_000))
+
+    # --- Aggregate cards ---
+    avg_ret = agg.get("avg_return_pct", 0)
+    avg_ret_color = "#16a34a" if avg_ret >= 0 else "#dc2626"
+    agg_card_data = [
+        ("Avg return %", f'<span style="color:{avg_ret_color}">{avg_ret:+.4f}%</span>'),
+        ("Pooled win rate", f'{agg.get("pooled_win_rate_pct", 0):.1f}%'),
+        ("Total roundtrips", str(agg.get("total_roundtrips", 0))),
+        ("Total fees", f'{agg.get("total_fees", 0):,.0f}'),
+        ("Symbols traded", f'{agg.get("n_symbols_traded", 0)} / {agg.get("n_symbols_traded", 0) + agg.get("n_symbols_skipped", 0)}'),
+    ]
+    agg_cards_html = "".join(
+        f'<div class="card"><div class="label">{label}</div>'
+        f'<div class="value" style="font-size:15px">{val}</div></div>'
+        for label, val in agg_card_data
+    )
+
+    # --- Comparison chart (Plotly CDN already included in <head>) ---
+    comparison_html = _build_comparison_chart(per_symbol, starting_cash)
+
+    # --- Per-symbol tabs ---
+    symbols = list(per_symbol.keys())
+    tab_buttons_parts: list[str] = []
+    tab_panels_parts: list[str] = []
+
+    for i, sym in enumerate(symbols):
+        is_first = i == 0
+        active_cls = "active" if is_first else ""
+
+        tab_buttons_parts.append(
+            f'<button class="tab-btn {active_cls}" onclick="showTab(\'{sym}\', this)">{sym}</button>'
+        )
+
+        sym_data = per_symbol[sym]
+        sym_trace = per_traces.get(sym, {})
+        cards_html = _sym_metric_cards(sym_data)
+
+        fig = _build_sym_figure(sym_data, sym_trace, sym, starting_cash)
+        chart_html = fig.to_html(
+            include_plotlyjs=False,
+            full_html=False,
+            div_id=f"chart-{sym}",
+            config={"responsive": True},
+        )
+
+        ret = sym_data.get("return_pct", 0)
+        ret_color = "#16a34a" if ret >= 0 else "#dc2626"
+        tab_panels_parts.append(
+            f'<div id="tab-{sym}" class="tab-panel {active_cls}">'
+            f'<div style="font-size:14px;font-weight:700;color:{ret_color};margin-bottom:10px;">'
+            f'{sym} &nbsp; {ret:+.4f}%</div>'
+            f'<div class="cards">{cards_html}</div>'
+            f'<div class="chart-wrap">{chart_html}</div>'
+            f'</div>'
+        )
+
+    out = strategy_dir / "report_per_symbol.html"
+    out.write_text(
+        _PER_SYMBOL_HTML.format(
+            title=agg.get("spec_name", strategy_dir.name),
+            strat_id=strategy_dir.name,
+            n_traded=agg.get("n_symbols_traded", 0),
+            n_skipped=agg.get("n_symbols_skipped", 0),
+            total_roundtrips=agg.get("total_roundtrips", 0),
+            agg_cards=agg_cards_html,
+            comparison_chart=comparison_html,
+            tab_buttons="".join(tab_buttons_parts),
+            tab_panels="\n".join(tab_panels_parts),
+            spec_escaped=spec_text.replace("<", "&lt;").replace(">", "&gt;"),
+        )
+    )
+    return out
+
+
 def main() -> None:
     import sys
 

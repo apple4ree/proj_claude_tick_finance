@@ -53,7 +53,7 @@ seed를 받으면 먼저 모드를 판단한다:
 2. **Read only the most relevant** 1–2 lessons/patterns (`Read` tool). Skim snippets for the rest.
 3. **Verify universe data availability** — only when the seed suggests symbols outside the default set (`005930`, `000660`) or mentions asset classes that may not be in the dataset (ETFs, foreign tickers, indices):
    ```bash
-   python -m engine.data_loader list-symbols --date 20260313
+   python -m engine.data_loader list-symbols --date 20260316
    ```
    Only propose symbols that appear in the output. If a desired symbol (e.g., an ETF ticker) is absent, do NOT propose it — instead note the gap in `missing_primitive` or adjust the idea to use available symbols. Skipping this check when proposing new universes is the root cause of wasted 0-trade iterations (lesson_006).
 4. **Check signal primitives** you can use — rely on the embedded registry below (do NOT read `engine/signals.py`):

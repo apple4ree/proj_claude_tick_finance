@@ -103,6 +103,28 @@ def load_day(date: str, symbol: str) -> pd.DataFrame:
     return load_csv(_csv_path(date, symbol))
 
 
+def clean_lob_df(df: pd.DataFrame) -> pd.DataFrame:
+    """Drop rows with structurally invalid order-book state.
+
+    Filters applied (in order):
+      1. Positive best prices  — ASKP1 > 0 and BIDP1 > 0
+      2. Price inversion       — ASKP1 > BIDP1  (crossed/locked markets are bad data)
+      3. Zero top-of-book depth — ASKP_RSQN1 > 0 and BIDP_RSQN1 > 0
+
+    These three checks mirror the cleaning passes in the reference RL-agent
+    backtest (cleaning.py) and eliminate rows that would produce nonsensical
+    mid prices or mislead the queue-depth model.
+    """
+    mask = (
+        (df["ASKP1"] > 0)
+        & (df["BIDP1"] > 0)
+        & (df["ASKP1"] > df["BIDP1"])
+        & (df["ASKP_RSQN1"] > 0)
+        & (df["BIDP_RSQN1"] > 0)
+    )
+    return df[mask]
+
+
 def iter_events(
     date: str,
     symbols: Iterable[str],
@@ -121,6 +143,7 @@ def iter_events(
         return
     all_df = pd.concat(frames, ignore_index=True)
     all_df.sort_values("ts_ns", kind="mergesort", inplace=True)
+    all_df = clean_lob_df(all_df)
     yield from df_to_snapshots(all_df)
 
 

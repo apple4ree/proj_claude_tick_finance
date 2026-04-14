@@ -21,7 +21,7 @@ from dataclasses import asdict
 
 from engine.dsl import SpecStrategy
 from engine.metrics import compute_sharpe_mdd, compute_trade_stats
-from engine.report_html import render as render_html
+from engine.report_html import render as render_html, render_per_symbol as render_html_per_symbol
 from engine.simulator import (
     AlternatingTakerStrategy,
     BacktestConfig,
@@ -182,6 +182,8 @@ def run(
     report.avg_trade_pnl = stats["avg_trade_pnl"]
     report.best_trade = stats["best_trade"]
     report.worst_trade = stats["worst_trade"]
+    report.avg_win_bps = stats["avg_win_bps"]
+    report.avg_loss_bps = stats["avg_loss_bps"]
 
     payload = report.to_dict()
 
@@ -213,6 +215,134 @@ def run(
     return payload
 
 
+def run_per_symbol(
+    spec_path: Path | str,
+    *,
+    write_html: bool = True,
+    report_out: Path | None = None,
+) -> dict:
+    """Run one independent backtest per symbol and aggregate results.
+
+    Each symbol gets a fresh Strategy instance and full starting capital so
+    results are not contaminated by cross-symbol capital interactions.
+
+    Aggregate metrics:
+        avg_return_pct      — simple mean across symbols (equal-weight)
+        total_roundtrips    — sum
+        pooled_win_rate_pct — total wins / total roundtrips
+        total_fees          — sum
+        per_symbol          — per-symbol breakdown dict
+
+    Writes:
+        report_per_symbol.json  — aggregate + per-symbol metrics
+        trace_per_symbol.json   — equity curves, mid series, fills per symbol
+        report_per_symbol.html  — tabbed interactive report (if write_html=True)
+
+    Returns the aggregate payload dict.
+    """
+    spec_path = Path(spec_path)
+    strategy_dir = spec_path.parent
+    spec = load_spec(spec_path)
+    cfg = _build_config(spec)
+
+    symbols = spec.universe.symbols
+    dates = spec.universe.dates
+
+    per_symbol: dict[str, dict] = {}
+    per_symbol_traces: dict[str, dict] = {}
+    skipped: list[str] = []
+
+    for sym in symbols:
+        strategy = _build_strategy(spec, spec_path)
+        bt = Backtester(dates=dates, symbols=[sym], strategy=strategy, config=cfg)
+        report = bt.run()
+        report.starting_cash = cfg.starting_cash
+        report.total_fees = bt.portfolio.total_fees
+        report.n_trades = bt.portfolio.n_trades
+        report.realized_pnl = sum(
+            p.realized_pnl for p in bt.portfolio.positions.values()
+        )
+        report.unrealized_pnl = bt.portfolio.mark_to_mid(bt.last_mids)
+        report.return_pct = (report.total_pnl / cfg.starting_cash) * 100.0
+        stats = compute_trade_stats(bt.portfolio.fills)
+
+        if stats["n_roundtrips"] == 0:
+            skipped.append(sym)
+            continue
+
+        per_symbol[sym] = {
+            "return_pct": round(report.return_pct, 4),
+            "n_roundtrips": stats["n_roundtrips"],
+            "win_rate_pct": round(stats["win_rate_pct"], 2),
+            "total_fees": round(report.total_fees, 2),
+            "best_trade": round(stats["best_trade"], 2),
+            "worst_trade": round(stats["worst_trade"], 2),
+            "rejected": report.rejected,
+        }
+
+        per_symbol_traces[sym] = {
+            "equity_curve": [[int(ts), float(eq)] for ts, eq in bt.equity_samples],
+            "mid_series": {
+                s: [[int(ts), float(mid)] for ts, mid in series]
+                for s, series in bt.mid_samples.items()
+            },
+            "fills": [
+                {
+                    "ts_ns": int(f.ts_ns),
+                    "symbol": f.symbol,
+                    "side": f.side,
+                    "qty": int(f.qty),
+                    "avg_price": float(f.avg_price),
+                    "fee": float(f.fee),
+                    "tag": f.tag,
+                }
+                for f in bt.portfolio.fills
+            ],
+        }
+
+    returns = [v["return_pct"] for v in per_symbol.values()]
+    total_roundtrips = sum(v["n_roundtrips"] for v in per_symbol.values())
+    total_wins = sum(
+        round(v["n_roundtrips"] * v["win_rate_pct"] / 100)
+        for v in per_symbol.values()
+    )
+    pooled_win_rate = (
+        total_wins / total_roundtrips * 100 if total_roundtrips > 0 else 0.0
+    )
+
+    payload: dict = {
+        "strategy_id": strategy_dir.name,
+        "spec_name": spec.name,
+        "mode": "per_symbol",
+        "starting_cash": cfg.starting_cash,
+        "n_symbols_traded": len(per_symbol),
+        "n_symbols_skipped": len(skipped),
+        "skipped_symbols": skipped,
+        "avg_return_pct": round(sum(returns) / len(returns), 4) if returns else 0.0,
+        "total_roundtrips": total_roundtrips,
+        "pooled_win_rate_pct": round(pooled_win_rate, 2),
+        "total_fees": round(sum(v["total_fees"] for v in per_symbol.values()), 2),
+        "per_symbol": per_symbol,
+    }
+
+    report_path = (
+        report_out if report_out is not None else strategy_dir / "report_per_symbol.json"
+    )
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2))
+
+    trace_path = strategy_dir / "trace_per_symbol.json"
+    trace_path.write_text(json.dumps(per_symbol_traces, ensure_ascii=False))
+
+    if write_html:
+        try:
+            render_html_per_symbol(strategy_dir)
+        except Exception as e:
+            payload.setdefault("errors", {})["report_html"] = str(e)
+
+    return payload
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="tick strategy backtest runner")
     ap.add_argument("--spec", required=True, help="path to spec YAML")
@@ -220,14 +350,26 @@ def main() -> None:
     ap.add_argument("--summary", action="store_true", help="print summary JSON to stdout")
     ap.add_argument("--no-html", action="store_true", help="skip HTML rendering")
     ap.add_argument("--no-trace", action="store_true", help="skip trace.json write")
+    ap.add_argument(
+        "--per-symbol",
+        action="store_true",
+        help="run one backtest per symbol and aggregate; writes report_per_symbol.json",
+    )
     args = ap.parse_args()
 
-    payload = run(
-        args.spec,
-        write_trace=not args.no_trace,
-        write_html=not args.no_html,
-        report_out=Path(args.out) if args.out else None,
-    )
+    if args.per_symbol:
+        payload = run_per_symbol(
+            args.spec,
+            write_html=not args.no_html,
+            report_out=Path(args.out) if args.out else None,
+        )
+    else:
+        payload = run(
+            args.spec,
+            write_trace=not args.no_trace,
+            write_html=not args.no_html,
+            report_out=Path(args.out) if args.out else None,
+        )
     if args.summary:
         print(json.dumps(payload, ensure_ascii=False))
 

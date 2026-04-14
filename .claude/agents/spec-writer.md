@@ -54,8 +54,9 @@ If unsure, try to write the DSL expression first; if either `entry.when` or `exi
 
    a. **Verify symbols exist in dataset**:
       ```bash
-      python -m engine.data_loader list-symbols --date <date>
+      python -m engine.data_loader list-symbols --date 20260316
       ```
+      (IS 기준일 20260316 사용. 이 날짜에 없는 심볼은 IS 전체에서 사용 불가.)
       If any symbol in `universe.symbols` is absent from the output, return early — do NOT create the strategy directory:
       ```json
       {"error": "symbol_not_in_dataset", "description": "<symbol> not found for date <date>"}
@@ -105,7 +106,7 @@ If unsure, try to write the DSL expression first; if either `entry.when` or `exi
       ```bash
       python -m engine.data_loader list-dates
       ```
-      사용 가능한 날짜 중 최근 3일치를 확인하고 `universe.dates`에 포함한다. 각 날짜에 대해 심볼 존재 여부를 별도로 확인한다 (Step 2a와 동일).
+      IS 기간(20260316~20260325) 날짜를 `universe.dates`에 포함한다. 각 날짜에 대해 심볼 존재 여부를 별도로 확인한다 (Step 2a와 동일). OOS 기간(20260326/20260327/20260330)은 전략 개발 중 절대 추가하지 않는다.
 
 3. **Create the strategy dir**:
    ```bash
@@ -126,13 +127,24 @@ If unsure, try to write the DSL expression first; if either `entry.when` or `exi
    - Imports restricted to `engine.simulator`, `engine.data_loader`, `engine.signals`, `dataclasses`, and `typing`. Do NOT import `os`, `subprocess`, `socket`, `requests`, or anything networking.
    - Read all tunable numbers from `spec["params"]` — never hard-code.
    - Maintain rolling state via `engine.signals.SymbolState` + `update_state` where possible.
+   - **LATENCY GUARD (mandatory)**: Orders have 5ms+ fill latency. During that window, `ctx.portfolio.positions[symbol].qty` still reads 0 (for buys) or old qty (for sells). Without a guard, entry/exit fires every tick → duplicate orders exhaust cash. Every Python strategy MUST include:
+     ```python
+     _MAX_PENDING_TICKS = 100  # ticks before assuming rejection (>> 5ms latency)
+     self._pending_buy: dict[str, int] = {}   # sym → tick when submitted
+     self._pending_sell: dict[str, int] = {}  # sym → tick when submitted
+     ```
+     Fill-confirm: when pos_qty > 0 and sym in _pending_buy → del _pending_buy[sym]. When pos_qty == 0 and sym in _pending_sell → del _pending_sell[sym]. Wait: when sym in _pending_buy/_sell and tick_count - pending_tick < 100 → return []. Reset on rejection: when tick_count - pending_tick >= 100 and still no fill → del pending[sym] (order was rejected). See `strategies/_examples/python_trailing_stop/strategy.py` for the canonical pattern.
 
    Required top-level keys: `name`, `description`, `capital`, `universe`, `fees`, `latency`, `signals`, `entry`, `exit`, `risk`.
 
    Defaults to use if the idea is silent:
    - `capital: 10000000`
-   - `universe.symbols: ["005930", "000660"]`
-   - `universe.dates: ["20260313"]`
+   - `universe.symbols: ["top10"]`  ← 유동성 상위 10개 심볼 자동 확장 (기본값)
+     - `"top10"` shorthand: 005930, 000660, 005380, 034020, 010140, 006800, 272210, 042700, 015760, 035420
+     - `"*"` shorthand: 데이터 있는 전체 40개 심볼 (과부하 주의, 명시 요청 시에만)
+     - 특정 섹터 집중이 필요하면 직접 심볼 목록 작성
+   - `universe.dates: ["20260316", "20260317", "20260318", "20260319", "20260320", "20260323", "20260324", "20260325"]`
+     (IS 기간: 2026-03-16 ~ 2026-03-25, 7일. OOS는 20260326/20260327/20260330 — 전략 개발 중 절대 사용 금지)
    - `fees: {commission_bps: 1.5, tax_bps: 18.0}`
    - `latency: {submit_ms: 5.0, jitter_ms: 1.0, seed: 42}`
    - `risk.max_position_per_symbol: 1`

@@ -39,6 +39,7 @@ class BacktestReport:
     n_trades: int = 0
     n_partial_fills: int = 0
     pending_at_end: int = 0
+    n_resting_cancelled: int = 0   # resting limit orders cancelled at EOD
     rejected: dict = field(default_factory=dict)
     starting_cash: float = 0.0
     ending_cash: float = 0.0
@@ -51,6 +52,8 @@ class BacktestReport:
     avg_trade_pnl: float = 0.0
     best_trade: float = 0.0
     worst_trade: float = 0.0
+    avg_win_bps: float = 0.0
+    avg_loss_bps: float = 0.0
     duration_sec: float = 0.0
 
     def to_dict(self) -> dict:
@@ -66,6 +69,7 @@ class BacktestReport:
             "n_trades": self.n_trades,
             "n_partial_fills": self.n_partial_fills,
             "pending_at_end": self.pending_at_end,
+            "n_resting_cancelled": self.n_resting_cancelled,
             "rejected": dict(self.rejected),
             "starting_cash": round(self.starting_cash, 2),
             "ending_cash": round(self.ending_cash, 2),
@@ -78,6 +82,8 @@ class BacktestReport:
             "avg_trade_pnl": round(self.avg_trade_pnl, 4),
             "best_trade": round(self.best_trade, 4),
             "worst_trade": round(self.worst_trade, 4),
+            "avg_win_bps": round(self.avg_win_bps, 2),
+            "avg_loss_bps": round(self.avg_loss_bps, 2),
             "duration_sec": round(self.duration_sec, 3),
             "per_symbol": {
                 s: {
@@ -136,9 +142,16 @@ def compute_trade_stats(fills: Iterable) -> dict:
 
     Each closed roundtrip's PnL = (sell_px - buy_px) * qty − proportional
     commission/tax. Produces win_rate, avg/best/worst trade.
+
+    Also computes avg_win_bps and avg_loss_bps: fee-adjusted net PnL divided
+    by buy-side notional (in basis points). These are the canonical diagnostic
+    metrics for resting-limit strategies where time-exit paths create a
+    left-skewed win distribution that makes win_rate_pct alone misleading.
+    A strategy is EV-positive only when avg_win_bps * win_rate > |avg_loss_bps| * loss_rate.
     """
     inventory: dict[str, list[list[float]]] = {}  # sym -> [[qty, px, fee], ...]
     trades: list[float] = []
+    trade_bps: list[float] = []  # net PnL / buy notional * 1e4
 
     for f in fills:
         sym = f.symbol
@@ -153,6 +166,7 @@ def compute_trade_stats(fills: Iterable) -> dict:
         roundtrip_pnl = 0.0
         # proportional sell fee is fully allocated to this roundtrip
         fee_accum = sell_fee
+        buy_notional = 0.0  # accumulated buy-side cost basis for bps denominator
         inv = inventory.get(sym, [])
         while remaining > 0 and inv:
             layer = inv[0]
@@ -161,6 +175,7 @@ def compute_trade_stats(fills: Iterable) -> dict:
             roundtrip_pnl += (sell_px - layer_px) * take
             fee_share = (layer_fee / layer_qty) * take if layer_qty > 0 else 0.0
             fee_accum += fee_share
+            buy_notional += layer_px * take
             layer[0] -= take
             layer[2] -= fee_share
             remaining -= take
@@ -168,6 +183,8 @@ def compute_trade_stats(fills: Iterable) -> dict:
                 inv.pop(0)
         net = roundtrip_pnl - fee_accum
         trades.append(net)
+        bps = (net / buy_notional * 1e4) if buy_notional > 0 else 0.0
+        trade_bps.append(bps)
 
     n = len(trades)
     if n == 0:
@@ -177,12 +194,20 @@ def compute_trade_stats(fills: Iterable) -> dict:
             "avg_trade_pnl": 0.0,
             "best_trade": 0.0,
             "worst_trade": 0.0,
+            "avg_win_bps": 0.0,
+            "avg_loss_bps": 0.0,
         }
     wins = sum(1 for t in trades if t > 0)
+    win_bps_list = [b for b in trade_bps if b > 0]
+    loss_bps_list = [b for b in trade_bps if b <= 0]
+    avg_win_bps = sum(win_bps_list) / len(win_bps_list) if win_bps_list else 0.0
+    avg_loss_bps = sum(loss_bps_list) / len(loss_bps_list) if loss_bps_list else 0.0
     return {
         "n_roundtrips": n,
         "win_rate_pct": wins / n * 100.0,
         "avg_trade_pnl": sum(trades) / n,
         "best_trade": max(trades),
         "worst_trade": min(trades),
+        "avg_win_bps": round(avg_win_bps, 2),
+        "avg_loss_bps": round(avg_loss_bps, 2),
     }
