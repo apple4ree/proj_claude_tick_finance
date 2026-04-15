@@ -416,7 +416,9 @@
         "win-rate",
         "symbol-heterogeneity",
         "methodology",
-        "breakeven"
+        "breakeven",
+        "declining-symbol",
+        "regime-filter"
       ],
       "title": "pattern_universe_filter_per_symbol_win_rate_screen",
       "source": null,
@@ -491,6 +493,386 @@
       "metric": "return_pct=0.0262 trades=15 win_rate_pct=46.67 n_symbols=2"
     },
     {
+      "id": "lesson_20260414_025_obi_threshold_not_binding_at_0_32_total_imbalance_threshold_or_spread_gate_controls_000660_entry_frequency",
+      "path": "knowledge/lessons/lesson_20260414_025_obi_threshold_not_binding_at_0_32_total_imbalance_threshold_or_spread_gate_controls_000660_entry_frequency.md",
+      "tags": [
+        "lesson",
+        "obi-threshold",
+        "binding-constraint",
+        "entry-frequency",
+        "total-imbalance-threshold",
+        "spread-gate",
+        432,
+        "krx",
+        "resting-limit"
+      ],
+      "title": "lesson_20260414_025_obi_threshold_not_binding_at_0_32_total_imbalance_threshold_or_spread_gate_controls_000660_entry_frequency",
+      "source": "strat_20260414_0027_krx_resting_limit_000660_obi32",
+      "metric": "return_pct=0.0478 trades=7 win_rate_pct=42.86 n_symbols=1"
+    },
+    {
+      "id": "pattern_sample_size_gate_before_parameter_tuning",
+      "path": "knowledge/patterns/pattern_sample_size_gate_before_parameter_tuning.md",
+      "tags": [
+        "pattern",
+        "methodology",
+        "sample-size",
+        "lot-sizing",
+        "krx",
+        "win-rate",
+        "adverse-selection",
+        "iteration-stagnation"
+      ],
+      "title": "pattern_sample_size_gate_before_parameter_tuning",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "lesson_20260415_001_market_maker_stalls_at_zero_roundtrips_hard_stop_fires_before_spread_is_harvested",
+      "path": "knowledge/lessons/lesson_20260415_001_market_maker_stalls_at_zero_roundtrips_hard_stop_fires_before_spread_is_harvested.md",
+      "tags": [
+        "lesson",
+        "market-making",
+        "fee-burn",
+        "hard-stop",
+        "spread-gate",
+        "adverse-selection"
+      ],
+      "title": "lesson_20260415_001_market_maker_stalls_at_zero_roundtrips_hard_stop_fires_before_spread_is_harvested",
+      "source": "strat_20260415_0001_krx_as_market_maker_000660",
+      "metric": "return_pct=-0.3025 trades=4 fees=20245.5"
+    },
+    {
+      "id": "lesson_20260415_002_two_sided_mm_buy_fills_but_sell_never_closes_price_momentum_absorbs_passive_ask",
+      "path": "knowledge/lessons/lesson_20260415_002_two_sided_mm_buy_fills_but_sell_never_closes_price_momentum_absorbs_passive_ask.md",
+      "tags": [
+        "lesson",
+        "market-making",
+        "fill-asymmetry",
+        "two-sided-quoting",
+        "sequential-quoting",
+        432
+      ],
+      "title": "lesson_20260415_002_two_sided_mm_buy_fills_but_sell_never_closes_price_momentum_absorbs_passive_ask",
+      "source": "strat_20260415_0002_krx_as_mm_000660_wider_stop",
+      "metric": "return_pct=-0.1025 trades=2 fees=10248.0"
+    },
+    {
+      "id": "lesson_20260415_003_sequential_taker_maker_fsm_position_state_diverges_engine_position_flood_cash_short_rejections",
+      "path": "knowledge/lessons/lesson_20260415_003_sequential_taker_maker_fsm_position_state_diverges_engine_position_flood_cash_short_rejections.md",
+      "tags": [
+        "lesson",
+        "state-machine",
+        "taker-maker",
+        "cash-rejection",
+        "position-sync",
+        "krx",
+        "lot-sizing"
+      ],
+      "title": "lesson_20260415_003_sequential_taker_maker_fsm_position_state_diverges_engine_position_flood_cash_short_rejections",
+      "source": "strat_20260415_0003_taker_maker_seq_000660",
+      "metric": "return_pct=-6.861 trades=36 fees=360838"
+    },
+    {
+      "id": "lesson_20260415_004_stop_loss_using_pre_entry_rolling_return_fires_immediately",
+      "path": "knowledge/lessons/lesson_20260415_004_stop_loss_using_pre_entry_rolling_return_fires_immediately.md",
+      "tags": [
+        "lesson",
+        "stop-loss",
+        "reference-price",
+        "rolling-window",
+        "immediate-stop",
+        "fee-burn"
+      ],
+      "title": "lesson_20260415_004_stop_loss_using_pre_entry_rolling_return_fires_immediately",
+      "source": "strat_20260415_0004_obi_taker_maker_000660",
+      "metric": "return_pct=-90.7 trades=3049 fees=6027881 win_rate=0.0"
+    },
+    {
+      "id": "pattern_stop_exit_leaves_orphaned_resting_limit",
+      "path": "knowledge/patterns/pattern_stop_exit_leaves_orphaned_resting_limit.md",
+      "tags": [
+        "pattern",
+        "stop-loss",
+        "resting-limit",
+        "orphaned-limit",
+        "order-management",
+        "engine-overhead",
+        "reference-price",
+        "rolling-window",
+        "fee-burn",
+        "krx",
+        "immediate-stop",
+        "fsm"
+      ],
+      "title": "pattern_stop_exit_leaves_orphaned_resting_limit",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "lesson_20260415_005_orphaned_resting_limit_after_stop_market_exit_causes_mass_rejections_and_runaway_duration",
+      "path": "knowledge/lessons/lesson_20260415_005_orphaned_resting_limit_after_stop_market_exit_causes_mass_rejections_and_runaway_duration.md",
+      "tags": [
+        "lesson",
+        "order-management",
+        "orphaned-limit",
+        "engine-overhead",
+        "stop-loss",
+        "rejection"
+      ],
+      "title": "lesson_20260415_005_orphaned_resting_limit_after_stop_market_exit_causes_mass_rejections_and_runaway_duration",
+      "source": "strat_20260415_0005_obi_taker_anchor_stop_000660_iter5",
+      "metric": "return_pct=-1.2352 trades=58 fees=118678 rejected_short=2410 duration_sec=602"
+    },
+    {
+      "id": "lesson_20260415_006_widening_target_degrades_wr_faster_than_it_improves_payoff_use_lot_size_to_amortize_fees_instead",
+      "path": "knowledge/lessons/lesson_20260415_006_widening_target_degrades_wr_faster_than_it_improves_payoff_use_lot_size_to_amortize_fees_instead.md",
+      "tags": [
+        "lesson",
+        "fee_burn",
+        "lot_size",
+        "win_rate",
+        "break_even",
+        "target_bps",
+        432,
+        "obi"
+      ],
+      "title": "lesson_20260415_006_widening_target_degrades_wr_faster_than_it_improves_payoff_use_lot_size_to_amortize_fees_instead",
+      "source": "strat_20260415_0006_obi_taker_price_poll_exit_000660_iter6",
+      "metric": "return_pct=-0.9294 trades=52 fees=106936"
+    },
+    {
+      "id": "lesson_20260415_007_cancel_order_must_not_evict_co_submitted_market_sell_stop_orders_from_pending_queue",
+      "path": "knowledge/lessons/lesson_20260415_007_cancel_order_must_not_evict_co_submitted_market_sell_stop_orders_from_pending_queue.md",
+      "tags": [
+        "lesson",
+        "engine",
+        "cancel",
+        "stop-loss",
+        "order-management",
+        "bug"
+      ],
+      "title": "lesson_20260415_007_cancel_order_must_not_evict_co_submitted_market_sell_stop_orders_from_pending_queue",
+      "source": "strat_20260415_0008_krx_resting_limit_2sym_obi35_lot2_cancel",
+      "metric": "return_pct=0.1038 trades=15 fees=31059.58"
+    },
+    {
+      "id": "lesson_20260415_008_lot_size_scaling_amplifies_nominal_pnl_linearly_but_does_not_improve_edge_quality",
+      "path": "knowledge/lessons/lesson_20260415_008_lot_size_scaling_amplifies_nominal_pnl_linearly_but_does_not_improve_edge_quality.md",
+      "tags": [
+        "lesson",
+        "lot-size",
+        "passive-limit",
+        "adverse-selection",
+        "sample-size",
+        "krx"
+      ],
+      "title": "lesson_20260415_008_lot_size_scaling_amplifies_nominal_pnl_linearly_but_does_not_improve_edge_quality",
+      "source": "strat_20260415_0009_krx_resting_limit_2sym_obi35_lot3_cancel",
+      "metric": "return_pct=0.1556 trades=15 fees=46589"
+    },
+    {
+      "id": "lesson_20260415_009_krx_opening_hour_09_00_09_30_obi_signals_are_noise_block_entries_until_09_30",
+      "path": "knowledge/lessons/lesson_20260415_009_krx_opening_hour_09_00_09_30_obi_signals_are_noise_block_entries_until_09_30.md",
+      "tags": [
+        "lesson",
+        "time-filter",
+        "opening-auction",
+        "OBI",
+        "KRX",
+        "market-making"
+      ],
+      "title": "lesson_20260415_009_krx_opening_hour_09_00_09_30_obi_signals_are_noise_block_entries_until_09_30",
+      "source": "strat_20260415_0010_krx_resting_limit_5sym_no_imbalance",
+      "metric": "return_pct=-0.1026 trades=30 win_rate=36.67 fees_bps=21"
+    },
+    {
+      "id": "pattern_krx_intraday_entry_window_10_13",
+      "path": "knowledge/patterns/pattern_krx_intraday_entry_window_10_13.md",
+      "tags": [
+        "pattern",
+        "time-filter",
+        "krx",
+        "resting-limit",
+        "OBI",
+        "opening-auction",
+        "MOC",
+        "win-rate",
+        "methodology"
+      ],
+      "title": "pattern_krx_intraday_entry_window_10_13",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "lesson_20260415_010_time_filter_must_match_universe_with_opening_hour_noise",
+      "path": "knowledge/lessons/lesson_20260415_010_time_filter_must_match_universe_with_opening_hour_noise.md",
+      "tags": [
+        "lesson",
+        "time_filter",
+        "universe_selection",
+        "opening_hour",
+        "krx",
+        "obi"
+      ],
+      "title": "lesson_20260415_010_time_filter_must_match_universe_with_opening_hour_noise",
+      "source": "strat_20260415_0011_krx_resting_limit_2sym_obi35_time_filter",
+      "metric": "return_pct=0.1046 trades=15 fees=30985"
+    },
+    {
+      "id": "lesson_20260415_011_krx_late_session_13_00_obi_edge_collapses_0pct_wr_requires_end_of_day_entry_cutoff",
+      "path": "knowledge/lessons/lesson_20260415_011_krx_late_session_13_00_obi_edge_collapses_0pct_wr_requires_end_of_day_entry_cutoff.md",
+      "tags": [
+        "lesson",
+        "time-filter",
+        "late-session",
+        "KRX",
+        "MOC",
+        "resting-limit",
+        "OBI"
+      ],
+      "title": "lesson_20260415_011_krx_late_session_13_00_obi_edge_collapses_0pct_wr_requires_end_of_day_entry_cutoff",
+      "source": "strat_20260415_0012_krx_resting_limit_4sym_time_filter",
+      "metric": "return_pct=0.0474 trades=27 win_rate=44.4 late_session_wr=0.0"
+    },
+    {
+      "id": "lesson_20260415_012_entry_volume_is_the_strongest_win_discriminator_1_7x_higher_volume_at_win_entries_vs_loss",
+      "path": "knowledge/lessons/lesson_20260415_012_entry_volume_is_the_strongest_win_discriminator_1_7x_higher_volume_at_win_entries_vs_loss.md",
+      "tags": [
+        "lesson",
+        "volume-filter",
+        "entry-signal",
+        "time-filter",
+        "obi",
+        "krx-resting-limit"
+      ],
+      "title": "lesson_20260415_012_entry_volume_is_the_strongest_win_discriminator_1_7x_higher_volume_at_win_entries_vs_loss",
+      "source": "strat_20260415_0013_krx_resting_limit_4sym_window_10_13",
+      "metric": "return_pct=0.1694 trades=26 win_rate=42.31 avg_win_bps=107.99 avg_loss_bps=-72.72"
+    },
+    {
+      "id": "lesson_20260415_013_exit_obi_divergence_as_early_exit_signal_for_resting_limit_stops",
+      "path": "knowledge/lessons/lesson_20260415_013_exit_obi_divergence_as_early_exit_signal_for_resting_limit_stops.md",
+      "tags": [
+        "lesson",
+        "exit",
+        "obi",
+        "stop-loss",
+        "resting-limit",
+        "mean-reversion"
+      ],
+      "title": "lesson_20260415_013_exit_obi_divergence_as_early_exit_signal_for_resting_limit_stops",
+      "source": "strat_20260415_0014_krx_resting_limit_4sym_vol_gate",
+      "metric": "return_pct=0.506 trades=15 win_rate=53.3 avg_win_bps=113.57 avg_loss_bps=-83.71"
+    },
+    {
+      "id": "lesson_20260415_014_passive_bid_fills_on_declining_symbols_are_toxic_universe_quality_gate_needed",
+      "path": "knowledge/lessons/lesson_20260415_014_passive_bid_fills_on_declining_symbols_are_toxic_universe_quality_gate_needed.md",
+      "tags": [
+        "lesson",
+        "universe-selection",
+        "passive-fill",
+        "declining-symbol",
+        "regime-filter",
+        "resting-limit"
+      ],
+      "title": "lesson_20260415_014_passive_bid_fills_on_declining_symbols_are_toxic_universe_quality_gate_needed",
+      "source": "strat_20260415_0016_krx_resting_limit_6sym_vol_gate",
+      "metric": "return_pct=0.36 trades=23 win_rate_pct=34.8 avg_win_bps=113.57 avg_loss_bps=-81.63"
+    },
+    {
+      "id": "lesson_20260415_015_obi_exit_fires_during_post_fill_settlement_needs_min_hold_guard",
+      "path": "knowledge/lessons/lesson_20260415_015_obi_exit_fires_during_post_fill_settlement_needs_min_hold_guard.md",
+      "tags": [
+        "lesson",
+        "obi",
+        "exit-signal",
+        "passive-fill",
+        "min-hold",
+        "settlement-period",
+        "winner-cut"
+      ],
+      "title": "lesson_20260415_015_obi_exit_fires_during_post_fill_settlement_needs_min_hold_guard",
+      "source": "strat_20260415_0017_krx_resting_limit_4sym_obi_exit",
+      "metric": "return_pct=-0.4376 trades=15 win_rate_pct=6.667 avg_win_bps=128.71 avg_loss_bps=-30.39"
+    },
+    {
+      "id": "lesson_20260415_016_universal_vol_gate_silently_collapses_multi_symbol_universe_to_2_active_symbols",
+      "path": "knowledge/lessons/lesson_20260415_016_universal_vol_gate_silently_collapses_multi_symbol_universe_to_2_active_symbols.md",
+      "tags": [
+        "lesson",
+        "universe",
+        "volume-gate",
+        "symbol-filter",
+        "krx",
+        "multi-symbol"
+      ],
+      "title": "lesson_20260415_016_universal_vol_gate_silently_collapses_multi_symbol_universe_to_2_active_symbols",
+      "source": "strat_20260415_0020_krx_resting_limit_6sym_screened",
+      "metric": "return_pct=0.4902 trades=16 fees=31455"
+    },
+    {
+      "id": "lesson_20260415_017_wide_spread_declining_symbols_destroy_edge_even_with_correct_volume_gate",
+      "path": "knowledge/lessons/lesson_20260415_017_wide_spread_declining_symbols_destroy_edge_even_with_correct_volume_gate.md",
+      "tags": [
+        "lesson",
+        "universe-filter",
+        "spread-gate",
+        "symbol-quality",
+        "declining-symbol"
+      ],
+      "title": "lesson_20260415_017_wide_spread_declining_symbols_destroy_edge_even_with_correct_volume_gate",
+      "source": "strat_20260415_0022_krx_resting_limit_5sym_krw_gate",
+      "metric": "return_pct=0.0639 trades=32 win_rate=40.625 avg_loss_bps=-78.41"
+    },
+    {
+      "id": "lesson_20260415_018_oos_regime_mismatch_invalidates_mean_reversion_passive_maker_evaluation",
+      "path": "knowledge/lessons/lesson_20260415_018_oos_regime_mismatch_invalidates_mean_reversion_passive_maker_evaluation.md",
+      "tags": [
+        "lesson",
+        "oos",
+        "regime",
+        "mean-reversion",
+        "passive-maker",
+        "market-crash",
+        "statistical-power"
+      ],
+      "title": "lesson_20260415_018_oos_regime_mismatch_invalidates_mean_reversion_passive_maker_evaluation",
+      "source": "strat_20260415_0023_oos_4sym_vol_gate",
+      "metric": "return_pct=-0.0878 trades=5 win_rate=20.0 is_return_pct=0.506 is_trades=15"
+    },
+    {
+      "id": "lesson_20260415_019_session_drop_regime_filter_cleanly_excises_downtrend_losses",
+      "path": "knowledge/lessons/lesson_20260415_019_session_drop_regime_filter_cleanly_excises_downtrend_losses.md",
+      "tags": [
+        "lesson",
+        "regime_filter",
+        "session_drop",
+        "entry_gate",
+        "win_rate",
+        "downtrend"
+      ],
+      "title": "lesson_20260415_019_session_drop_regime_filter_cleanly_excises_downtrend_losses",
+      "source": "strat_20260415_0025_krx_resting_limit_4sym_regime_filter",
+      "metric": "return_pct=0.5969 trades=9 win_rate=66.7 avg_win_bps=108.52 avg_loss_bps=-83.70"
+    },
+    {
+      "id": "lesson_20260415_020_is_period_was_uniquely_bullish_window_passive_maker_is_wr_does_not_generalize_across_regimes",
+      "path": "knowledge/lessons/lesson_20260415_020_is_period_was_uniquely_bullish_window_passive_maker_is_wr_does_not_generalize_across_regimes.md",
+      "tags": [
+        "lesson",
+        "is-overfitting",
+        "regime-dependency",
+        "passive-maker",
+        "session-drop",
+        "oos-failure",
+        "mean-reversion"
+      ],
+      "title": "lesson_20260415_020_is_period_was_uniquely_bullish_window_passive_maker_is_wr_does_not_generalize_across_regimes",
+      "source": "strat_20260415_0026_oos_regime_filter",
+      "metric": "return_pct=-0.0139 trades=4 win_rate=25.0 avg_win_bps=128.71 avg_loss_bps=-69.10"
+    },
+    {
       "id": "pattern_005930_fee_incompatible_with_short_hold",
       "path": "knowledge/patterns/pattern_005930_fee_incompatible_with_short_hold.md",
       "tags": [
@@ -505,6 +887,79 @@
         "anti-edge"
       ],
       "title": "pattern_005930_fee_incompatible_with_short_hold",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "pattern_market_making_structural_failures_krx",
+      "path": "knowledge/patterns/pattern_market_making_structural_failures_krx.md",
+      "tags": [
+        "pattern",
+        "market-making",
+        "krx",
+        "two-sided-quoting",
+        "position-sync",
+        "cash-rejection",
+        "fee-burn",
+        "adverse-selection",
+        "fsm"
+      ],
+      "title": "pattern_market_making_structural_failures_krx",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "pattern_post_fill_signal_quality_gates",
+      "path": "knowledge/patterns/pattern_post_fill_signal_quality_gates.md",
+      "tags": [
+        "pattern",
+        "methodology",
+        "krx",
+        "resting-limit",
+        "obi",
+        "volume-filter",
+        "adverse-selection",
+        "exit_management",
+        "win-rate",
+        "entry-signal",
+        "signal-edge",
+        "min-hold",
+        "settlement-period"
+      ],
+      "title": "pattern_post_fill_signal_quality_gates",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "pattern_krw_turnover_gate_replaces_share_count_gate",
+      "path": "knowledge/patterns/pattern_krw_turnover_gate_replaces_share_count_gate.md",
+      "tags": [
+        "pattern",
+        "universe-filter",
+        "volume-gate",
+        "krx",
+        "symbol-heterogeneity",
+        "krw",
+        "entry-filter"
+      ],
+      "title": "pattern_krw_turnover_gate_replaces_share_count_gate",
+      "source": null,
+      "metric": null
+    },
+    {
+      "id": "pattern_oos_regime_validity_gate",
+      "path": "knowledge/patterns/pattern_oos_regime_validity_gate.md",
+      "tags": [
+        "pattern",
+        "oos",
+        "regime",
+        "methodology",
+        "statistical-power",
+        "universe-filter",
+        "symbol-quality",
+        "declining-symbol"
+      ],
+      "title": "pattern_oos_regime_validity_gate",
       "source": null,
       "metric": null
     },
@@ -686,6 +1141,62 @@
       "dst": "lesson_20260414_024_tighter_obi_4x_return_gain_000660_payoff_magnitude_dwarfs_006800_revealing_lot_scale_asymmetry"
     },
     {
+      "src": "lesson_20260414_025_obi_threshold_not_binding_at_0_32_total_imbalance_threshold_or_spread_gate_controls_000660_entry_frequency",
+      "dst": "pattern_sample_size_gate_before_parameter_tuning"
+    },
+    {
+      "src": "lesson_20260414_025_obi_threshold_not_binding_at_0_32_total_imbalance_threshold_or_spread_gate_controls_000660_entry_frequency",
+      "dst": "pattern_spec_calibration_failure_wastes_iteration"
+    },
+    {
+      "src": "pattern_sample_size_gate_before_parameter_tuning",
+      "dst": "lesson_20260414_012_two_stage_state_machine_over_qualifies_entry_near_zero_trade_count_makes_signal_unvalidatable"
+    },
+    {
+      "src": "pattern_sample_size_gate_before_parameter_tuning",
+      "dst": "lesson_20260415_008_lot_size_scaling_amplifies_nominal_pnl_linearly_but_does_not_improve_edge_quality"
+    },
+    {
+      "src": "lesson_20260415_004_stop_loss_using_pre_entry_rolling_return_fires_immediately",
+      "dst": "pattern_stop_exit_leaves_orphaned_resting_limit"
+    },
+    {
+      "src": "lesson_20260415_005_orphaned_resting_limit_after_stop_market_exit_causes_mass_rejections_and_runaway_duration",
+      "dst": "pattern_stop_exit_leaves_orphaned_resting_limit"
+    },
+    {
+      "src": "lesson_20260415_006_widening_target_degrades_wr_faster_than_it_improves_payoff_use_lot_size_to_amortize_fees_instead",
+      "dst": "pattern_stop_exit_leaves_orphaned_resting_limit"
+    },
+    {
+      "src": "lesson_20260415_007_cancel_order_must_not_evict_co_submitted_market_sell_stop_orders_from_pending_queue",
+      "dst": "pattern_stop_exit_leaves_orphaned_resting_limit"
+    },
+    {
+      "src": "lesson_20260415_008_lot_size_scaling_amplifies_nominal_pnl_linearly_but_does_not_improve_edge_quality",
+      "dst": "pattern_krx_fee_hurdle_dominates_tick_edge"
+    },
+    {
+      "src": "lesson_20260415_008_lot_size_scaling_amplifies_nominal_pnl_linearly_but_does_not_improve_edge_quality",
+      "dst": "pattern_sample_size_gate_before_parameter_tuning"
+    },
+    {
+      "src": "lesson_20260415_009_krx_opening_hour_09_00_09_30_obi_signals_are_noise_block_entries_until_09_30",
+      "dst": "pattern_krx_intraday_entry_window_10_13"
+    },
+    {
+      "src": "pattern_krx_intraday_entry_window_10_13",
+      "dst": "pattern_universe_filter_per_symbol_win_rate_screen"
+    },
+    {
+      "src": "lesson_20260415_010_time_filter_must_match_universe_with_opening_hour_noise",
+      "dst": "pattern_krx_intraday_entry_window_10_13"
+    },
+    {
+      "src": "lesson_20260415_011_krx_late_session_13_00_obi_edge_collapses_0pct_wr_requires_end_of_day_entry_cutoff",
+      "dst": "pattern_krx_intraday_entry_window_10_13"
+    },
+    {
       "src": "pattern_005930_fee_incompatible_with_short_hold",
       "dst": "lesson_20260414_002_obi_momentum_has_no_edge_over_spread_cost_at_tick_horizon"
     },
@@ -704,6 +1215,66 @@
     {
       "src": "pattern_005930_fee_incompatible_with_short_hold",
       "dst": "pattern_win_rate_ceiling_mandates_hold_duration"
+    },
+    {
+      "src": "pattern_market_making_structural_failures_krx",
+      "dst": "lesson_20260415_001_market_maker_stalls_at_zero_roundtrips_hard_stop_fires_before_spread_is_harvested"
+    },
+    {
+      "src": "pattern_market_making_structural_failures_krx",
+      "dst": "lesson_20260415_002_two_sided_mm_buy_fills_but_sell_never_closes_price_momentum_absorbs_passive_ask"
+    },
+    {
+      "src": "pattern_market_making_structural_failures_krx",
+      "dst": "lesson_20260415_003_sequential_taker_maker_fsm_position_state_diverges_engine_position_flood_cash_short_rejections"
+    },
+    {
+      "src": "pattern_post_fill_signal_quality_gates",
+      "dst": "lesson_20260415_012_entry_volume_is_the_strongest_win_discriminator_1_7x_higher_volume_at_win_entries_vs_loss"
+    },
+    {
+      "src": "pattern_post_fill_signal_quality_gates",
+      "dst": "lesson_20260415_013_exit_obi_divergence_as_early_exit_signal_for_resting_limit_stops"
+    },
+    {
+      "src": "pattern_post_fill_signal_quality_gates",
+      "dst": "lesson_20260415_014_passive_bid_fills_on_declining_symbols_are_toxic_universe_quality_gate_needed"
+    },
+    {
+      "src": "pattern_post_fill_signal_quality_gates",
+      "dst": "lesson_20260415_015_obi_exit_fires_during_post_fill_settlement_needs_min_hold_guard"
+    },
+    {
+      "src": "pattern_post_fill_signal_quality_gates",
+      "dst": "pattern_sample_size_gate_before_parameter_tuning"
+    },
+    {
+      "src": "pattern_krw_turnover_gate_replaces_share_count_gate",
+      "dst": "lesson_20260415_012_entry_volume_is_the_strongest_win_discriminator_1_7x_higher_volume_at_win_entries_vs_loss"
+    },
+    {
+      "src": "pattern_krw_turnover_gate_replaces_share_count_gate",
+      "dst": "lesson_20260415_016_universal_vol_gate_silently_collapses_multi_symbol_universe_to_2_active_symbols"
+    },
+    {
+      "src": "pattern_oos_regime_validity_gate",
+      "dst": "is_oos_split"
+    },
+    {
+      "src": "pattern_oos_regime_validity_gate",
+      "dst": "lesson_20260415_017_wide_spread_declining_symbols_destroy_edge_even_with_correct_volume_gate"
+    },
+    {
+      "src": "pattern_oos_regime_validity_gate",
+      "dst": "lesson_20260415_018_oos_regime_mismatch_invalidates_mean_reversion_passive_maker_evaluation"
+    },
+    {
+      "src": "pattern_oos_regime_validity_gate",
+      "dst": "lesson_20260415_019_session_drop_regime_filter_cleanly_excises_downtrend_losses"
+    },
+    {
+      "src": "pattern_oos_regime_validity_gate",
+      "dst": "lesson_20260415_020_is_period_was_uniquely_bullish_window_passive_maker_is_wr_does_not_generalize_across_regimes"
     }
   ]
 }

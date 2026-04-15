@@ -116,6 +116,29 @@ def sig_spread_bps(snap: OrderBookSnapshot, st: SymbolState) -> float:
     return float(snap.spread) / mid * 1e4
 
 
+def sig_krw_turnover(snap: OrderBookSnapshot, st: SymbolState, lookback: int = 1) -> float:
+    """KRW-notional turnover over the last `lookback` ticks.
+
+    Returns (acml_vol_delta_shares * current_mid_KRW), a share-price-agnostic
+    activity gate. Use this instead of volume_delta when comparing symbols
+    with very different share prices (e.g. 000660 at 934k KRW vs 010140 at
+    28k KRW) — a uniform share-count threshold silently excludes low-float
+    high-price names while allowing noisy low-price names.
+
+    Typical IS values (10:30-13:00 window, 1-tick lookback):
+      000660 (SK Hynix):   ~500k–5M KRW per tick
+      006800 (Mirae):      ~50k–500k KRW per tick
+      034020 (Doosan):     ~100k–2M KRW per tick
+    Gate suggestion: krw_turnover > 5e8  (500M KRW over lookback ticks)
+    """
+    lb = max(1, int(lookback))
+    if len(st.acml_vol_buffer) < lb + 1:
+        return 0.0
+    vol_delta = float(st.acml_vol_buffer[-1] - st.acml_vol_buffer[-lb - 1])
+    mid = float(snap.mid)
+    return vol_delta * mid
+
+
 SIGNAL_REGISTRY: dict[str, Callable] = {
     "mid": sig_mid,
     "spread": sig_spread,
@@ -128,4 +151,5 @@ SIGNAL_REGISTRY: dict[str, Callable] = {
     "mid_return_bps": sig_mid_return_bps,
     "mid_change": sig_mid_change,
     "spread_bps": sig_spread_bps,
+    "krw_turnover": sig_krw_turnover,
 }

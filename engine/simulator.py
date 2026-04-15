@@ -11,6 +11,12 @@ Design decisions (Phase 3):
     is initialised to the LOB depth at the order's price level (back-of-queue)
     and decremented each tick by the observed depth decrease at that level.
   - Resting limits cancelled at EOD and counted in n_resting_cancelled.
+- **Cancel orders**: `Order(symbol, side=None, qty=0, order_type=CANCEL)` is
+  a first-class cancel primitive. When on_tick returns a CANCEL order for a
+  symbol, ALL resting LIMIT orders (and pending orders not yet matched) for
+  that symbol are removed immediately — no latency applied. Use this to clean
+  up orphaned resting limits after a stop-market exit fires. Example:
+    `Order(sym, side=None, qty=0, order_type=CANCEL, tag="cancel_after_stop")`
 - **Latency**: orders submitted at tick T are matched against the order
   book at the first tick whose ts >= T + submit_latency. No lookahead.
 - **Fee model**: KRX — commission (bps, both sides) + transaction tax
@@ -37,14 +43,15 @@ BUY = "BUY"
 SELL = "SELL"
 MARKET = "MARKET"
 LIMIT = "LIMIT"
+CANCEL = "CANCEL"  # Cancel all resting LIMIT orders for the given symbol
 
 
 @dataclass
 class Order:
     symbol: str
-    side: str   # BUY | SELL
+    side: str | None  # BUY | SELL | None (for CANCEL orders)
     qty: int
-    order_type: str = MARKET  # MARKET | LIMIT
+    order_type: str = MARKET  # MARKET | LIMIT | CANCEL
     limit_price: int | None = None
     tag: str = ""
 
@@ -58,6 +65,26 @@ class Fill:
     avg_price: float
     fee: float
     tag: str = ""
+    context: dict = field(default_factory=dict)  # signal snapshot at fill time
+
+
+def _snap_context(snap: "OrderBookSnapshot") -> dict:
+    """Capture key LOB signal values at fill time for post-analysis."""
+    total_bid = int(snap.total_bid_qty)
+    total_ask = int(snap.total_ask_qty)
+    denom = total_bid + total_ask
+    obi = round((total_bid - total_ask) / denom, 4) if denom > 0 else 0.0
+    bid0 = int(snap.bid_px[0])
+    ask0 = int(snap.ask_px[0])
+    spread_bps = round((ask0 - bid0) / bid0 * 1e4, 2) if bid0 > 0 else 0.0
+    return {
+        "obi": obi,
+        "spread_bps": spread_bps,
+        "bid_px": bid0,
+        "ask_px": ask0,
+        "mid": round(float(snap.mid), 2),
+        "acml_vol": int(snap.acml_vol),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -356,6 +383,7 @@ class Backtester:
                 avg_price=avg_px,
                 fee=fee,
                 tag=order.tag,
+                context=_snap_context(snap),
             )
             self.portfolio.apply_fill(fill)
         self.pending = still
@@ -425,6 +453,7 @@ class Backtester:
                 avg_price=avg_px,
                 fee=fee,
                 tag=order.tag,
+                context=_snap_context(snap),
             )
             self.portfolio.apply_fill(fill)
         self.resting_limits = remaining
@@ -497,6 +526,22 @@ class Backtester:
                 )
                 new_orders = self.strategy.on_tick(snap, ctx)
                 for order in new_orders or []:
+                    if order.order_type == CANCEL:
+                        # Immediate cancel: remove all resting LIMIT orders for this
+                        # symbol.  Pending (in-flight, latency-queued) orders are NOT
+                        # cleared — a CANCEL targets the resting maker book only.
+                        # This preserves co-submitted MARKET orders (e.g., stop-loss
+                        # MARKET SELL + CANCEL for orphaned resting LIMIT) from being
+                        # accidentally wiped.  No latency applied — cancels in KRX
+                        # equity market are near-instant (sub-ms ACK).
+                        before = len(self.resting_limits)
+                        self.resting_limits = [
+                            ro for ro in self.resting_limits
+                            if ro.order.symbol != order.symbol
+                        ]
+                        cancelled = before - len(self.resting_limits)
+                        self.n_resting_cancelled += cancelled
+                        continue
                     target = snap.ts_ns + self.config.latency_model.sample_ns()
                     self.pending.append(_PendingOrder(target_ts_ns=target, order=order))
 

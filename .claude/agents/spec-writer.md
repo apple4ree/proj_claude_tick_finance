@@ -9,9 +9,28 @@ You are the **spec writer**.
 
 ## Schema
 
-### Input (ideator output)
-core 필드 외에 다음 extension 필드를 처리한다:
-- `lot_size`: integer → `entry.size`에 반영 (명시된 경우 우선)
+### Input (execution-designer output — 신규 파이프라인)
+execution-designer가 넘겨주는 필드:
+- **alpha 필드** (alpha-designer에서 carry-over): `name`, `hypothesis`, `entry_condition`, `market_context`, `signals_needed`, `missing_primitive`, `needs_python`, `paradigm`, `multi_date`, `parent_lesson`
+- **execution 필드**: `entry_execution`, `exit_execution`, `position`
+- **경로 필드**: `alpha_draft_path`, `execution_draft_path`
+
+`entry_execution` 필드 매핑:
+- `price`: `"bid"` | `"bid_minus_1tick"` | `"mid"` → params의 `entry_price_mode`로 저장
+- `ttl_ticks`: integer | null → params의 `entry_ttl_ticks`로 저장 (null이면 0으로 저장하여 비활성 표시)
+- `cancel_on_bid_drop_ticks`: integer | null → params의 `cancel_on_bid_drop_ticks`로 저장
+
+`exit_execution` 필드 매핑:
+- `profit_target_bps`, `stop_loss_bps` → params 직접 저장
+- `trailing_stop`: boolean → params의 `trailing_stop`로 저장
+- `trailing_activation_bps`, `trailing_distance_bps` → params 직접 저장 (null이면 0.0)
+
+`position` 필드 매핑:
+- `lot_size` → params의 `lot_size`
+- `max_entries_per_session` → params의 `max_entries_per_session`
+
+### Input (legacy — strategy-ideator 직접 호출 시 하위호환)
+- `lot_size`: integer → `entry.size`에 반영
 - `holding_target_ticks`: integer → exit의 `max_hold_ticks` 조건에 반영
 - `paradigm`: string → spec의 `description`에 포함
 - `multi_date`: boolean → `universe.dates`를 복수 날짜로 확장
@@ -31,7 +50,7 @@ core 필드 외에 다음 extension 필드를 처리한다:
 
 ## Input
 
-A strategy idea JSON from `strategy-ideator` with fields: `name`, `hypothesis`, `entry_intent`, `exit_intent`, `signals_needed`, `risk`, `parent_lesson`, `missing_primitive`, and optionally `needs_python` (see below). Extension fields (`lot_size`, `holding_target_ticks`, `paradigm`, `multi_date`, `escape_route`) are processed per the Schema above.
+execution-designer의 JSON output (신규 파이프라인) 또는 strategy-ideator의 JSON output (레거시). 두 경우 모두 처리 가능하다. execution-designer output 여부는 `entry_execution` 필드 존재로 판단한다.
 
 ## Decide the strategy kind first
 
@@ -135,6 +154,105 @@ If unsure, try to write the DSL expression first; if either `entry.when` or `exi
      ```
      Fill-confirm: when pos_qty > 0 and sym in _pending_buy → del _pending_buy[sym]. When pos_qty == 0 and sym in _pending_sell → del _pending_sell[sym]. Wait: when sym in _pending_buy/_sell and tick_count - pending_tick < 100 → return []. Reset on rejection: when tick_count - pending_tick >= 100 and still no fill → del pending[sym] (order was rejected). See `strategies/_examples/python_trailing_stop/strategy.py` for the canonical pattern.
 
+   **EXECUTION PARAMS (execution-designer output 있을 때 필수 구현)**:
+
+   spec.yaml `params:`에 아래 항목을 반드시 포함한다:
+   ```yaml
+   params:
+     entry_ttl_ticks: <int>        # 0 = disabled, N = cancel after N ticks
+     cancel_on_bid_drop_ticks: <int>  # 0 = disabled, N = cancel if bid drops N ticks
+     trailing_stop: <bool>
+     trailing_activation_bps: <float>   # 0.0 if trailing_stop=false
+     trailing_distance_bps: <float>     # 0.0 if trailing_stop=false
+     max_entries_per_session: <int>
+   ```
+
+   strategy.py에서 이 파라미터들을 구현하는 표준 패턴:
+
+   **① Entry TTL (entry_ttl_ticks > 0일 때)**:
+   ```python
+   self._entry_submitted_tick: dict[str, int] = {}  # sym → tick when BUY LIMIT submitted
+
+   # BUY LIMIT 제출 시:
+   self._entry_submitted_tick[sym] = tc
+
+   # 매 틱 (포지션 없고 entry_submitted 상태):
+   if self.entry_ttl_ticks > 0 and sym in self._entry_submitted_tick:
+       ticks_waiting = tc - self._entry_submitted_tick[sym]
+       if ticks_waiting >= self.entry_ttl_ticks:
+           # TTL 만료 → CANCEL 발행, 세션 내 재진입 허용
+           del self._entry_submitted_tick[sym]
+           self._entry_submitted[sym] = False  # reset for re-entry
+           self._entries_today[sym] = self._entries_today.get(sym, 0)  # don't increment
+           return [Order(sym, None, qty=0, order_type=CANCEL, tag="ttl_cancel")]
+   ```
+
+   **② Bid-drop cancel (cancel_on_bid_drop_ticks > 0일 때)**:
+   ```python
+   self._entry_bid_px: dict[str, int] = {}  # sym → bid_px at time of BUY LIMIT submission
+
+   # BUY LIMIT 제출 시:
+   self._entry_bid_px[sym] = int(snap.bid_px[0])
+
+   # 매 틱 (포지션 없고 entry_submitted 상태):
+   if self.cancel_on_bid_drop_ticks > 0 and sym in self._entry_bid_px:
+       bid_now = int(snap.bid_px[0])
+       # bid_px는 호가 단위이므로 tick_size로 낙폭 계산
+       # 단순화: bid_px 직접 비교 (tick_size 대신 원 단위)
+       # tick_size 추정: st.best_bid_buffer[-2] - st.best_bid_buffer[-1] 등으로 추정 가능
+       # 보수적 근사: bid_px 하락이 entry_bid_px의 N배 tick_size 이상
+       if self._entry_bid_px[sym] - bid_now >= self.cancel_on_bid_drop_ticks * self._est_tick_size(sym):
+           del self._entry_bid_px[sym]
+           self._entry_submitted[sym] = False
+           return [Order(sym, None, qty=0, order_type=CANCEL, tag="bid_drop_cancel")]
+
+   def _est_tick_size(self, sym: str) -> int:
+       """Estimate tick size from recent bid buffer."""
+       st = self.states.get(sym)
+       if st and len(st.best_bid_buffer) >= 2:
+           diffs = [abs(st.best_bid_buffer[-i] - st.best_bid_buffer[-i-1])
+                    for i in range(1, min(10, len(st.best_bid_buffer)))]
+           nonzero = [d for d in diffs if d > 0]
+           return int(min(nonzero)) if nonzero else 100
+       return 100  # default fallback
+   ```
+
+   **③ Trailing stop (trailing_stop=True일 때)**:
+   ```python
+   self._peak_mid: dict[str, float] = {}  # sym → highest mid since entry
+
+   # 포지션 진입 직후:
+   self._peak_mid[sym] = snap.mid
+
+   # 매 틱 (holding 상태):
+   self._peak_mid[sym] = max(self._peak_mid.get(sym, snap.mid), snap.mid)
+   
+   if self.trailing_stop and hold is not None:
+       gain_bps = (snap.mid - hold.avg_cost) / hold.avg_cost * 1e4
+       if gain_bps >= self.trailing_activation_bps:
+           # trailing 활성화
+           peak = self._peak_mid.get(sym, snap.mid)
+           drop_from_peak_bps = (peak - snap.mid) / peak * 1e4 if peak > 0 else 0.0
+           if drop_from_peak_bps >= self.trailing_distance_bps:
+               # trailing stop 발동 → MARKET SELL + CANCEL
+               ...
+   ```
+
+   **④ max_entries_per_session (> 1일 때)**:
+   ```python
+   self._entries_today: dict[str, int] = {}  # sym → count of entries today
+
+   # 세션 리셋 시:
+   self._entries_today[sym] = 0
+
+   # 진입 조건 체크:
+   if self._entries_today.get(sym, 0) >= self.max_entries_per_session:
+       return []  # 오늘 한도 초과
+
+   # 진입 성공 시:
+   self._entries_today[sym] = self._entries_today.get(sym, 0) + 1
+   ```
+
    Required top-level keys: `name`, `description`, `capital`, `universe`, `fees`, `latency`, `signals`, `entry`, `exit`, `risk`.
 
    Defaults to use if the idea is silent:
@@ -160,7 +278,12 @@ If unsure, try to write the DSL expression first; if either `entry.when` or `exi
 
 5. **Write** to `strategies/<strategy_id>/spec.yaml` via the `Write` tool.
 
-6. **Persist the idea JSON** to `strategies/<strategy_id>/idea.json` — dump the exact JSON you received from strategy-ideator verbatim. This closes the "every stage output is persisted" invariant of the framework.
+6. **Persist design artifacts**:
+   - `strategies/<strategy_id>/idea.json` — dump the exact JSON received (execution-designer output or legacy ideator output) verbatim.
+   - If `alpha_draft_path` exists: copy `strategies/_drafts/<name>_alpha.md` → `strategies/<strategy_id>/alpha_design.md`
+   - If `execution_draft_path` exists: copy `strategies/_drafts/<name>_execution.md` → `strategies/<strategy_id>/execution_design.md`
+   
+   이 세 파일이 전략 디렉토리 안에 함께 보존되어야 한다. Copy는 Read + Write로 수행한다.
 
 7. **Validate**:
    ```bash

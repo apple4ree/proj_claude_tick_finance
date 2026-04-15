@@ -4,6 +4,7 @@ created: 2026-04-14T12:48:24
 tags: [lesson, obi-threshold, binding-constraint, entry-frequency, total-imbalance-threshold, spread-gate, 000660, krx, resting-limit]
 source: strat_20260414_0027_krx_resting_limit_000660_obi32
 metric: "return_pct=0.0478 trades=7 win_rate_pct=42.86 n_symbols=1"
+links: ["[[pattern_spec_calibration_failure_wastes_iteration]]", "[[pattern_sample_size_gate_before_parameter_tuning]]"]
 ---
 
 # obi_threshold_not_binding_at_0.32_total_imbalance_threshold_or_spread_gate_controls_000660_entry_frequency

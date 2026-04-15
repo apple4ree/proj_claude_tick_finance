@@ -22,6 +22,7 @@ from pathlib import Path
 
 import numpy as np
 import plotly.graph_objects as go
+import yaml
 from plotly.subplots import make_subplots
 
 _KST = timezone(timedelta(hours=9))
@@ -29,6 +30,267 @@ _KST = timezone(timedelta(hours=9))
 
 def _ts(ns: int) -> str:
     return datetime.fromtimestamp(ns / 1e9, tz=_KST).isoformat()
+
+
+def _fmt_param_val(v: object) -> str:
+    if isinstance(v, float):
+        return f"{v:g}"
+    if isinstance(v, int) and v > 9999:
+        return f"{v:,}"
+    return str(v)
+
+
+def _spec_description_html(spec: dict) -> str:
+    """Human-readable description block rendered inside the spec.yaml details."""
+    sections: list[str] = []
+
+    # --- Description ---
+    desc = (spec.get("description") or "").strip()
+    if desc:
+        esc = desc.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+        para = esc.replace("\n\n", "</p><p>").replace("\n", "<br>")
+        sections.append(
+            '<div class="spec-section">'
+            '<div class="spec-section-title">Description</div>'
+            f"<p>{para}</p>"
+            "</div>"
+        )
+
+    # --- Parameters ---
+    params = spec.get("params") or {}
+    if params:
+        rows = "".join(
+            f'<tr><td class="pk">{k}</td><td class="pv">{_fmt_param_val(v)}</td></tr>'
+            for k, v in params.items()
+        )
+        sections.append(
+            '<div class="spec-section">'
+            '<div class="spec-section-title">Parameters</div>'
+            '<table class="spec-table">'
+            "<thead><tr><th>Parameter</th><th>Value</th></tr></thead>"
+            f"<tbody>{rows}</tbody>"
+            "</table></div>"
+        )
+
+    # --- Universe & Config ---
+    universe = spec.get("universe") or {}
+    fees = spec.get("fees") or {}
+    latency = spec.get("latency") or {}
+    meta: list[tuple[str, str]] = []
+
+    syms = universe.get("symbols", [])
+    if syms:
+        meta.append(("Symbols", ", ".join(syms)))
+    dates = universe.get("dates", [])
+    if dates:
+        meta.append(("Dates", f"{dates[0]} → {dates[-1]}  ({len(dates)} days)"))
+    if spec.get("capital"):
+        meta.append(("Capital", f"{spec['capital']:,} KRW"))
+    if fees:
+        comm = fees.get("commission_bps", 0)
+        tax = fees.get("tax_bps", 0)
+        meta.append(("Fees", f"commission {comm} bps + sell tax {tax} bps → {comm + tax} bps total round-trip"))
+    if latency:
+        meta.append(("Latency", f"submit {latency.get('submit_ms', 0)} ms ± {latency.get('jitter_ms', 0)} ms jitter"))
+
+    if meta:
+        rows = "".join(
+            f'<tr><td class="pk">{k}</td><td class="pv">{v}</td></tr>'
+            for k, v in meta
+        )
+        sections.append(
+            '<div class="spec-section">'
+            '<div class="spec-section-title">Universe &amp; Config</div>'
+            '<table class="spec-table">'
+            "<thead><tr><th>Field</th><th>Value</th></tr></thead>"
+            f"<tbody>{rows}</tbody>"
+            "</table></div>"
+        )
+
+    return "\n".join(sections)
+
+
+def _sensitivity_panel_html(spec: dict, report: dict) -> str:
+    """Interactive break-even WR and fee burden panel (pure JS, no backtest re-run)."""
+    params   = spec.get("params") or {}
+    fees     = spec.get("fees") or {}
+
+    profit_target  = float(params.get("profit_target_bps", 150.0))
+    stop_loss      = float(params.get("stop_loss_bps", 50.0))
+    lot_size       = int(params.get("lot_size", 2))
+    commission_bps = float(fees.get("commission_bps", 1.5))
+    tax_bps        = float(fees.get("tax_bps", 18.0))
+    round_trip_bps = commission_bps + tax_bps
+
+    current_wr      = float(report.get("win_rate_pct", 0))
+    n_roundtrips    = int(report.get("n_roundtrips", 0))
+    total_fees      = float(report.get("total_fees", 0))
+    avg_win_bps     = float(report.get("avg_win_bps", profit_target))
+    original_lot    = lot_size  # lot_size from spec (fee baseline)
+
+    # break-even WR at spec params
+    be_wr_spec = stop_loss / (profit_target + stop_loss) * 100 if (profit_target + stop_loss) > 0 else 50.0
+    edge_spec  = current_wr - be_wr_spec
+
+    return f"""
+<div class="sens-wrap">
+  <div class="sens-title">파라미터 민감도 분석</div>
+
+  <!-- ① 수익 구조 분석 -->
+  <div class="sens-section-label">① 수익 구조 — break-even WR</div>
+  <div class="sens-row">
+    <span class="sens-name">profit target (bps)</span>
+    <input class="sens-slider" type="range" min="30" max="400" step="5"
+           value="{profit_target:.0f}" id="pt-sl" oninput="sensUpdate()">
+    <span class="sens-val" id="pt-val">{profit_target:.0f}</span>
+  </div>
+  <div class="sens-row">
+    <span class="sens-name">stop loss (bps)</span>
+    <input class="sens-slider" type="range" min="10" max="200" step="5"
+           value="{stop_loss:.0f}" id="sl-sl" oninput="sensUpdate()">
+    <span class="sens-val" id="sl-val">{stop_loss:.0f}</span>
+  </div>
+
+  <div class="sens-metrics">
+    <div class="sens-card">
+      <div class="sens-label">Break-even WR</div>
+      <div class="sens-value" id="be-wr">—</div>
+    </div>
+    <div class="sens-card">
+      <div class="sens-label">실제 WR (고정)</div>
+      <div class="sens-value" style="color:#16a34a">{current_wr:.1f}%</div>
+    </div>
+    <div class="sens-card">
+      <div class="sens-label">엣지 마진</div>
+      <div class="sens-value" id="edge-margin">—</div>
+    </div>
+    <div class="sens-card">
+      <div class="sens-label">손익비 (P:L)</div>
+      <div class="sens-value" id="payoff-ratio">—</div>
+    </div>
+  </div>
+
+  <!-- WR 비교 바 -->
+  <div class="wr-bar-wrap">
+    <div class="wr-bar-label">실제 WR</div>
+    <div class="wr-track">
+      <div class="wr-fill wr-current" id="wr-current-bar" style="width:{min(current_wr,100):.1f}%"></div>
+      <div class="wr-marker" id="wr-be-marker" style="left:{min(be_wr_spec,100):.1f}%">
+        <div class="wr-marker-line"></div>
+        <div class="wr-marker-label" id="wr-be-label">BE {be_wr_spec:.1f}%</div>
+      </div>
+    </div>
+    <div class="wr-bar-label" style="text-align:right">{current_wr:.1f}%</div>
+  </div>
+
+  <div class="sens-divider"></div>
+
+  <!-- ② 수수료 부담 분석 -->
+  <div class="sens-section-label">② 수수료 부담 분석</div>
+  <div class="sens-row">
+    <span class="sens-name">lot size</span>
+    <input class="sens-slider" type="range" min="1" max="10" step="1"
+           value="{lot_size}" id="lot-sl" oninput="sensUpdate()">
+    <span class="sens-val" id="lot-val">{lot_size}</span>
+  </div>
+
+  <div class="sens-metrics">
+    <div class="sens-card">
+      <div class="sens-label">수수료 round-trip</div>
+      <div class="sens-value">{round_trip_bps:.1f} bps</div>
+    </div>
+    <div class="sens-card">
+      <div class="sens-label">수수료 / profit target</div>
+      <div class="sens-value" id="fee-ratio">—</div>
+    </div>
+    <div class="sens-card">
+      <div class="sens-label">수수료 차감 순익 (bps)</div>
+      <div class="sens-value" id="net-profit">—</div>
+    </div>
+    <div class="sens-card">
+      <div class="sens-label">lot 변경 시 총 수수료 추정</div>
+      <div class="sens-value" id="fee-scaled">—</div>
+    </div>
+  </div>
+
+  <!-- 수수료 부담 바 -->
+  <div class="fee-bar-wrap">
+    <div class="fee-bar-bg">
+      <div class="fee-bar-cost" id="fee-bar-cost"></div>
+      <div class="fee-bar-net"  id="fee-bar-net"></div>
+    </div>
+    <div class="fee-bar-legend">
+      <span><span class="fee-dot fee-dot-cost"></span>수수료</span>
+      <span><span class="fee-dot fee-dot-net"></span>순 수익</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {{
+  const CURRENT_WR     = {current_wr:.4f};
+  const ROUND_TRIP_BPS = {round_trip_bps:.4f};
+  const TOTAL_FEES     = {total_fees:.2f};
+  const N_ROUNDTRIPS   = {n_roundtrips};
+  const ORIG_LOT       = {original_lot};
+
+  function fmt1(v) {{ return v.toFixed(1); }}
+  function fmt0(v) {{ return v.toFixed(0); }}
+
+  window.sensUpdate = function() {{
+    const profit  = parseFloat(document.getElementById('pt-sl').value);
+    const stop    = parseFloat(document.getElementById('sl-sl').value);
+    const lotSize = parseInt(document.getElementById('lot-sl').value);
+
+    document.getElementById('pt-val').textContent  = fmt0(profit);
+    document.getElementById('sl-val').textContent  = fmt0(stop);
+    document.getElementById('lot-val').textContent = lotSize;
+
+    // ① break-even WR
+    const beWR = stop / (profit + stop) * 100;
+    document.getElementById('be-wr').textContent = fmt1(beWR) + '%';
+
+    const edge = CURRENT_WR - beWR;
+    const edgeEl = document.getElementById('edge-margin');
+    edgeEl.textContent = (edge >= 0 ? '+' : '') + fmt1(edge) + 'pp';
+    edgeEl.style.color = edge >= 5 ? '#16a34a' : edge >= 0 ? '#d97706' : '#dc2626';
+
+    const payoff = profit / stop;
+    document.getElementById('payoff-ratio').textContent = fmt1(payoff) + ':1';
+
+    // WR bar
+    const beClamp = Math.min(Math.max(beWR, 0), 100);
+    document.getElementById('wr-be-marker').style.left = beClamp + '%';
+    document.getElementById('wr-be-label').textContent  = 'BE ' + fmt1(beWR) + '%';
+    document.getElementById('wr-current-bar').style.width = Math.min(CURRENT_WR, 100) + '%';
+
+    // ② fee burden
+    const feeRatio = ROUND_TRIP_BPS / profit * 100;
+    document.getElementById('fee-ratio').textContent = fmt1(feeRatio) + '%';
+
+    const netProfit = profit - ROUND_TRIP_BPS;
+    const netEl = document.getElementById('net-profit');
+    netEl.textContent = (netProfit >= 0 ? '+' : '') + fmt1(netProfit) + ' bps';
+    netEl.style.color = netProfit >= 0 ? '#16a34a' : '#dc2626';
+
+    // scale total fees proportional to lot change
+    const feeScaled = N_ROUNDTRIPS > 0
+      ? (TOTAL_FEES / ORIG_LOT * lotSize)
+      : 0;
+    document.getElementById('fee-scaled').textContent =
+      Math.round(feeScaled).toLocaleString() + ' KRW';
+
+    // fee bar (% breakdown of profit target)
+    const costPct = Math.min(feeRatio, 100);
+    const netPct  = Math.max(100 - costPct, 0);
+    document.getElementById('fee-bar-cost').style.width = costPct + '%';
+    document.getElementById('fee-bar-net').style.width  = netPct  + '%';
+  }};
+
+  sensUpdate();
+}})();
+</script>
+"""
 
 
 def _metric_cards(report: dict) -> str:
@@ -247,6 +509,107 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
     border-radius: 12px;
     padding: 10px;
   }}
+  /* ── Sensitivity panel ───────────────────────── */
+  .sens-wrap {{
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 18px;
+  }}
+  .sens-title {{
+    font-size: 13px; font-weight: 700; color: #374151;
+    margin-bottom: 14px; letter-spacing: -0.01em;
+  }}
+  .sens-section-label {{
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #9ca3af; margin: 12px 0 8px;
+  }}
+  .sens-row {{
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  }}
+  .sens-name {{
+    font-size: 12px; color: #6b7280;
+    min-width: 160px; font-family: 'Menlo','Consolas',monospace;
+  }}
+  .sens-val {{
+    font-size: 12px; font-weight: 600; color: #111827;
+    min-width: 38px; text-align: right; font-family: 'Menlo','Consolas',monospace;
+  }}
+  .sens-slider {{
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 4px; border-radius: 2px; background: #e5e7eb; outline: none; cursor: pointer;
+  }}
+  .sens-slider::-webkit-slider-thumb {{
+    -webkit-appearance: none; width: 16px; height: 16px;
+    border-radius: 50%; background: #374151; cursor: pointer;
+  }}
+  .sens-metrics {{
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; margin: 12px 0 8px;
+  }}
+  @media (max-width: 700px) {{ .sens-metrics {{ grid-template-columns: repeat(2, 1fr); }} }}
+  .sens-card {{
+    background: #f9fafb; border: 1px solid #e5e7eb;
+    border-radius: 8px; padding: 10px 12px;
+  }}
+  .sens-label {{
+    font-size: 10px; color: #9ca3af; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;
+  }}
+  .sens-value {{
+    font-size: 16px; font-weight: 700; color: #111827;
+    font-family: 'Menlo','Consolas',monospace;
+  }}
+  /* WR comparison bar */
+  .wr-bar-wrap {{
+    display: flex; align-items: center; gap: 8px; margin: 8px 0;
+  }}
+  .wr-bar-label {{ font-size: 11px; color: #9ca3af; min-width: 52px; }}
+  .wr-track {{
+    flex: 1; height: 16px; background: #f3f4f6;
+    border-radius: 8px; position: relative; overflow: visible;
+  }}
+  .wr-fill {{
+    height: 100%; border-radius: 8px; transition: width .2s;
+  }}
+  .wr-current {{ background: #2563eb; }}
+  .wr-marker {{
+    position: absolute; top: -4px; transform: translateX(-50%);
+    transition: left .2s;
+  }}
+  .wr-marker-line {{
+    width: 2px; height: 24px; background: #ef4444; margin: 0 auto;
+  }}
+  .wr-marker-label {{
+    font-size: 9px; color: #ef4444; font-weight: 700;
+    white-space: nowrap; text-align: center; margin-top: 2px;
+  }}
+  /* Fee bar */
+  .fee-bar-wrap {{ margin: 10px 0 4px; }}
+  .fee-bar-bg {{
+    display: flex; height: 14px; border-radius: 7px; overflow: hidden;
+    background: #f3f4f6;
+  }}
+  .fee-bar-cost {{
+    background: #fca5a5; height: 100%; transition: width .2s;
+  }}
+  .fee-bar-net {{
+    background: #86efac; height: 100%; transition: width .2s;
+  }}
+  .fee-bar-legend {{
+    display: flex; gap: 12px; font-size: 11px; color: #9ca3af; margin-top: 5px;
+  }}
+  .fee-dot {{
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 2px; margin-right: 4px; vertical-align: middle;
+  }}
+  .fee-dot-cost {{ background: #fca5a5; }}
+  .fee-dot-net  {{ background: #86efac; }}
+  .sens-divider {{
+    border: none; border-top: 1px solid #e5e7eb; margin: 14px 0;
+  }}
+  /* ── end sensitivity panel ────────────────────── */
   .meta {{
     margin-top: 24px;
     color: #6b7280;
@@ -266,6 +629,53 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
     font-size: 12px;
     overflow-x: auto;
     line-height: 1.5;
+    margin-bottom: 0;
+  }}
+  .spec-section {{
+    margin-top: 18px;
+    border-top: 1px solid #334155;
+    padding-top: 14px;
+  }}
+  .spec-section-title {{
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #94a3b8;
+    margin-bottom: 8px;
+  }}
+  .spec-section p {{
+    color: #cbd5e1;
+    line-height: 1.7;
+    font-size: 12.5px;
+    margin: 0;
+    white-space: pre-wrap;
+  }}
+  .spec-table {{
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px;
+  }}
+  .spec-table th {{
+    text-align: left;
+    color: #64748b;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-bottom: 1px solid #334155;
+  }}
+  .spec-table td {{
+    padding: 4px 10px;
+    border-bottom: 1px solid #1e3a5f33;
+    vertical-align: top;
+  }}
+  .pk {{
+    color: #7dd3fc;
+    font-family: 'Menlo', 'Consolas', monospace;
+    white-space: nowrap;
+    width: 34%;
+  }}
+  .pv {{
+    color: #e2e8f0;
   }}
 </style>
 </head>
@@ -281,10 +691,14 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
   </div>
   <div class="cards">{cards}</div>
   <div class="chart-wrap">{chart}</div>
+  {sensitivity_panel}
+  {per_day_section}
+  {fill_context_section}
   <div class="meta">
     <details>
       <summary>spec.yaml</summary>
       <pre>{spec_escaped}</pre>
+      {spec_description}
     </details>
   </div>
 </div>
@@ -293,11 +707,127 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 """
 
 
+def _per_day_section_html(report: dict) -> str:
+    """Per-day breakdown table: n_entries, n_roundtrips, wins, losses, stops, EOD, net_pnl."""
+    per_day = report.get("per_day") or {}
+    if not per_day:
+        return ""
+
+    rows_html = ""
+    for date, d in sorted(per_day.items()):
+        pnl = d.get("net_pnl", 0.0)
+        pnl_color = "#16a34a" if pnl >= 0 else "#dc2626"
+        wr = 0.0
+        if d.get("n_roundtrips", 0) > 0:
+            wr = d["n_wins"] / d["n_roundtrips"] * 100
+        rows_html += (
+            f'<tr>'
+            f'<td>{date}</td>'
+            f'<td>{d.get("n_entries", 0)}</td>'
+            f'<td>{d.get("n_roundtrips", 0)}</td>'
+            f'<td style="color:#16a34a">{d.get("n_wins", 0)}</td>'
+            f'<td style="color:#dc2626">{d.get("n_losses", 0)}</td>'
+            f'<td>{d.get("n_stops", 0)}</td>'
+            f'<td>{d.get("n_eod", 0)}</td>'
+            f'<td style="font-weight:600">{wr:.0f}%</td>'
+            f'<td style="color:{pnl_color};font-weight:600">{pnl:+,.0f}</td>'
+            f'</tr>'
+        )
+
+    return f"""
+<div class="sens-wrap" style="margin-top:1.5rem">
+  <div class="sens-title">일별 트레이딩 결과 (KST)</div>
+  <div style="overflow-x:auto">
+    <table class="spec-table" style="width:100%;min-width:640px">
+      <thead>
+        <tr>
+          <th>Date</th><th>진입</th><th>체결</th>
+          <th style="color:#16a34a">WIN</th><th style="color:#dc2626">LOSS</th>
+          <th>SL</th><th>EOD</th><th>WR</th><th>Net PnL (KRW)</th>
+        </tr>
+      </thead>
+      <tbody>{rows_html}</tbody>
+    </table>
+  </div>
+</div>"""
+
+
+def _fill_context_section_html(report: dict) -> str:
+    """WIN vs LOSS average fill-time LOB context comparison."""
+    roundtrips = report.get("roundtrips") or []
+    if not roundtrips:
+        return ""
+
+    wins = [rt for rt in roundtrips if rt.get("outcome") == "WIN" and rt.get("entry_context")]
+    losses = [rt for rt in roundtrips if rt.get("outcome") == "LOSS" and rt.get("entry_context")]
+
+    if not wins and not losses:
+        return ""
+
+    def _avg(rts: list, key: str) -> str:
+        vals = [rt["entry_context"].get(key) for rt in rts if key in (rt.get("entry_context") or {})]
+        if not vals:
+            return "—"
+        return f"{sum(vals) / len(vals):.4f}"
+
+    def _avg_bps(rts: list, key: str) -> str:
+        vals = [rt["entry_context"].get(key) for rt in rts if key in (rt.get("entry_context") or {})]
+        if not vals:
+            return "—"
+        return f"{sum(vals) / len(vals):.2f}"
+
+    metrics = [
+        ("OBI (order book imbalance)", "obi", _avg),
+        ("Spread (bps)", "spread_bps", _avg_bps),
+        ("Mid price (KRW)", "mid", lambda rts, k: f"{sum(rt['entry_context'].get(k, 0) for rt in rts if rt.get('entry_context')) / max(len(rts), 1):,.0f}"),
+        ("Acml vol", "acml_vol", lambda rts, k: f"{int(sum(rt['entry_context'].get(k, 0) for rt in rts if rt.get('entry_context')) / max(len(rts), 1)):,}"),
+    ]
+
+    rows_html = ""
+    for label, key, fmt_fn in metrics:
+        w_val = fmt_fn(wins, key) if wins else "—"
+        l_val = fmt_fn(losses, key) if losses else "—"
+        rows_html += (
+            f'<tr><td>{label}</td>'
+            f'<td style="color:#16a34a;font-weight:600">{w_val}</td>'
+            f'<td style="color:#dc2626;font-weight:600">{l_val}</td></tr>'
+        )
+
+    # avg pnl_bps per outcome
+    if wins:
+        avg_win_bps = sum(rt.get("pnl_bps", 0) for rt in wins) / len(wins)
+        rows_html += f'<tr><td>Avg PnL (bps)</td><td style="color:#16a34a;font-weight:600">{avg_win_bps:+.2f}</td><td>—</td></tr>'
+    if losses:
+        avg_loss_bps = sum(rt.get("pnl_bps", 0) for rt in losses) / len(losses)
+        rows_html += f'<tr><td>Avg PnL (bps)</td><td>—</td><td style="color:#dc2626;font-weight:600">{avg_loss_bps:+.2f}</td></tr>'
+
+    return f"""
+<div class="sens-wrap" style="margin-top:1.5rem">
+  <div class="sens-title">WIN vs LOSS — 진입 시점 LOB 컨텍스트 비교</div>
+  <p style="font-size:0.8rem;color:#6b7280;margin:0 0 0.75rem">
+    N: {len(wins)} WIN, {len(losses)} LOSS &nbsp;·&nbsp; entry_context = 체결 직전 스냅샷 기준
+  </p>
+  <div style="overflow-x:auto">
+    <table class="spec-table" style="width:100%">
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th style="color:#16a34a">WIN avg</th>
+          <th style="color:#dc2626">LOSS avg</th>
+        </tr>
+      </thead>
+      <tbody>{rows_html}</tbody>
+    </table>
+  </div>
+</div>"""
+
+
 def render(strategy_dir: Path) -> Path:
     report = json.loads((strategy_dir / "report.json").read_text())
     trace_path = strategy_dir / "trace.json"
     trace = json.loads(trace_path.read_text()) if trace_path.exists() else {}
     spec_text = (strategy_dir / "spec.yaml").read_text()
+    spec = yaml.safe_load(spec_text) or {}
 
     fig = _build_figure(report, trace)
     chart_html = fig.to_html(
@@ -313,7 +843,11 @@ def render(strategy_dir: Path) -> Path:
         duration=report.get("duration_sec", 0.0),
         cards=_metric_cards(report),
         chart=chart_html,
+        sensitivity_panel=_sensitivity_panel_html(spec, report),
+        per_day_section=_per_day_section_html(report),
+        fill_context_section=_fill_context_section_html(report),
         spec_escaped=spec_text.replace("<", "&lt;").replace(">", "&gt;"),
+        spec_description=_spec_description_html(spec),
     )
 
     out = strategy_dir / "report.html"
@@ -502,7 +1036,24 @@ _PER_SYMBOL_HTML = """<!DOCTYPE html>
   .meta pre {{
     background: #1e293b; color: #e2e8f0; padding: 14px;
     border-radius: 8px; font-size: 12px; overflow-x: auto; line-height: 1.5;
+    margin-bottom: 0;
   }}
+  .spec-section {{ margin-top: 18px; border-top: 1px solid #334155; padding-top: 14px; }}
+  .spec-section-title {{
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.07em; color: #94a3b8; margin-bottom: 8px;
+  }}
+  .spec-section p {{
+    color: #cbd5e1; line-height: 1.7; font-size: 12.5px; margin: 0; white-space: pre-wrap;
+  }}
+  .spec-table {{ border-collapse: collapse; width: 100%; font-size: 12px; }}
+  .spec-table th {{
+    text-align: left; color: #64748b; font-weight: 600;
+    padding: 3px 10px; border-bottom: 1px solid #334155;
+  }}
+  .spec-table td {{ padding: 4px 10px; border-bottom: 1px solid #1e3a5f33; vertical-align: top; }}
+  .pk {{ color: #7dd3fc; font-family: 'Menlo','Consolas',monospace; white-space: nowrap; width: 34%; }}
+  .pv {{ color: #e2e8f0; }}
 </style>
 </head>
 <body>
@@ -526,6 +1077,7 @@ _PER_SYMBOL_HTML = """<!DOCTYPE html>
     <details>
       <summary>spec.yaml</summary>
       <pre>{spec_escaped}</pre>
+      {spec_description}
     </details>
   </div>
 </div>
@@ -573,6 +1125,7 @@ def render_per_symbol(strategy_dir: Path) -> Path:
     trace_path = strategy_dir / "trace_per_symbol.json"
     per_traces = json.loads(trace_path.read_text()) if trace_path.exists() else {}
     spec_text = (strategy_dir / "spec.yaml").read_text()
+    spec = yaml.safe_load(spec_text) or {}
 
     per_symbol = agg.get("per_symbol", {})
     starting_cash = float(agg.get("starting_cash", 10_000_000))
@@ -645,6 +1198,7 @@ def render_per_symbol(strategy_dir: Path) -> Path:
             tab_buttons="".join(tab_buttons_parts),
             tab_panels="\n".join(tab_panels_parts),
             spec_escaped=spec_text.replace("<", "&lt;").replace(">", "&gt;"),
+            spec_description=_spec_description_html(spec),
         )
     )
     return out

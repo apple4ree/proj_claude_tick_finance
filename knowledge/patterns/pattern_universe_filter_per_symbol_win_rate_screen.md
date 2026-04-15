@@ -1,11 +1,12 @@
 ---
 id: pattern_universe_filter_per_symbol_win_rate_screen
 created: 2026-04-14T00:00:00
-tags: [pattern, universe, krx, win-rate, symbol-heterogeneity, methodology, breakeven]
+tags: [pattern, universe, krx, win-rate, symbol-heterogeneity, methodology, breakeven, declining-symbol, regime-filter]
 severity: high
 lessons:
   - "[[lesson_20260414_020_symbol_heterogeneity_4_of_10_krx_symbols_structurally_below_win_rate_breakeven]]"
   - "[[lesson_20260414_023_000660_concentration_masks_4_symbol_drag_pooled_avg_hides_a_2_symbol_viable_core]]"
+  - "[[lesson_20260415_014_passive_bid_fills_on_declining_symbols_are_toxic_universe_quality_gate_needed]]"
 ---
 
 # Pattern: Per-symbol win-rate screen required before universe inclusion
@@ -74,6 +75,13 @@ more than 25 bps on either side.
 - **Rule 3**: Symbol re-inclusion requires a structural explanation for why the
   symbol will now clear breakeven (e.g., wider profit target, different entry gate).
   "It might work now" is not a justification.
+- **Rule 4 (strat_0016, iter 16)**: Per-symbol WR screen is necessary but not sufficient.
+  Also require a positive IS buy-hold return before including a symbol. A symbol with
+  -6% buy-hold return during the IS window is in a downtrend; passive BID fills will
+  accumulate at successively worse levels with no recovery. The vol gate (min_entry_volume)
+  does NOT screen for directional regime — a declining symbol can pass the volume check
+  while delivering 0W/8L outcomes. Minimum screen: buy_hold_return > 0% over IS window.
+  Preferred screen: VWAP > open by the time of first entry (intraday trend gate).
 
 ## Anti-patterns
 

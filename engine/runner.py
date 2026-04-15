@@ -220,11 +220,99 @@ def _write_trace(bt: Backtester, strategy_dir: Path) -> None:
                 "avg_price": float(f.avg_price),
                 "fee": float(f.fee),
                 "tag": f.tag,
+                "context": getattr(f, "context", {}) or {},
             }
             for f in bt.portfolio.fills
         ],
     }
     (strategy_dir / "trace.json").write_text(json.dumps(trace, ensure_ascii=False))
+
+
+def _compute_roundtrips_with_context(fills: list) -> list[dict]:
+    """FIFO BUY→SELL matching per symbol with entry context attached.
+
+    Each returned dict:
+      symbol, entry_ts_ns, exit_ts_ns, qty, entry_price, exit_price,
+      gross_pnl, net_pnl, pnl_bps, outcome (WIN|LOSS), exit_tag,
+      entry_context (LOB signal snapshot at BUY fill time)
+    """
+    from collections import defaultdict, deque
+
+    buy_queues: dict[str, deque] = defaultdict(deque)
+    roundtrips: list[dict] = []
+
+    for f in fills:
+        if f.side == "BUY":
+            buy_queues[f.symbol].append(f)
+        elif f.side == "SELL":
+            q = buy_queues[f.symbol]
+            if not q:
+                continue
+            buy_f = q.popleft()
+            qty = min(buy_f.qty, f.qty)
+            gross_pnl = (f.avg_price - buy_f.avg_price) * qty
+            net_pnl = gross_pnl - buy_f.fee - f.fee
+            pnl_bps = (
+                round((f.avg_price - buy_f.avg_price) / buy_f.avg_price * 1e4, 2)
+                if buy_f.avg_price > 0
+                else 0.0
+            )
+            roundtrips.append({
+                "symbol": f.symbol,
+                "entry_ts_ns": int(buy_f.ts_ns),
+                "exit_ts_ns": int(f.ts_ns),
+                "qty": int(qty),
+                "entry_price": float(buy_f.avg_price),
+                "exit_price": float(f.avg_price),
+                "gross_pnl": round(float(gross_pnl), 2),
+                "net_pnl": round(float(net_pnl), 2),
+                "pnl_bps": pnl_bps,
+                "outcome": "WIN" if net_pnl > 0 else "LOSS",
+                "exit_tag": f.tag,
+                "entry_context": getattr(buy_f, "context", {}) or {},
+            })
+    return roundtrips
+
+
+def _compute_per_day(fills: list) -> dict[str, dict]:
+    """Group fills by KST date and compute daily trading stats.
+
+    Returns {date_str: {n_entries, n_roundtrips, n_wins, n_losses, n_stops, n_eod, net_pnl}}
+    """
+    from collections import defaultdict
+    from datetime import datetime, timezone, timedelta
+
+    _KST = timezone(timedelta(hours=9))
+
+    def _kst_date(ts_ns: int) -> str:
+        return datetime.fromtimestamp(ts_ns / 1e9, tz=_KST).strftime("%Y-%m-%d")
+
+    day: dict[str, dict] = defaultdict(
+        lambda: {"n_entries": 0, "n_roundtrips": 0, "n_wins": 0, "n_losses": 0,
+                 "n_stops": 0, "n_eod": 0, "net_pnl": 0.0}
+    )
+
+    # Count entries by entry BUY date
+    for f in fills:
+        if f.side == "BUY":
+            day[_kst_date(f.ts_ns)]["n_entries"] += 1
+
+    # Count roundtrip outcomes by exit date
+    for rt in _compute_roundtrips_with_context(fills):
+        d = _kst_date(rt["exit_ts_ns"])
+        day[d]["n_roundtrips"] += 1
+        if rt["outcome"] == "WIN":
+            day[d]["n_wins"] += 1
+        else:
+            day[d]["n_losses"] += 1
+        tag_low = rt["exit_tag"].lower()
+        if any(k in tag_low for k in ("sl", "stop")):
+            day[d]["n_stops"] += 1
+        elif "eod" in tag_low:
+            day[d]["n_eod"] += 1
+        day[d]["net_pnl"] = round(day[d]["net_pnl"] + rt["net_pnl"], 2)
+
+    return dict(sorted(day.items()))
 
 
 _PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -288,6 +376,8 @@ def run(
     report.avg_loss_bps = stats["avg_loss_bps"]
 
     payload = report.to_dict()
+    payload["roundtrips"] = _compute_roundtrips_with_context(bt.portfolio.fills)
+    payload["per_day"] = _compute_per_day(bt.portfolio.fills)
 
     if write_trace:
         _write_trace(bt, strategy_dir)
