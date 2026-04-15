@@ -28,7 +28,7 @@ This loop is NOT a fixed "ideate → spec → backtest → feedback" pipeline. T
 
 At each iteration boundary, decide which of these applies. Pick exactly one. (If more than one is needed, do them over consecutive iterations.)
 
-1. **New strategy** (standard path) — alpha-designer → execution-designer → spec-writer → [code-generator if missing primitive] → backtest-runner → feedback-analyst. When invoking feedback-analyst, pass the full JSON returned by backtest-runner as the metrics argument — this satisfies feedback-analyst's "Optional metrics" input and prevents it from re-reading `report.json`.
+1. **New strategy** (standard path) — alpha-designer → execution-designer → spec-writer → [code-generator if missing primitive] → [strategy-coder if needs_strategy_coder=true] → backtest-runner → [alpha-critic + execution-critic in parallel] → feedback-analyst (reconciler). After backtest-runner, invoke alpha-critic and execution-critic **in parallel** (both receive the same metrics JSON). Then pass both critiques to feedback-analyst for reconciliation into the final lesson and seeds.
 2. **Engine fix** — when backtest-runner's `anomaly_flag` or an audit check flags a principle violation that blocks progress. Route: code-generator (mode=bugfix) → re-run audit → return to the strategy that triggered it.
 3. **DSL extension** — when spec-writer reports the current grammar cannot express an idea pattern you're seeing repeatedly. Route: spec-writer (meta-authority) or code-generator (mode=dsl_ext), followed by example update.
 4. **Pattern consolidation** — when ≥3 lessons share a root cause. Route: feedback-analyst or strategy-ideator writes `knowledge/patterns/<id>.md` and rebuilds the graph.
@@ -61,6 +61,10 @@ for i in 1..N:
     # After spec-writer:
     #   vfy = Bash("python scripts/verify_outputs.py --agent spec-writer --output '<spec_writer_json>'")
     #   if not vfy.ok: abort iteration, log failures, do NOT run backtest
+    #   if spec_writer_json.needs_strategy_coder == true:
+    #     invoke strategy-coder with strategy_id and execution_design JSON
+    #     vfy_coder = Bash("python -c \"import strategies.<id>.strategy; print('OK')\"")
+    #     if vfy_coder fails: abort iteration, log, do NOT run backtest
     #
     # After backtest-runner:
     #   vfy = Bash("python scripts/verify_outputs.py --agent backtest-runner --output '<backtest_json>'")

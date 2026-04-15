@@ -72,6 +72,45 @@ def _spec_description_html(spec: dict) -> str:
             "</table></div>"
         )
 
+    # --- Payoff & Fee Mechanics (수식) ---
+    fees_cfg = spec.get("fees") or {}
+    params_cfg = spec.get("params") or {}
+    pt  = params_cfg.get("profit_target_bps")
+    sl  = params_cfg.get("stop_loss_bps")
+    lot = params_cfg.get("lot_size")
+    comm = float(fees_cfg.get("commission_bps", 1.5))
+    tax  = float(fees_cfg.get("tax_bps", 18.0))
+    rtt  = comm + tax  # round-trip cost bps
+
+    if pt is not None and sl is not None:
+        pt_f, sl_f = float(pt), float(sl)
+        be_wr = sl_f / (pt_f + sl_f) * 100 if (pt_f + sl_f) > 0 else 0.0
+        payoff = pt_f / sl_f if sl_f > 0 else 0.0
+        lot_str = f"  ·  lot = {lot}" if lot is not None else ""
+
+        formula_rows = [
+            ("Round-trip cost",
+             f"commission ({comm} bps) + sell tax ({tax} bps) = <b>{rtt:.1f} bps</b>"),
+            ("Break-even win rate",
+             f"stop / (target + stop) = {sl_f:.0f} / ({pt_f:.0f} + {sl_f:.0f}) = <b>{be_wr:.1f}%</b>"),
+            ("Payoff ratio (P:L)",
+             f"target / stop = {pt_f:.0f} / {sl_f:.0f} = <b>{payoff:.2f}</b>{lot_str}"),
+            ("Min edge required",
+             f"actual WR must exceed {be_wr:.1f}% to be profitable after {rtt:.1f} bps fees"),
+        ]
+        rows_f = "".join(
+            f'<tr><td class="pk">{k}</td><td class="pv">{v}</td></tr>'
+            for k, v in formula_rows
+        )
+        sections.append(
+            '<div class="spec-section">'
+            '<div class="spec-section-title">Payoff &amp; Fee Structure</div>'
+            '<table class="spec-table">'
+            "<thead><tr><th>Formula</th><th>Value</th></tr></thead>"
+            f"<tbody>{rows_f}</tbody>"
+            "</table></div>"
+        )
+
     # --- Universe & Config ---
     universe = spec.get("universe") or {}
     fees = spec.get("fees") or {}
@@ -610,6 +649,17 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
     border: none; border-top: 1px solid #e5e7eb; margin: 14px 0;
   }}
   /* ── end sensitivity panel ────────────────────── */
+  /* Symbol tabs */
+  .tab-bar {{
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
+  }}
+  .tab-btn {{
+    padding: 6px 16px; border: 1px solid #e5e7eb; border-radius: 8px;
+    cursor: pointer; font-size: 13px; font-weight: 600; background: white;
+    color: #374151; font-family: inherit; transition: all 0.12s;
+  }}
+  .tab-btn:hover {{ background: #f3f4f6; }}
+  .tab-btn.active {{ background: #2563eb; color: white; border-color: #2563eb; }}
   .meta {{
     margin-top: 24px;
     color: #6b7280;
@@ -695,10 +745,10 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
   {per_day_section}
   {fill_context_section}
   <div class="meta">
+    {spec_description}
     <details>
-      <summary>spec.yaml</summary>
+      <summary>spec.yaml (raw)</summary>
       <pre>{spec_escaped}</pre>
-      {spec_description}
     </details>
   </div>
 </div>
@@ -822,6 +872,77 @@ def _fill_context_section_html(report: dict) -> str:
 </div>"""
 
 
+def _build_symbol_tabs_html(report: dict, trace: dict) -> str:
+    """Tab bar + per-symbol Plotly charts for report.html.
+
+    Each tab shows: that symbol's mid-price + BUY/SELL markers (row 1)
+    + global equity curve (row 2) + global drawdown (row 3).
+
+    The first tab's figure includes the Plotly CDN script; subsequent
+    tabs use include_plotlyjs=False so the script is only loaded once.
+    """
+    mid_series = trace.get("mid_series", {}) or {}
+    fills = trace.get("fills", []) or []
+    equity_curve = trace.get("equity_curve", [])
+    symbols = list(mid_series.keys())
+
+    if not symbols:
+        # Fallback: single figure with whatever is in trace
+        fig = _build_figure(report, trace)
+        return fig.to_html(
+            include_plotlyjs="cdn", full_html=False,
+            div_id="chart-root", config={"responsive": True},
+        )
+
+    tab_buttons: list[str] = []
+    tab_panels: list[str] = []
+
+    for i, sym in enumerate(symbols):
+        is_first = i == 0
+        active_cls = "active" if is_first else ""
+
+        # Slice trace to this symbol only (equity/drawdown stay global)
+        sym_trace = {
+            "mid_series": {sym: mid_series[sym]},
+            "fills": [f for f in fills if f.get("symbol") == sym],
+            "equity_curve": equity_curve,
+        }
+
+        fig = _build_figure(report, sym_trace)
+        chart_html = fig.to_html(
+            include_plotlyjs="cdn" if is_first else False,
+            full_html=False,
+            div_id=f"chart-{sym}",
+            config={"responsive": True},
+        )
+
+        tab_buttons.append(
+            f'<button class="tab-btn {active_cls}"'
+            f' onclick="showSymTab(\'{sym}\', this)">{sym}</button>'
+        )
+        tab_panels.append(
+            f'<div id="sym-tab-{sym}" class="sym-tab-panel"'
+            f' style="display:{"block" if is_first else "none"}">'
+            f'{chart_html}'
+            f'</div>'
+        )
+
+    tab_js = """<script>
+function showSymTab(sym, btn) {
+  document.querySelectorAll('.sym-tab-panel').forEach(function(p) { p.style.display = 'none'; });
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('sym-tab-' + sym).style.display = 'block';
+  btn.classList.add('active');
+}
+</script>"""
+
+    return (
+        f'<div class="tab-bar">{"".join(tab_buttons)}</div>\n'
+        + "\n".join(tab_panels)
+        + "\n" + tab_js
+    )
+
+
 def render(strategy_dir: Path) -> Path:
     report = json.loads((strategy_dir / "report.json").read_text())
     trace_path = strategy_dir / "trace.json"
@@ -829,10 +950,7 @@ def render(strategy_dir: Path) -> Path:
     spec_text = (strategy_dir / "spec.yaml").read_text()
     spec = yaml.safe_load(spec_text) or {}
 
-    fig = _build_figure(report, trace)
-    chart_html = fig.to_html(
-        include_plotlyjs="cdn", full_html=False, div_id="chart-root", config={"responsive": True}
-    )
+    chart_html = _build_symbol_tabs_html(report, trace)
 
     html = _HTML_TEMPLATE.format(
         title=report.get("spec_name", strategy_dir.name),
