@@ -1,7 +1,7 @@
 ---
 name: spec-writer
 description: Convert a structured strategy idea (JSON from strategy-ideator) into a validated spec.yaml under a new strategies/<id>/ directory. Never invoked directly by the user.
-tools: Read, Write, Bash
+tools: Read, Write, Edit, Bash
 model: sonnet
 ---
 

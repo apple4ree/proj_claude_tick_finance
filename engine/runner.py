@@ -102,6 +102,108 @@ def _build_strategy(spec: StrategySpec, spec_path: Path | str) -> Strategy:
     raise ValueError(f"Unknown strategy_kind: {kind}")
 
 
+def _write_report_md(payload: dict, strategy_dir: Path) -> None:
+    """Write report_summary.md — human+LLM-readable backtest summary.
+
+    Generated alongside report.json / report_per_symbol.json so that agents
+    can read structured markdown instead of parsing nested JSON.
+    """
+    from datetime import datetime as _dt
+
+    mode = payload.get("mode", "single")
+    sid  = payload.get("strategy_id") or strategy_dir.name
+    name = payload.get("spec_name", "")
+    ts   = _dt.now().strftime("%Y-%m-%d %H:%M")
+
+    lines: list[str] = [
+        f"# Backtest Report: {sid}",
+        f"",
+        f"spec: {name} | mode: {mode} | generated: {ts}",
+        "",
+    ]
+
+    if mode == "per_symbol":
+        # --- per-symbol aggregate ---
+        lines += [
+            "## Aggregate Metrics",
+            "",
+            "| Metric | Value |",
+            "|--------|-------|",
+            f"| avg_return_pct | {payload.get('avg_return_pct', 0):+.4f}% |",
+            f"| total_roundtrips | {payload.get('total_roundtrips', 0)} |",
+            f"| pooled_win_rate_pct | {payload.get('pooled_win_rate_pct', 0):.2f}% |",
+            f"| total_fees | {payload.get('total_fees', 0):,.2f} KRW |",
+            f"| n_symbols_traded | {payload.get('n_symbols_traded', 0)} |",
+            f"| n_symbols_skipped | {payload.get('n_symbols_skipped', 0)} |",
+            "",
+            "## Per-Symbol Results",
+            "",
+            "| symbol | return_pct | n_roundtrips | win_rate_pct | total_fees"
+            " | best_trade | worst_trade |",
+            "|--------|-----------|--------------|--------------|-----------|"
+            "------------|-------------|",
+        ]
+        for sym, s in payload.get("per_symbol", {}).items():
+            lines.append(
+                f"| {sym} | {s.get('return_pct', 0):+.4f}% | {s.get('n_roundtrips', 0)}"
+                f" | {s.get('win_rate_pct', 0):.2f}% | {s.get('total_fees', 0):,.2f}"
+                f" | {s.get('best_trade', 0):+,.2f} | {s.get('worst_trade', 0):+,.2f} |"
+            )
+        skipped = payload.get("skipped_symbols", [])
+        if skipped:
+            lines += ["", f"Skipped (0 trades): {', '.join(skipped)}"]
+    else:
+        # --- single-run ---
+        rej = payload.get("rejected", {})
+        lines += [
+            "## Summary Metrics",
+            "",
+            "| Metric | Value |",
+            "|--------|-------|",
+            f"| return_pct | {payload.get('return_pct', 0):+.4f}% |",
+            f"| total_pnl | {payload.get('total_pnl', 0):+,.2f} KRW |",
+            f"| realized_pnl | {payload.get('realized_pnl', 0):+,.2f} KRW |",
+            f"| total_fees | {payload.get('total_fees', 0):,.2f} KRW |",
+            f"| n_roundtrips | {payload.get('n_roundtrips', 0)} |",
+            f"| win_rate_pct | {payload.get('win_rate_pct', 0):.3f}% |",
+            f"| avg_win_bps | {payload.get('avg_win_bps', 0):+.2f} bps |",
+            f"| avg_loss_bps | {payload.get('avg_loss_bps', 0):+.2f} bps |",
+            f"| sharpe_raw | {payload.get('sharpe_raw', 0):.4f} |",
+            f"| sharpe_annualized | {payload.get('sharpe_annualized', 0):.4f} |",
+            f"| mdd_pct | {payload.get('mdd_pct', 0):.4f}% |",
+            "",
+            "## Status Flags",
+            "",
+            "| Flag | Count |",
+            "|------|-------|",
+            f"| partial_fills | {payload.get('n_partial_fills', 0)} |",
+            f"| pending_at_end | {payload.get('pending_at_end', 0)} |",
+            f"| resting_cancelled | {payload.get('n_resting_cancelled', 0)} |",
+            f"| rejected.cash | {rej.get('cash', 0)} |",
+            f"| rejected.short | {rej.get('short', 0)} |",
+            f"| rejected.no_liquidity | {rej.get('no_liquidity', 0)} |",
+            f"| rejected.non_marketable | {rej.get('non_marketable', 0)} |",
+        ]
+
+        per_sym = payload.get("per_symbol", {})
+        if per_sym:
+            lines += [
+                "",
+                "## Buy-Hold Benchmark (per symbol)",
+                "",
+                "| symbol | first_mid | last_mid | buy_hold_return_pct |",
+                "|--------|-----------|----------|---------------------|",
+            ]
+            for sym, s in per_sym.items():
+                lines.append(
+                    f"| {sym} | {s.get('first_mid', 0):,.0f} | {s.get('last_mid', 0):,.0f}"
+                    f" | {s.get('buy_hold_return_pct', 0):+.4f}% |"
+                )
+
+    lines.append("")
+    (strategy_dir / "report_summary.md").write_text("\n".join(lines))
+
+
 def _write_trace(bt: Backtester, strategy_dir: Path) -> None:
     trace = {
         "equity_curve": [[int(ts), float(eq)] for ts, eq in bt.equity_samples],
@@ -212,6 +314,7 @@ def run(
     }
     # Re-write report.json with artifacts included
     report_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2))
+    _write_report_md(payload, strategy_dir)
     return payload
 
 
@@ -340,6 +443,7 @@ def run_per_symbol(
         except Exception as e:
             payload.setdefault("errors", {})["report_html"] = str(e)
 
+    _write_report_md(payload, strategy_dir)
     return payload
 
 

@@ -54,7 +54,7 @@ You may NOT:
    python scripts/list_strategies.py --limit 10
    python knowledge/graph.py stats
    python knowledge/graph.py orphans
-   python scripts/audit_principles.py 2>&1 | tail -3
+   python scripts/audit_principles.py --json
    ls -1 knowledge/lessons/ knowledge/patterns/ 2>/dev/null
    ```
 

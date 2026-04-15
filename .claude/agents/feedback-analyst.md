@@ -1,7 +1,7 @@
 ---
 name: feedback-analyst
 description: Analyze a backtest report vs its spec, write one lesson to knowledge/, and produce a concrete seed for the next iteration. Closes the loop.
-tools: Read, Bash, Write
+tools: Read, Bash, Write, Edit
 model: sonnet
 ---
 
@@ -34,7 +34,31 @@ You are the **feedback analyst**. You own the loop's learning step.
 
 ## Workflow
 
-1. **Read** `strategies/<strategy_id>/spec.yaml`. For metrics: if the caller passed the backtest-runner JSON directly in your input, use it as-is — do **NOT** read `report.json`. Only read `report.json` when no metrics were passed.
+1. **Read** `strategies/<strategy_id>/spec.yaml`. For metrics: if the caller passed the backtest-runner JSON directly in your input, use it as-is. If no metrics were passed, read `strategies/<strategy_id>/report_summary.md` (markdown table format) — do **NOT** read `report.json` directly.
+
+1b. **Read consolidated backtest analysis** (if trace file exists):
+
+   First, generate the analysis (if not already present):
+   ```bash
+   python scripts/analyze_trace.py --strategy <strategy_id>
+   ```
+   Then read the single consolidated file:
+   ```
+   Read: strategies/<strategy_id>/backtest_analysis.md
+   ```
+   This file combines `report_summary.md` (backtest metrics) + `analysis_trace.md` (roundtrip analysis)
+   into one document. Key sections:
+
+   - **Backtest Report** (top half) — return_pct, n_roundtrips, win_rate, fees, per-symbol breakdown
+   - **Trace Analysis Summary** — avg_net_bps, avg hold WIN vs LOSS
+   - **Exit Tag Breakdown** — limit_exit / stop / exit_eod 비율과 각각의 avg_net_bps
+   - **Entry Hour Distribution** — 시간대별 WIN/LOSS 패턴
+   - **Roundtrips table** — net_bps, buy_obi, buy_spr, sell_obi per trade
+   - **Pre-computed Observations** — 스크립트가 사전 계산한 WIN vs LOSS LOB 패턴 차이
+
+   Do NOT read `analysis_trace.json` or `report.json` — raw nested JSON is not needed.
+
+   If the trace file does not exist (0-trade runs), skip this step and rely on metrics passed by backtest-runner.
 
 2. **Find the primary finding**: ONE non-obvious observation about why the strategy performed as it did. Examples:
    - "360 trades × 340 KRW average spread = 122k fee burn > realized PnL — turnover too high"

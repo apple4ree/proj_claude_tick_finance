@@ -194,12 +194,14 @@ class ScheduledOrders:
 # ---------------------------------------------------------------------------
 
 _RESULTS: list[tuple[str, bool, str]] = []
+_SILENT: bool = False  # suppresses per-check print when --json is set
 
 
 def check(name: str, ok: bool, detail: str = "") -> None:
     _RESULTS.append((name, ok, detail))
-    mark = "PASS" if ok else "FAIL"
-    print(f"[{mark}] {name}" + (f" — {detail}" if detail else ""))
+    if not _SILENT:
+        mark = "PASS" if ok else "FAIL"
+        print(f"[{mark}] {name}" + (f" — {detail}" if detail else ""))
 
 
 def make_stream(symbol="000001", n=5, best_bid=100, best_ask=101, qty_each=100) -> list[OrderBookSnapshot]:
@@ -500,6 +502,21 @@ def check_resting_limit_eod_cancel():
 
 
 def main():
+    import argparse
+    import json as _json
+
+    ap = argparse.ArgumentParser(description="Empirical audit of backtest principles")
+    ap.add_argument(
+        "--json",
+        action="store_true",
+        help="Output structured JSON summary instead of human-readable text",
+    )
+    args = ap.parse_args()
+
+    global _SILENT
+    if args.json:
+        _SILENT = True
+
     checks = [
         check_no_lookahead,
         check_latency_ordering,
@@ -519,9 +536,28 @@ def main():
             fn()
         except Exception as e:
             check(fn.__name__, False, f"exception: {e}")
-    n_fail = sum(1 for _, ok, _ in _RESULTS if not ok)
-    print()
-    print(f"summary: {len(_RESULTS) - n_fail}/{len(_RESULTS)} passed")
+
+    n_total = len(_RESULTS)
+    n_fail  = sum(1 for _, ok, _ in _RESULTS if not ok)
+    n_pass  = n_total - n_fail
+
+    if args.json:
+        out = {
+            "checks_passed": n_pass,
+            "checks_failed": n_fail,
+            "total": n_total,
+            "failures": [
+                {"name": name, "detail": detail}
+                for name, ok, detail in _RESULTS
+                if not ok
+            ],
+            "summary": f"{n_pass}/{n_total} passed",
+        }
+        print(_json.dumps(out))
+    else:
+        print()
+        print(f"summary: {n_pass}/{n_total} passed")
+
     sys.exit(0 if n_fail == 0 else 1)
 
 
