@@ -84,6 +84,48 @@ python scripts/attribute_pnl.py --all
 
 Iterate 루프의 feedback-analyst는 clean_pnl을 기준으로 진짜 edge 여부를 판단해야 함.
 
+## Data-Driven Generation Pipeline (Phase A → Generation)
+
+전략 생성은 이제 데이터 기반입니다. Agent가 LLM 직감으로 signal/exit를 고르지 않고, 사전 분석된 signal brief에서 선택합니다.
+
+### Flow
+
+```
+signal_research.py extract   (feature extraction, 1회 per symbol)
+    ↓
+generate_signal_brief.py     (Sharpe-ranked top 10 + optimal exits)
+    ↓  data/signal_briefs/<symbol>.json
+    ↓
+alpha-designer               (read brief, pick from top 10)
+    ↓
+execution-designer           (use brief's optimal_exit as baseline)
+    ↓
+spec-writer / strategy-coder (build strategy from data-informed params)
+    ↓
+backtest + invariants + attribute_pnl (post-gen validation)
+```
+
+### 핵심 규칙
+
+- `/new-strategy` 및 `/iterate`는 alpha-designer 호출 전에 **반드시** signal brief를 생성/갱신
+- Brief의 `n_viable_in_top == 0`이면 해당 symbol 건너뜀 (iteration 낭비 방지)
+- alpha-designer는 top 10 내에서만 signal 선택 (새 signal 발명 금지)
+- execution-designer는 brief의 `optimal_exit`을 baseline으로 사용 (±20% 이내만 조정)
+
+### 강제 검증
+
+Agent 산출물에 `signal_brief_rank`, `deviation_from_brief` 필드 포함 → critic이 확인 → 규약 이탈 시 feedback-analyst가 재작업 요청.
+
+### 사용법
+
+```bash
+# KRX symbol (fee 21 bps)
+python scripts/generate_signal_brief.py --symbol 005930 --features-dir data/signal_research --fee 21.0
+
+# Crypto symbol (fee 4 bps)
+python scripts/generate_signal_brief.py --symbol BTC --features-dir data/signal_research/crypto --fee 4.0
+```
+
 ## Data Universe
 
 - **IS (In-Sample)**: 20260305 ~ 20260320 (12일) — 전략 개발용. 하락+상승 혼합 regime.
