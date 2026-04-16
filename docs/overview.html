@@ -3,751 +3,277 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tick Strategy Framework — Architecture Overview</title>
+<title>Tick Strategy Framework — 프로젝트 개요</title>
 <style>
   :root {
-    --bg: #fafafa;
-    --fg: #1a1a1a;
-    --muted: #6b7280;
-    --accent: #2563eb;
-    --accent-soft: #dbeafe;
-    --green: #16a34a;
-    --green-soft: #f0fdf4;
-    --purple: #9333ea;
-    --purple-soft: #faf5ff;
-    --amber: #d97706;
-    --amber-soft: #fef3c7;
-    --red: #dc2626;
-    --red-soft: #fef2f2;
-    --border: #e5e7eb;
-    --code-bg: #f3f4f6;
-    --code-fg: #1f2937;
-    --dark-bg: #1e293b;
-    --dark-fg: #e2e8f0;
+    --bg: #fafafa; --fg: #1a1a1a; --muted: #6b7280;
+    --accent: #2563eb; --accent-soft: #dbeafe;
+    --green: #16a34a; --green-soft: #f0fdf4;
+    --purple: #9333ea; --purple-soft: #faf5ff;
+    --amber: #d97706; --amber-soft: #fef3c7;
+    --red: #dc2626; --red-soft: #fef2f2;
+    --border: #e5e7eb; --code-bg: #f3f4f6;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--fg);
-    line-height: 1.65;
-    -webkit-font-smoothing: antialiased;
-  }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 56px 24px 96px; }
-  h1 { font-size: 36px; margin: 0 0 8px; letter-spacing: -0.02em; font-weight: 800; }
-  h2 { font-size: 24px; margin: 56px 0 18px; padding-bottom: 10px; border-bottom: 2px solid var(--accent); letter-spacing: -0.01em; font-weight: 700; }
-  h3 { font-size: 17px; margin: 28px 0 10px; color: var(--accent); font-weight: 700; }
-  p { margin: 8px 0 16px; }
-  .lead { color: var(--muted); font-size: 17px; margin: 0 0 12px; }
-  .meta { color: var(--muted); font-size: 13px; margin: 0 0 24px; }
-  .meta code { font-size: 12px; }
-
-  code, pre { font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-  :not(pre) > code { background: var(--code-bg); color: var(--code-fg); padding: 2px 6px; border-radius: 4px; font-size: 12.5px; }
-  pre {
-    background: var(--dark-bg);
-    color: var(--dark-fg);
-    padding: 16px 18px;
-    border-radius: 8px;
-    overflow-x: auto;
-    font-size: 12.5px;
-    line-height: 1.55;
-    margin: 12px 0 20px;
-  }
-  pre code { background: transparent; padding: 0; color: inherit; font-size: 12.5px; }
-  .cm { color: #94a3b8; }
-  .kw { color: #f472b6; }
-  .str { color: #86efac; }
-  .num { color: #fbbf24; }
-  .fn { color: #60a5fa; }
-
-  .diagram {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    margin: 12px 0 24px;
-    overflow-x: auto;
-  }
-  .diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
-  .caption { text-align: center; color: var(--muted); font-size: 12.5px; margin-top: 8px; }
-
-  table { width: 100%; border-collapse: collapse; margin: 8px 0 24px; font-size: 14px; }
-  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
-  th { background: var(--code-bg); font-weight: 700; font-size: 13px; }
-  td code { font-size: 12px; }
-
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 8px 0 24px; }
-  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 8px 0 24px; }
-  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 8px 0 24px; }
-  @media (max-width: 760px) {
-    .grid2, .grid3, .grid4 { grid-template-columns: 1fr; }
-  }
-  .card { background: white; border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
-  .card h4 { margin: 0 0 6px; font-size: 14px; color: var(--accent); font-weight: 700; }
-  .card p { font-size: 13px; color: var(--muted); margin: 0; }
-  .card.green { border-color: #86efac; }
-  .card.green h4 { color: var(--green); }
-  .card.amber { border-color: #fcd34d; }
-  .card.amber h4 { color: var(--amber); }
-  .card.purple { border-color: #d8b4fe; }
-  .card.purple h4 { color: var(--purple); }
-  .card.red { border-color: #fca5a5; }
-  .card.red h4 { color: var(--red); }
-
-  .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--accent-soft); color: var(--accent); margin-right: 4px; }
-  .badge.ok { background: #dcfce7; color: #166534; }
-  .badge.warn { background: var(--amber-soft); color: #92400e; }
-  .badge.purple { background: var(--purple-soft); color: var(--purple); }
-  .badge.red { background: var(--red-soft); color: var(--red); }
-
-  ul.clean { padding-left: 20px; margin: 8px 0 20px; }
-  ul.clean li { margin: 4px 0; }
-
-  .flow-arrow { color: var(--accent); font-weight: 700; margin: 0 4px; }
-
-  footer { margin-top: 72px; padding-top: 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 12.5px; text-align: center; }
-
-  hr.section { border: none; border-top: 1px dashed var(--border); margin: 40px 0; }
+  body { margin: 0; font-family: 'Pretendard', -apple-system, sans-serif; background: var(--bg); color: var(--fg); line-height: 1.6; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+  h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.4rem; margin-top: 2.5rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.3rem; }
+  h3 { font-size: 1.1rem; margin-top: 1.5rem; color: var(--accent); }
+  .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 2rem; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+  .stat { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; text-align: center; }
+  .stat-val { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+  .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+  .card { background: white; border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem; margin: 1rem 0; }
+  .card-title { font-weight: 600; margin-bottom: 0.5rem; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 500; margin: 2px; }
+  .tag-green { background: var(--green-soft); color: var(--green); }
+  .tag-amber { background: var(--amber-soft); color: var(--amber); }
+  .tag-red { background: var(--red-soft); color: var(--red); }
+  .tag-purple { background: var(--purple-soft); color: var(--purple); }
+  .tag-blue { background: var(--accent-soft); color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+  th, td { padding: 0.5rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border); }
+  th { background: var(--code-bg); font-weight: 600; }
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 3px; font-size: 0.85rem; }
+  pre { background: var(--code-bg); padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; }
+  .flow { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+  .flow-item { background: white; border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.8rem; font-size: 0.85rem; }
+  .flow-arrow { color: var(--muted); font-weight: bold; }
+  .highlight { background: var(--amber-soft); border-left: 3px solid var(--amber); padding: 0.8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+  .finding { background: var(--red-soft); border-left: 3px solid var(--red); padding: 0.8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+  .success { background: var(--green-soft); border-left: 3px solid var(--green); padding: 0.8rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; }
+  footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.8rem; }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="container">
 
-  <h1>Tick Strategy Framework</h1>
-  <p class="lead">KIS 10-level order book data (<code>H0STASP0</code>)에 대해 전략을 자율적으로 설계 &rarr; 백테스트 &rarr; 학습하는 Claude Code 기반 프레임워크.</p>
-  <p class="meta">
-    <span class="badge">9 agents</span>
-    <span class="badge ok">audit 12/12</span>
-    <span class="badge purple">49 strategies</span>
-    <span class="badge">45 lessons &middot; 15 patterns</span>
-    &middot; updated 2026-04-15 &middot; <code>/home/dgu/tick/proj_claude_tick_finance</code>
-  </p>
+<h1>Tick Strategy Framework</h1>
+<p class="subtitle">LLM Multi-Agent 자율 전략 생성 · 백테스트 · 학습 프레임워크 &mdash; 2026-04-16 기준</p>
 
-  <!-- ==================== 1. 개요 ==================== -->
-  <h2>1. 개요</h2>
-  <p>세 가지 설계 원칙:</p>
-  <div class="grid3">
-    <div class="card"><h4>Signal / Execution 분리</h4><p><b>alpha-designer</b>가 신호 edge(WHEN/WHY)를, <b>execution-designer</b>가 주문 메커닉(HOW)을 각각 담당. 진입 타이밍과 체결 전략을 독립적으로 최적화.</p></div>
-    <div class="card"><h4>학습 루프</h4><p>매 이터레이션마다 feedback-analyst가 WIN/LOSS 체결 시점 LOB 컨텍스트를 분석하고, Alpha Critique + Execution Critique로 구조화된 교훈을 남김.</p></div>
-    <div class="card"><h4>자기 진화</h4><p>meta-reviewer가 K회 마다 프레임워크 자체(engine/, DSL, knowledge 카테고리)를 감사하고 구조적 개선을 지시. 파이프라인이 고정되지 않음.</p></div>
-  </div>
+<div class="stats">
+  <div class="stat"><div class="stat-val">39</div><div class="stat-label">생성된 전략</div></div>
+  <div class="stat"><div class="stat-val">11</div><div class="stat-label">전문 Agent</div></div>
+  <div class="stat"><div class="stat-val">43</div><div class="stat-label">Lessons</div></div>
+  <div class="stat"><div class="stat-val">18</div><div class="stat-label">Patterns</div></div>
+  <div class="stat"><div class="stat-val">15</div><div class="stat-label">Scripts</div></div>
+  <div class="stat"><div class="stat-val">7</div><div class="stat-label">Invariant 유형</div></div>
+</div>
 
-  <!-- ==================== 2. Agent 파이프라인 ==================== -->
-  <h2>2. Agent Pipeline</h2>
-  <p>전략 생성은 6단계 에이전트 체인으로 진행됩니다. 각 에이전트는 .md 산출물을 남기고, 다음 에이전트가 이를 읽습니다.</p>
+<!-- ===== 프로젝트 개요 ===== -->
+<h2>프로젝트 개요</h2>
+<p>
+  KRX 10-level 호가잔량(H0STASP0) tick 데이터 및 Upbit 크립토 LOB 데이터를 기반으로,
+  LLM multi-agent 파이프라인이 트레이딩 전략을 <strong>자율 생성 → 백테스트 → 분석 → 학습</strong>하는 프레임워크입니다.
+</p>
+<p>
+  핵심 연구 질문: <em>"LLM이 생성한 domain code(trading strategy)는 specification의 의도와 runtime behavior가 체계적으로 불일치하며,
+  multi-agent critique와 automated invariant checker가 이를 얼마나 발견하는가?"</em>
+</p>
 
-  <div class="diagram">
-    <svg viewBox="0 0 960 520" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
-        </marker>
-        <marker id="arr-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="#d97706"/>
-        </marker>
-        <marker id="arr-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/>
-        </marker>
-        <marker id="arr-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
-        </marker>
-      </defs>
+<!-- ===== 디렉토리 구조 ===== -->
+<h2>디렉토리 구조</h2>
+<pre>
+proj_claude_tick_finance/
+├── engine/              순수 Python 백테스트 엔진 (10개 모듈)
+│   ├── data_loader.py   KRX/Crypto LOB CSV → OrderBookSnapshot
+│   ├── signals.py       12개 signal primitive (OBI, microprice, spread 등)
+│   ├── simulator.py     주문 매칭, 큐 모델, fee, invariant checker 통합
+│   ├── invariants.py    Spec-driven 7개 invariant 자동 추론 + strict mode
+│   ├── runner.py        spec.yaml → 백테스트 실행 (--strict 옵션)
+│   └── ...
+├── scripts/             CLI 도구 (15개)
+│   ├── signal_research.py       LOB feature → forward return 분석
+│   ├── optimal_params.py        분포 기반 수학적 최적 PT/SL 도출
+│   ├── generate_signal_brief.py Sharpe top-10 signal 요약 JSON
+│   ├── attribute_pnl.py         Counterfactual PnL 귀속 (clean vs bug)
+│   ├── sweep_invariants.py      전 전략 invariant 위반 집계
+│   ├── compare_detection.py     Critic vs Checker 발견율 비교
+│   └── ...
+├── strategies/          생성된 전략 (39개), spec.yaml + strategy.py + report.json
+├── knowledge/           Obsidian 호환 지식 vault
+│   ├── lessons/ (43개)  실패/성공 교훈
+│   ├── patterns/ (18개) 반복 패턴 통합
+│   └── .graph.json      지식 그래프 (62 nodes, 84 edges)
+├── .claude/agents/      11개 전문 agent 정의
+├── .claude/commands/    /iterate, /new-strategy 커맨드
+├── data/signal_research/ Signal 분석 결과 (KRX + Crypto)
+├── data/signal_briefs/  Agent용 signal 요약 JSON
+├── tests/               Unit tests (invariants, signal brief)
+└── docs/                이 overview + plan 문서
+</pre>
 
-      <g font-family="system-ui">
-        <!-- Row 1: Main pipeline -->
-        <rect x="30" y="20" width="900" height="180" rx="14" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
-        <text x="50" y="46" font-size="14" font-weight="800" fill="#1e3a8a">Strategy Generation Pipeline</text>
+<!-- ===== 3-Phase 파이프라인 ===== -->
+<h2>3-Phase 파이프라인</h2>
 
-        <!-- 1. alpha-designer -->
-        <g transform="translate(40,60)">
-          <rect width="160" height="72" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5"/>
-          <text x="80" y="22" font-size="12" font-weight="700" text-anchor="middle" fill="#1e40af">alpha-designer</text>
-          <text x="80" y="38" font-size="10" text-anchor="middle" fill="#475569">WHEN / WHY to enter</text>
-          <text x="80" y="54" font-size="9" text-anchor="middle" fill="#94a3b8">hypothesis, entry_condition</text>
-          <text x="80" y="66" font-size="9" text-anchor="middle" fill="#16a34a">_drafts/&lt;name&gt;_alpha.md</text>
-        </g>
+<h3>Phase A: Pre-Generation (데이터 분석)</h3>
+<p>전략 생성 <strong>이전에</strong> 시장 데이터를 분석하여 viable signal과 최적 파라미터를 결정합니다.</p>
+<div class="flow">
+  <div class="flow-item"><strong>signal_research.py</strong><br>feature 추출 + forward return</div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item"><strong>optimal_params.py</strong><br>분포 기반 최적 PT/SL</div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item"><strong>generate_signal_brief.py</strong><br>Sharpe top-10 JSON</div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="border-color:var(--accent)"><strong>data/signal_briefs/</strong><br>Agent가 읽는 데이터</div>
+</div>
 
-        <!-- 2. execution-designer -->
-        <g transform="translate(220,60)">
-          <rect width="160" height="72" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5"/>
-          <text x="80" y="22" font-size="12" font-weight="700" text-anchor="middle" fill="#1e40af">execution-designer</text>
-          <text x="80" y="38" font-size="10" text-anchor="middle" fill="#475569">HOW to execute</text>
-          <text x="80" y="54" font-size="9" text-anchor="middle" fill="#94a3b8">TTL, stop/target, lot_size</text>
-          <text x="80" y="66" font-size="9" text-anchor="middle" fill="#16a34a">_drafts/&lt;name&gt;_execution.md</text>
-        </g>
+<h3>Generation: Agent 파이프라인 (전략 생성)</h3>
+<div class="flow">
+  <div class="flow-item" style="background:var(--accent-soft)">alpha-designer<br><small>신호 선택 (brief에서)</small></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:var(--accent-soft)">execution-designer<br><small>PT/SL 설정 (optimal_exit)</small></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:var(--purple-soft)">spec-writer<br><small>YAML 생성</small></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:var(--purple-soft)">strategy-coder<br><small>Python 구현</small></div>
+</div>
+<table>
+  <tr><th>Agent</th><th>역할</th><th>핵심 규칙</th></tr>
+  <tr><td>alpha-designer</td><td>신호 edge 결정 (WHEN/WHY)</td><td>signal brief top-10에서만 선택</td></tr>
+  <tr><td>execution-designer</td><td>주문 메커닉 (HOW)</td><td>optimal_exit ±20% 이내 조정</td></tr>
+  <tr><td>spec-writer</td><td>YAML 생성 + 교정</td><td>description 한국어 작성</td></tr>
+  <tr><td>strategy-coder</td><td>Python strategy.py 구현</td><td>7-invariant 체크리스트 준수</td></tr>
+  <tr><td>backtest-runner</td><td>백테스트 실행</td><td>normal + strict 이중 실행</td></tr>
+  <tr><td>alpha-critic</td><td>신호 품질 분석</td><td>clean_pnl 기준 판단</td></tr>
+  <tr><td>execution-critic</td><td>체결 메커닉 분석</td><td>invariant 위반 → 실행 결함 매핑</td></tr>
+  <tr><td>feedback-analyst</td><td>비평 종합 → 교훈 + 시드</td><td>clean_pnl &lt; 0 → escape 강제</td></tr>
+  <tr><td>meta-reviewer</td><td>프레임워크 감사</td><td>매 K회 호출</td></tr>
+  <tr><td>code-generator</td><td>엔진 확장</td><td>audit 12/12 유지</td></tr>
+  <tr><td>strategy-ideator</td><td>전략 아이디어 생성 (legacy)</td><td>—</td></tr>
+</table>
 
-        <!-- 3. spec-writer -->
-        <g transform="translate(400,60)">
-          <rect width="160" height="72" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5"/>
-          <text x="80" y="22" font-size="12" font-weight="700" text-anchor="middle" fill="#1e40af">spec-writer</text>
-          <text x="80" y="38" font-size="10" text-anchor="middle" fill="#475569">alpha + exec &rarr; spec.yaml</text>
-          <text x="80" y="54" font-size="9" text-anchor="middle" fill="#94a3b8">+ strategy.py (if python)</text>
-          <text x="80" y="66" font-size="9" text-anchor="middle" fill="#16a34a">strategies/&lt;id&gt;/</text>
-        </g>
+<h3>Phase B: Post-Generation (검증 + 피드백)</h3>
+<p>전략 생성 <strong>이후에</strong> spec-code 정합성을 검증하고 진짜 edge를 분리합니다.</p>
+<div class="flow">
+  <div class="flow-item">backtest<br><small>normal run</small></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:var(--amber-soft)">invariant check<br><small>7개 자동 검증</small></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:var(--amber-soft)">strict run<br><small>엔진 개입 모드</small></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:var(--red-soft)">attribute_pnl<br><small>clean vs bug 분리</small></div>
+  <span class="flow-arrow">→</span>
+  <div class="flow-item" style="background:var(--green-soft)">critics + feedback<br><small>clean_pnl 기준 판단</small></div>
+</div>
 
-        <!-- 4. backtest-runner -->
-        <g transform="translate(580,60)">
-          <rect width="160" height="72" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5"/>
-          <text x="80" y="22" font-size="12" font-weight="700" text-anchor="middle" fill="#1e40af">backtest-runner</text>
-          <text x="80" y="38" font-size="10" text-anchor="middle" fill="#475569">spec &rarr; report JSON</text>
-          <text x="80" y="54" font-size="9" text-anchor="middle" fill="#94a3b8">roundtrips, per_day,</text>
-          <text x="80" y="66" font-size="9" text-anchor="middle" fill="#94a3b8">fill context</text>
-        </g>
+<!-- ===== Spec-Invariant Checker ===== -->
+<h2>Spec-Invariant Checker</h2>
+<p>엔진이 spec.yaml 파라미터에서 runtime invariant를 <strong>자동 추론</strong>하여 매 fill 이벤트마다 체크합니다. Agent 수정 0.</p>
+<table>
+  <tr><th>유형</th><th>spec 파라미터</th><th>severity</th><th>설명</th></tr>
+  <tr><td><code>sl_overshoot</code></td><td>stop_loss_bps</td><td><span class="tag tag-red">high</span></td><td>SL 체결 시 실제 손실이 spec보다 큰 경우</td></tr>
+  <tr><td><code>pt_overshoot</code></td><td>profit_target_bps</td><td><span class="tag tag-amber">low</span></td><td>PT 체결 시 과도한 초과 수익</td></tr>
+  <tr><td><code>entry_gate_end_bypass</code></td><td>entry_end_time_seconds</td><td><span class="tag tag-red">high</span></td><td>진입 마감 이후 체결</td></tr>
+  <tr><td><code>entry_gate_start_bypass</code></td><td>entry_start_time_seconds</td><td><span class="tag tag-red">high</span></td><td>진입 개시 이전 체결</td></tr>
+  <tr><td><code>max_entries_exceeded</code></td><td>max_entries_per_session</td><td><span class="tag tag-red">high</span></td><td>일일 진입 횟수 초과</td></tr>
+  <tr><td><code>max_position_exceeded</code></td><td>max_position_per_symbol</td><td><span class="tag tag-red">high</span></td><td>포지션 수량 초과 (double-fill)</td></tr>
+  <tr><td><code>time_stop_overshoot</code></td><td>time_stop_ticks</td><td><span class="tag tag-amber">medium</span></td><td>시간 제한 초과 보유</td></tr>
+</table>
 
-        <!-- 5. feedback-analyst -->
-        <g transform="translate(760,60)">
-          <rect width="160" height="72" rx="8" fill="white" stroke="#93c5fd" stroke-width="1.5"/>
-          <text x="80" y="22" font-size="12" font-weight="700" text-anchor="middle" fill="#1e40af">feedback-analyst</text>
-          <text x="80" y="38" font-size="10" text-anchor="middle" fill="#475569">report &rarr; lesson</text>
-          <text x="80" y="54" font-size="9" text-anchor="middle" fill="#94a3b8">Alpha/Execution Critique</text>
-          <text x="80" y="66" font-size="9" text-anchor="middle" fill="#16a34a">knowledge/lessons/</text>
-        </g>
+<h3>Counterfactual PnL 귀속</h3>
+<p><code>--strict</code> 모드에서 엔진이 위반 발생 시 개입(REJECT/FORCE SELL)하여 spec 준수 버전의 수익을 계산합니다.</p>
+<div class="finding">
+  <strong>핵심 발견:</strong> strat_0032의 +0.573% 수익 중 <strong>89.8%가 double-fill 버그</strong>에 의한 것.
+  Clean PnL(spec 준수 시) = +0.058%에 불과.
+</div>
 
-        <!-- chain arrows -->
-        <g fill="none" stroke="#2563eb" stroke-width="2" marker-end="url(#arr)">
-          <line x1="200" y1="96" x2="220" y2="96"/>
-          <line x1="380" y1="96" x2="400" y2="96"/>
-          <line x1="560" y1="96" x2="580" y2="96"/>
-          <line x1="740" y1="96" x2="760" y2="96"/>
-        </g>
+<!-- ===== 핵심 발견 사항 ===== -->
+<h2>핵심 발견 사항</h2>
 
-        <!-- feedback loop arrow -->
-        <path d="M 840 136 Q 840 165 480 165 Q 120 165 120 136" stroke="#d97706" stroke-width="2" fill="none" stroke-dasharray="5 3" marker-end="url(#arr-amber)"/>
-        <text x="480" y="162" font-size="11" fill="#d97706" text-anchor="middle" font-weight="600">next_idea_seed &mdash; local / escape / paradigm</text>
-      </g>
+<div class="card">
+  <div class="card-title">1. KRX LOB Signal은 Fee를 이기지 못함</div>
+  <p>99만 ticks, 17개 feature × 6 horizons = 612 조합 분석 결과, <strong>모든 signal의 Q5 수익이 fee(21 bps) 미만</strong>.
+  최고 signal(microprice_diff @ 1000t)의 Q5 = +3.72 bps — fee의 1/5 수준.</p>
+  <span class="tag tag-red">KRX</span> <span class="tag tag-amber">fee 장벽</span> <span class="tag tag-blue">99만 ticks</span>
+</div>
 
-      <!-- Row 2: Support agents -->
-      <g font-family="system-ui">
-        <rect x="30" y="220" width="440" height="100" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
-        <text x="50" y="248" font-size="13" font-weight="800" fill="#92400e">Support Agents</text>
+<div class="card">
+  <div class="card-title">2. 크립토에서도 대표본 시 Signal 유효하지 않음</div>
+  <p>BTC 9.5K ticks에서 10개 viable 보였으나, 174K ticks로 확장 시 <strong>0개 viable로 반전</strong>.
+  소표본 편향(small-sample bias)이 결론을 뒤집은 사례.</p>
+  <span class="tag tag-red">소표본 편향</span> <span class="tag tag-purple">BTC</span> <span class="tag tag-blue">174K ticks</span>
+</div>
 
-        <g transform="translate(50,260)">
-          <rect width="130" height="46" rx="6" fill="white" stroke="#fcd34d" stroke-width="1.2" stroke-dasharray="4 2"/>
-          <text x="65" y="18" font-size="11" font-weight="700" text-anchor="middle" fill="#92400e">code-generator</text>
-          <text x="65" y="34" font-size="9" text-anchor="middle" fill="#78350f">engine/ 확장/수정</text>
-        </g>
-        <g transform="translate(196,260)">
-          <rect width="130" height="46" rx="6" fill="white" stroke="#fcd34d" stroke-width="1.2" stroke-dasharray="4 2"/>
-          <text x="65" y="18" font-size="11" font-weight="700" text-anchor="middle" fill="#92400e">meta-reviewer</text>
-          <text x="65" y="34" font-size="9" text-anchor="middle" fill="#78350f">프레임워크 감사 (매 K회)</text>
-        </g>
-        <g transform="translate(340,260)">
-          <rect width="120" height="46" rx="6" fill="white" stroke="#fcd34d" stroke-width="1.2" stroke-dasharray="4 2"/>
-          <text x="60" y="18" font-size="11" font-weight="700" text-anchor="middle" fill="#92400e">strategy-ideator</text>
-          <text x="60" y="34" font-size="9" text-anchor="middle" fill="#78350f">seed &rarr; idea JSON</text>
-        </g>
-      </g>
+<div class="card">
+  <div class="card-title">3. 보고된 수익의 대부분이 Spec-Code Gap에서 발생</div>
+  <p>Counterfactual 분석 결과 strat_0032(best)의 수익 89.8%가 <code>max_position_exceeded</code> 버그에 의한 것.
+  이전 14회 iterate 루프는 버그로 인한 수익을 edge로 오인하고 있었음.</p>
+  <span class="tag tag-red">double-fill</span> <span class="tag tag-amber">counterfactual</span> <span class="tag tag-green">자동 검출</span>
+</div>
 
-      <!-- Row 2: Optuna -->
-      <g font-family="system-ui">
-        <rect x="490" y="220" width="440" height="100" rx="12" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
-        <text x="510" y="248" font-size="13" font-weight="800" fill="#991b1b">Parameter Optimization</text>
+<div class="card">
+  <div class="card-title">4. Signal Brief Gate가 낭비 방지</div>
+  <p>이전: 14회 iteration, ~20시간 → 결론 "edge 없음".<br>
+  이후: Signal brief 1회 생성(~15분) + 1초 판단 → <strong>같은 결론을 사전에 도출</strong>.</p>
+  <span class="tag tag-green">Phase A</span> <span class="tag tag-blue">n_viable=0 → ABORT</span>
+</div>
 
-        <g transform="translate(510,260)">
-          <rect width="200" height="46" rx="6" fill="white" stroke="#fca5a5" stroke-width="1.2"/>
-          <text x="100" y="18" font-size="11" font-weight="700" text-anchor="middle" fill="#991b1b">optuna_sweep.py</text>
-          <text x="100" y="34" font-size="9" text-anchor="middle" fill="#78350f">spec.yaml optuna: block &rarr; TPE search</text>
-        </g>
-        <g transform="translate(730,260)">
-          <rect width="180" height="46" rx="6" fill="white" stroke="#fca5a5" stroke-width="1.2"/>
-          <text x="90" y="18" font-size="11" font-weight="700" text-anchor="middle" fill="#991b1b">IS edge validation</text>
-          <text x="90" y="34" font-size="9" text-anchor="middle" fill="#78350f">"IS 과적합도 못하면 edge 없음"</text>
-        </g>
-      </g>
+<!-- ===== 데이터 ===== -->
+<h2>데이터</h2>
+<table>
+  <tr><th>시장</th><th>데이터 유형</th><th>IS 기간</th><th>OOS 기간</th><th>Fee (RT)</th></tr>
+  <tr><td>KRX (005930 등)</td><td>10-level LOB snapshot</td><td>20260305~20260320 (12일)</td><td>20260323~20260330 (6일)</td><td>21.0 bps</td></tr>
+  <tr><td>Upbit BTC/ETH/XRP</td><td>LOB snapshot + Trade</td><td>수집 중 (24/7)</td><td>—</td><td>~4.0 bps</td></tr>
+</table>
 
-      <!-- Row 3: Engine Layer -->
-      <g font-family="system-ui">
-        <rect x="30" y="340" width="900" height="80" rx="12" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
-        <text x="50" y="366" font-size="13" font-weight="800" fill="#14532d">Engine Layer</text>
-        <text x="140" y="366" font-size="11" fill="#64748b">pure Python &middot; token cost = 0</text>
+<!-- ===== 주요 명령어 ===== -->
+<h2>주요 명령어</h2>
+<pre>
+# 자율 루프 (N회 반복)
+/iterate 10 "seed description"
 
-        <g transform="translate(50,378)">
-          <rect width="120" height="28" rx="5" fill="white" stroke="#86efac" stroke-width="1"/>
-          <text x="60" y="18" font-size="10" font-weight="600" text-anchor="middle" fill="#166534">data_loader</text>
-        </g>
-        <g transform="translate(180,378)">
-          <rect width="120" height="28" rx="5" fill="white" stroke="#86efac" stroke-width="1"/>
-          <text x="60" y="18" font-size="10" font-weight="600" text-anchor="middle" fill="#166534">simulator</text>
-        </g>
-        <g transform="translate(310,378)">
-          <rect width="100" height="28" rx="5" fill="white" stroke="#86efac" stroke-width="1"/>
-          <text x="50" y="18" font-size="10" font-weight="600" text-anchor="middle" fill="#166534">signals</text>
-        </g>
-        <g transform="translate(420,378)">
-          <rect width="80" height="28" rx="5" fill="white" stroke="#86efac" stroke-width="1"/>
-          <text x="40" y="18" font-size="10" font-weight="600" text-anchor="middle" fill="#166534">dsl</text>
-        </g>
-        <g transform="translate(510,378)">
-          <rect width="80" height="28" rx="5" fill="white" stroke="#86efac" stroke-width="1"/>
-          <text x="40" y="18" font-size="10" font-weight="600" text-anchor="middle" fill="#166534">runner</text>
-        </g>
-        <g transform="translate(600,378)">
-          <rect width="90" height="28" rx="5" fill="white" stroke="#86efac" stroke-width="1"/>
-          <text x="45" y="18" font-size="10" font-weight="600" text-anchor="middle" fill="#166534">metrics</text>
-        </g>
-        <g transform="translate(700,378)">
-          <rect width="110" height="28" rx="5" fill="white" stroke="#86efac" stroke-width="1"/>
-          <text x="55" y="18" font-size="10" font-weight="600" text-anchor="middle" fill="#166534">report_html</text>
-        </g>
-        <g transform="translate(820,378)">
-          <rect width="90" height="28" rx="5" fill="white" stroke="#86efac" stroke-width="1"/>
-          <text x="45" y="18" font-size="10" font-weight="600" text-anchor="middle" fill="#166534">spec</text>
-        </g>
-      </g>
+# 단일 전략 생성 (데이터 기반)
+/new-strategy "seed description"
 
-      <!-- Row 4: Data -->
-      <g font-family="system-ui">
-        <rect x="30" y="440" width="900" height="60" rx="12" fill="#faf5ff" stroke="#9333ea" stroke-width="2"/>
-        <text x="50" y="466" font-size="13" font-weight="800" fill="#581c87">Data &amp; Knowledge</text>
+# Signal 분석 (Phase A)
+python scripts/signal_research.py extract --symbol 005930 --dates 20260305,...
+python scripts/signal_research.py analyze --symbol 005930 --fee-hurdle 21.0
+python scripts/generate_signal_brief.py --symbol BTC --fee 4.0
 
-        <g transform="translate(210,456)">
-          <rect width="170" height="28" rx="5" fill="white" stroke="#d8b4fe" stroke-width="1"/>
-          <text x="85" y="18" font-size="10" font-weight="600" text-anchor="middle" fill="#6b21a8">H0STASP0 CSVs</text>
-        </g>
-        <g transform="translate(400,456)">
-          <rect width="170" height="28" rx="5" fill="white" stroke="#d8b4fe" stroke-width="1"/>
-          <text x="85" y="18" font-size="10" font-weight="600" text-anchor="middle" fill="#6b21a8">strategies/ (49)</text>
-        </g>
-        <g transform="translate(590,456)">
-          <rect width="170" height="28" rx="5" fill="white" stroke="#d8b4fe" stroke-width="1"/>
-          <text x="85" y="18" font-size="10" font-weight="600" text-anchor="middle" fill="#6b21a8">knowledge/ (45L + 15P)</text>
-        </g>
-        <g transform="translate(780,456)">
-          <rect width="130" height="28" rx="5" fill="white" stroke="#d8b4fe" stroke-width="1"/>
-          <text x="65" y="18" font-size="10" font-weight="600" text-anchor="middle" fill="#6b21a8">_drafts/ (staging)</text>
-        </g>
-      </g>
-    </svg>
-    <div class="caption">[Figure 1] 4-layer architecture: Agent Pipeline &rarr; Support/Optimization &rarr; Engine &rarr; Data &amp; Knowledge</div>
-  </div>
+# 수학적 파라미터 최적화
+python scripts/optimal_params.py sweep --symbol BTC --fee 4.0
 
-  <!-- ==================== 3. Agent 상세 ==================== -->
-  <h2>3. Agent Roles</h2>
-
-  <h3>3-1. Generation Pipeline (순차 실행)</h3>
-  <table>
-    <thead><tr><th>Agent</th><th>Input</th><th>Output</th><th>Role</th></tr></thead>
-    <tbody>
-      <tr>
-        <td><code>alpha-designer</code></td>
-        <td>seed (natural language)</td>
-        <td><code>_drafts/&lt;name&gt;_alpha.md</code> + JSON</td>
-        <td>신호 edge 설계: hypothesis, entry_condition, signals_needed. <b>실행 메커닉은 건드리지 않음.</b></td>
-      </tr>
-      <tr>
-        <td><code>execution-designer</code></td>
-        <td>alpha .md 파일</td>
-        <td><code>_drafts/&lt;name&gt;_execution.md</code> + JSON</td>
-        <td>주문 메커닉 설계: entry price/TTL/bid-drop cancel, exit stop/target/trailing, lot_size, max_entries. <b>입/출 신호 조건은 건드리지 않음.</b></td>
-      </tr>
-      <tr>
-        <td><code>spec-writer</code></td>
-        <td>alpha + execution JSON</td>
-        <td><code>strategies/&lt;id&gt;/spec.yaml</code> + design .md copies</td>
-        <td>두 설계를 합쳐 실행 가능한 spec.yaml 생성. 교정 검증(심볼/threshold/분포) 수행. alpha/execution .md를 strategy 디렉토리로 복사. <b>strategy.py는 작성하지 않음.</b></td>
-      </tr>
-      <tr>
-        <td><code>strategy-coder</code></td>
-        <td>spec.yaml + execution design</td>
-        <td><code>strategies/&lt;id&gt;/strategy.py</code></td>
-        <td>Python-path 전용. spec.yaml의 params를 읽어 stateful strategy.py 구현: latency guard, entry TTL, bid-drop cancel, trailing stop, max_entries. <b>spec.yaml은 수정하지 않음.</b></td>
-      </tr>
-      <tr>
-        <td><code>backtest-runner</code></td>
-        <td>spec.yaml path</td>
-        <td>report JSON (roundtrips, per_day, fill context 포함)</td>
-        <td>engine.runner 호출. report.json + trace.json + report.html 생성. 핵심 지표만 JSON으로 반환 (토큰 최적화).</td>
-      </tr>
-      <tr>
-        <td><code>feedback-analyst</code></td>
-        <td>report JSON + alpha/execution .md</td>
-        <td>knowledge/lessons/ + feedback.json + seeds</td>
-        <td>WIN/LOSS fill context 분석, Alpha Critique + Execution Critique 구조로 교훈 작성. local_seed + escape_seed 생성.</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <h3>3-2. Support Agents (on demand)</h3>
-  <table>
-    <thead><tr><th>Agent</th><th>Trigger</th><th>Role</th></tr></thead>
-    <tbody>
-      <tr>
-        <td><code>code-generator</code></td>
-        <td>spec-writer가 missing primitive 보고 / audit 실패 / meta-reviewer 지시</td>
-        <td>engine/ 코드 수정: 새 signal primitive, 버그 수정, DSL 확장, 매칭/fee/latency 개선</td>
-      </tr>
-      <tr>
-        <td><code>meta-reviewer</code></td>
-        <td>매 K(=3) 이터레이션 경계 / stop_suggested 시</td>
-        <td>프레임워크 수준 감사: engine 결함, DSL 스키마 한계, 방법론 전환 필요성 판단. paradigm_shift 가능.</td>
-      </tr>
-      <tr>
-        <td><code>strategy-ideator</code></td>
-        <td>(legacy) /new-strategy 커맨드</td>
-        <td>단일 seed &rarr; idea JSON 생성. 현재 파이프라인에서는 alpha-designer가 이 역할을 대체.</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- ==================== 4. Engine ==================== -->
-  <h2>4. Engine Layer</h2>
-
-  <table>
-    <thead><tr><th>Module</th><th>Description</th></tr></thead>
-    <tbody>
-      <tr><td><code>data_loader.py</code></td><td>KIS H0STASP0 CSV 로드. 10-level ask/bid price+qty + acml_vol &rarr; <code>OrderBookSnapshot</code> stream. Multi-symbol chronological merge.</td></tr>
-      <tr><td><code>simulator.py</code></td><td>Self-contained matching engine. <b>MARKET + LIMIT (resting)</b> 주문 지원. Queue-ahead LOB depth model. Fee model (commission + tax bps). Latency model (submit_ms + jitter). EOD 강제 청산. <b>Fill-time LOB context capture</b> (obi, spread_bps, mid, acml_vol).</td></tr>
-      <tr><td><code>signals.py</code></td><td>12 signal primitives: <code>obi</code>, <code>spread_bps</code>, <code>microprice</code>, <code>mid_return_bps</code>, <code>volume_delta</code>, <code>total_imbalance</code>, <code>krw_turnover</code>, <code>mid</code>, <code>spread</code>, <code>best_ask</code>, <code>best_bid</code>, <code>mid_change</code>. Per-symbol rolling state buffer.</td></tr>
-      <tr><td><code>dsl.py</code></td><td>AST whitelist evaluator. spec.yaml의 signals/entry/exit 표현식을 안전하게 평가. <code>SpecStrategy</code> interpreter.</td></tr>
-      <tr><td><code>spec.py</code></td><td>YAML spec loader. Universe shorthands (<code>"top10"</code>, <code>"*"</code>). <code>StrategySpec</code> dataclass.</td></tr>
-      <tr><td><code>runner.py</code></td><td>Backtest orchestrator. 4 dispatch modes: <code>dsl</code>, <code>python</code>, <code>buyhold</code>, <code>alternating</code>. <b>Roundtrip FIFO matching</b> (BUY&rarr;SELL, WIN/LOSS + entry context). <b>Per-day stats</b> (KST date grouping). report.json + trace.json + report.html 생성.</td></tr>
-      <tr><td><code>metrics.py</code></td><td>Sharpe (raw + annualized), MDD, win rate, avg win/loss bps, trade stats. <code>BacktestReport</code> dataclass.</td></tr>
-      <tr><td><code>report_html.py</code></td><td>Interactive Plotly report. <b>Symbol tabs</b> (per-symbol chart). Sensitivity panel (break-even WR, fee burden). Per-day breakdown table. WIN vs LOSS fill context comparison. Spec description with payoff formulas.</td></tr>
-    </tbody>
-  </table>
-
-  <h3>4-1. Simulator: Fill Context</h3>
-  <p>모든 Fill 객체에 체결 시점의 LOB snapshot이 기록됩니다:</p>
-<pre><code>@dataclass
-<span class="kw">class</span> <span class="fn">Fill</span>:
-    ts_ns: <span class="fn">int</span>
-    symbol: <span class="fn">str</span>
-    side: <span class="fn">str</span>        <span class="cm"># "BUY" | "SELL"</span>
-    qty: <span class="fn">int</span>
-    avg_price: <span class="fn">float</span>
-    fee: <span class="fn">float</span>
-    tag: <span class="fn">str</span>
-    context: <span class="fn">dict</span>     <span class="cm"># {obi, spread_bps, bid_px, ask_px, mid, acml_vol}</span></code></pre>
-
-  <h3>4-2. Runner: Roundtrip &amp; Per-Day</h3>
-  <p><code>runner.py</code>가 report.json에 추가하는 데이터:</p>
-  <div class="grid2">
-    <div class="card green">
-      <h4>roundtrips[]</h4>
-      <p>FIFO BUY&rarr;SELL matching per symbol. 각 roundtrip: <code>entry_context</code> (체결 시점 LOB), <code>pnl_bps</code>, <code>outcome</code> (WIN|LOSS), <code>exit_tag</code> (tp/sl/eod).</p>
-    </div>
-    <div class="card green">
-      <h4>per_day{}</h4>
-      <p>KST 날짜별 집계: <code>n_entries</code>, <code>n_wins</code>, <code>n_losses</code>, <code>n_stops</code>, <code>n_eod</code>, <code>net_pnl</code>. 레짐 의존성 분석에 활용.</p>
-    </div>
-  </div>
-
-  <h3>4-3. Report HTML</h3>
-  <p><code>report.html</code>에 포함되는 interactive 섹션:</p>
-  <div class="grid4">
-    <div class="card"><h4>Symbol Tabs</h4><p>심볼별 price + BUY/SELL marker 차트. 전체 equity &amp; drawdown은 공유.</p></div>
-    <div class="card"><h4>Sensitivity Panel</h4><p>profit_target / stop_loss 슬라이더 &rarr; break-even WR + fee burden 실시간 계산 (pure JS).</p></div>
-    <div class="card"><h4>Per-Day Table</h4><p>날짜별 진입/체결/WIN/LOSS/SL/EOD/WR/Net PnL 테이블.</p></div>
-    <div class="card"><h4>Fill Context</h4><p>WIN vs LOSS 그룹의 avg OBI, spread, mid, acml_vol 비교.</p></div>
-  </div>
-
-  <!-- ==================== 5. Optuna Sweep ==================== -->
-  <h2>5. Parameter Optimization (Optuna)</h2>
-  <p><code>scripts/optuna_sweep.py</code>: spec.yaml에 <code>optuna:</code> 블록을 추가하면 TPE/Random sampler로 파라미터 공간을 탐색합니다.</p>
-
-  <div class="grid2">
-    <div class="card red">
-      <h4>목적: IS Edge Validation</h4>
-      <p>IS 데이터에서 과적합조차 못하면 전략 구조 자체에 edge가 없다는 판정. 과적합 &ne; 최종 파라미터 &mdash; 구조 검증 도구.</p>
-    </div>
-    <div class="card red">
-      <h4>주의: N &ge; 50 권장</h4>
-      <p>N_roundtrips &lt; 30에서 최적화된 threshold는 overfit. 최종 파라미터 선정은 walk-forward OOS 검증 후에.</p>
-    </div>
-  </div>
-
-<pre><code><span class="cm"># spec.yaml에 추가</span>
-<span class="kw">optuna</span>:
-  <span class="kw">n_trials</span>: <span class="num">50</span>
-  <span class="kw">metric</span>: <span class="str">return_pct</span>       <span class="cm"># return_pct | sharpe_annualized | composite</span>
-  <span class="kw">min_trades</span>: <span class="num">5</span>
-  <span class="kw">search_space</span>:
-    <span class="kw">profit_target_bps</span>:
-      type: <span class="str">float</span>
-      low: <span class="num">60.0</span>
-      high: <span class="num">400.0</span>
-      step: <span class="num">10.0</span>
-    <span class="kw">stop_loss_bps</span>:
-      type: <span class="str">float</span>
-      low: <span class="num">20.0</span>
-      high: <span class="num">150.0</span>
-      step: <span class="num">10.0</span>
-    <span class="kw">obi_threshold</span>:
-      type: <span class="str">float</span>
-      low: <span class="num">0.2</span>
-      high: <span class="num">0.7</span>
-      step: <span class="num">0.05</span></code></pre>
-
-<pre><code><span class="cm"># 실행</span>
-python scripts/optuna_sweep.py \
-    --spec strategies/&lt;id&gt;/spec.yaml \
-    --n-trials <span class="num">50</span> \
-    --metric composite \
-    --out-spec strategies/&lt;id&gt;/spec_best.yaml   <span class="cm"># 최적 파라미터 저장</span>
-
-<span class="cm"># agent 연동용 JSON 출력</span>
-python scripts/optuna_sweep.py --spec ... --json</code></pre>
-
-  <h3>Metric 옵션</h3>
-  <table>
-    <thead><tr><th>Metric</th><th>Formula</th><th>When to use</th></tr></thead>
-    <tbody>
-      <tr><td><code>return_pct</code></td><td>총 수익률 (%)</td><td>기본. 절대 수익 극대화.</td></tr>
-      <tr><td><code>sharpe_annualized</code></td><td>annualized Sharpe ratio</td><td>위험 조정 수익. 안정성 중시.</td></tr>
-      <tr><td><code>composite</code></td><td><code>return_pct &times; win_rate_pct / 100</code></td><td>수익 &times; 승률 균형. 과적합 방지 효과.</td></tr>
-    </tbody>
-  </table>
-
-  <!-- ==================== 6. 사용법 ==================== -->
-  <h2>6. CLI Reference</h2>
-
-  <h3>6-1. Claude Code Slash Commands</h3>
-<pre><code><span class="cm"># 완전 자율 루프 (N회, K=3 마다 meta-review)</span>
-/iterate <span class="num">10</span> <span class="str">"passive BID limit entry on strong OBI with trailing stop exit"</span>
-
-<span class="cm"># 단일 이터레이션</span>
-/new-strategy <span class="str">"volume burst + OBI cross entry"</span></code></pre>
-
-  <h3>6-2. Engine CLI</h3>
-<pre><code><span class="cm"># 데이터 탐색</span>
-python -m engine.data_loader list-dates
-python -m engine.data_loader list-symbols --date <span class="num">20260316</span>
-
-<span class="cm"># 백테스트 (단일)</span>
+# 백테스트 (normal + strict)
 python -m engine.runner --spec strategies/&lt;id&gt;/spec.yaml --summary
+python -m engine.runner --spec strategies/&lt;id&gt;/spec.yaml --strict --summary
 
-<span class="cm"># 백테스트 (per-symbol 독립 실행)</span>
-python -m engine.runner --spec strategies/&lt;id&gt;/spec.yaml --per-symbol --summary
+# Counterfactual PnL 귀속
+python scripts/attribute_pnl.py --strategy &lt;strategy_id&gt;
+python scripts/attribute_pnl.py --all
 
-<span class="cm"># HTML 리포트 단독 재생성</span>
-python -m engine.report_html &lt;strategy_name&gt;
+# Invariant 분석 (논문용)
+python scripts/sweep_invariants.py
+python scripts/compare_detection.py
 
-<span class="cm"># 감사</span>
-python scripts/audit_principles.py</code></pre>
+# 감사
+python scripts/audit_principles.py    # 12/12 must pass
+</pre>
 
-  <h3>6-3. Knowledge &amp; Analysis</h3>
-<pre><code><span class="cm"># 지식 검색</span>
-python scripts/search_knowledge.py --query <span class="str">"adverse selection"</span> --top <span class="num">5</span>
+<!-- ===== 논문 방향 ===== -->
+<h2>논문 방향</h2>
+<div class="card">
+  <div class="card-title">Spec-Code Semantic Gap in LLM-Generated Domain Programs</div>
+  <p><strong>타겟:</strong> EMNLP / NeurIPS 2026 (5월 deadline)</p>
+  <p><strong>핵심 주장:</strong> LLM이 생성한 domain code는 syntax/type check를 통과하지만 specification의 의도와 runtime behavior가 체계적으로 불일치한다.
+  7개 gap taxonomy + automated invariant checker + counterfactual PnL attribution으로 이를 정량화.</p>
+  <p><strong>Contributions:</strong></p>
+  <ul>
+    <li><strong>C1 (문제 정의):</strong> Spec-code semantic gap의 개념과 6개 유형 taxonomy</li>
+    <li><strong>C2 (자동 검출):</strong> Spec-driven invariant checker — 7개 invariant 자동 추론</li>
+    <li><strong>C3 (정량 영향):</strong> Counterfactual PnL attribution — clean vs bug 수익 분리</li>
+    <li><strong>C4 (비교):</strong> LLM critic vs automated checker의 gap 발견율 비교</li>
+  </ul>
+</div>
 
-<span class="cm"># 그래프</span>
-python knowledge/graph.py build
-python knowledge/graph.py stats
-python knowledge/graph.py related <span class="str">obi</span>
+<!-- ===== footer ===== -->
+<footer>
+  <p>생성일: 2026-04-16 · Tick Strategy Framework v2 · Claude Opus 4.6 기반 자율 생성</p>
+  <p>지식 그래프: 62 nodes, 84 edges · 감사 상태: 12/12 통과</p>
+</footer>
 
-<span class="cm"># 전략 목록</span>
-python scripts/list_strategies.py --limit <span class="num">10</span>
-
-<span class="cm"># 트레이스 분석</span>
-python scripts/analyze_trace.py --strategy &lt;strategy_id&gt;
-
-<span class="cm"># 파라미터 최적화</span>
-python scripts/optuna_sweep.py --spec strategies/&lt;id&gt;/spec.yaml --n-trials <span class="num">50</span></code></pre>
-
-  <!-- ==================== 7. 디렉터리 구조 ==================== -->
-  <h2>7. Directory Structure</h2>
-  <div class="diagram">
-    <svg viewBox="0 0 860 700" xmlns="http://www.w3.org/2000/svg" font-family="'JetBrains Mono', ui-monospace, monospace" font-size="12.5">
-      <style>
-        .dir { fill: #2563eb; font-weight: 700; }
-        .file { fill: #1f2937; }
-        .cm { fill: #9ca3af; font-style: italic; }
-      </style>
-
-      <text x="20" y="24" class="dir">proj_claude_tick_finance/</text>
-
-      <!-- .claude -->
-      <text x="40" y="54" class="dir">.claude/</text>
-      <text x="60" y="74" class="dir">agents/</text>
-      <text x="200" y="74" class="file">alpha-designer.md &middot; execution-designer.md</text>
-      <text x="200" y="90" class="file">spec-writer.md &middot; strategy-coder.md &middot; backtest-runner.md &middot; feedback-analyst.md</text>
-      <text x="200" y="106" class="file">code-generator.md &middot; meta-reviewer.md &middot; strategy-ideator.md (legacy)</text>
-      <text x="60" y="126" class="dir">commands/</text>
-      <text x="200" y="126" class="file">iterate.md &middot; new-strategy.md</text>
-      <text x="60" y="146" class="dir">skills/</text>
-      <text x="200" y="146" class="cm">new-strategy &middot; validate-spec &middot; run-backtest &middot; search-lessons &middot; write-lesson &middot; graph-query</text>
-
-      <!-- engine -->
-      <text x="40" y="180" class="dir">engine/</text>
-      <text x="760" y="180" class="cm">pure Python</text>
-      <text x="60" y="200" class="file">data_loader.py</text><text x="260" y="200" class="cm"># CSV &rarr; OrderBookSnapshot stream</text>
-      <text x="60" y="216" class="file">simulator.py</text><text x="260" y="216" class="cm"># matching (MARKET+LIMIT) &middot; fee &middot; latency &middot; fill context</text>
-      <text x="60" y="232" class="file">signals.py</text><text x="260" y="232" class="cm"># 11 primitives + per-symbol rolling state</text>
-      <text x="60" y="248" class="file">dsl.py</text><text x="260" y="248" class="cm"># AST whitelist evaluator + SpecStrategy</text>
-      <text x="60" y="264" class="file">spec.py</text><text x="260" y="264" class="cm"># YAML loader &rarr; StrategySpec (&quot;top10&quot;, &quot;*&quot; shorthands)</text>
-      <text x="60" y="280" class="file">runner.py</text><text x="260" y="280" class="cm"># orchestrator + roundtrips + per_day + report/trace/html</text>
-      <text x="60" y="296" class="file">metrics.py</text><text x="260" y="296" class="cm"># Sharpe &middot; MDD &middot; win rate &middot; BacktestReport</text>
-      <text x="60" y="312" class="file">report_html.py</text><text x="260" y="312" class="cm"># Plotly report + symbol tabs + sensitivity + per-day + fill context</text>
-
-      <!-- scripts -->
-      <text x="40" y="346" class="dir">scripts/</text>
-      <text x="760" y="346" class="cm">CLI tools</text>
-      <text x="60" y="366" class="file">audit_principles.py</text><text x="260" y="366" class="cm"># 12 backtest invariants check</text>
-      <text x="60" y="382" class="file">optuna_sweep.py</text><text x="260" y="382" class="cm"># Optuna TPE/Random parameter search</text>
-      <text x="60" y="398" class="file">analyze_trace.py</text><text x="260" y="398" class="cm"># FIFO roundtrip trace analysis + LOB enrichment</text>
-      <text x="60" y="414" class="file">verify_outputs.py</text><text x="260" y="414" class="cm"># agent output verification (claimed files exist?)</text>
-      <text x="60" y="430" class="file">validate_spec.py</text><text x="260" y="430" class="cm"># spec.yaml + primitive existence check</text>
-      <text x="60" y="446" class="file">list_strategies.py</text><text x="260" y="446" class="cm"># strategy list + metrics (JSON)</text>
-      <text x="60" y="462" class="file">search_knowledge.py</text><text x="260" y="462" class="cm"># knowledge/ keyword search (JSON)</text>
-      <text x="60" y="478" class="file">write_lesson.py</text><text x="260" y="478" class="cm"># create lesson MD with Obsidian frontmatter</text>
-      <text x="60" y="494" class="file">new_strategy.py</text><text x="260" y="494" class="cm"># create strategy directory from template</text>
-
-      <!-- strategies -->
-      <text x="40" y="528" class="dir">strategies/</text>
-      <text x="760" y="528" class="cm">49 strategies</text>
-      <text x="60" y="548" class="dir">_drafts/</text><text x="260" y="548" class="cm"># alpha/execution .md staging (agent pipeline 중간 산출물)</text>
-      <text x="60" y="564" class="dir">_examples/</text><text x="260" y="564" class="cm"># template specs (obi_momentum, dummy_hold, dummy_alt)</text>
-      <text x="60" y="580" class="dir">strat_YYYYMMDD_NNNN_&lt;slug&gt;/</text>
-      <text x="100" y="596" class="file">spec.yaml &middot; strategy.py &middot; report.json &middot; trace.json &middot; report.html</text>
-      <text x="100" y="612" class="file">feedback.json &middot; alpha_design.md &middot; execution_design.md</text>
-
-      <!-- knowledge -->
-      <text x="40" y="646" class="dir">knowledge/</text>
-      <text x="760" y="646" class="cm">Obsidian vault</text>
-      <text x="60" y="666" class="dir">lessons/</text><text x="200" y="666" class="cm"># 45 lessons (Observation / Why / Alpha Critique / Execution Critique / How to apply)</text>
-      <text x="60" y="682" class="dir">patterns/</text><text x="200" y="682" class="cm"># 15 patterns (3+ lessons sharing root cause)</text>
-      <text x="60" y="698" class="file">graph.py &middot; seeds/ &middot; .graph.json</text>
-    </svg>
-    <div class="caption">[Figure 2] Directory tree (__pycache__ omitted)</div>
-  </div>
-
-  <!-- ==================== 8. KRX Fee Structure ==================== -->
-  <h2>8. KRX Fee &amp; Matching Model</h2>
-
-  <div class="grid2">
-    <div class="card">
-      <h4>Fee Model</h4>
-      <p>Commission <b>1.5 bps</b> (BUY+SELL) + Sell tax <b>18.0 bps</b> = Round-trip <b>19.5 bps</b>.<br>
-      Configurable per spec: <code>fees.commission_bps</code>, <code>fees.tax_bps</code>.</p>
-    </div>
-    <div class="card">
-      <h4>Latency Model</h4>
-      <p>Submit delay <b>5ms &plusmn; 1ms</b> jitter. Order queued at <code>T + submit_ms + jitter</code>, matched against future ticks. No lookahead.</p>
-    </div>
-    <div class="card">
-      <h4>Resting Limit Queue Model</h4>
-      <p>Passive LIMIT: <code>queue_ahead</code> = LOB depth at submission. Decremented by depth drops each tick. Fill when <code>queue_ahead &le; 0 AND is_marketable</code>. Fill price = limit_price (maker).</p>
-    </div>
-    <div class="card">
-      <h4>Break-even Math</h4>
-      <p>WR<sub>BE</sub> = stop / (target + stop). PT=150, SL=50 &rarr; WR<sub>BE</sub>=25%. Actual WR must exceed this after 19.5 bps round-trip cost.</p>
-    </div>
-  </div>
-
-  <!-- ==================== 9. IS/OOS Split ==================== -->
-  <h2>9. Data Universe &amp; IS/OOS</h2>
-
-  <table>
-    <thead><tr><th>Period</th><th>Dates</th><th>Days</th><th>Purpose</th></tr></thead>
-    <tbody>
-      <tr>
-        <td><span class="badge">IN-SAMPLE</span></td>
-        <td>20260316 &mdash; 20260325</td>
-        <td>8</td>
-        <td>전략 개발 + 파라미터 탐색. Optuna sweep 대상.</td>
-      </tr>
-      <tr>
-        <td><span class="badge warn">OUT-OF-SAMPLE</span></td>
-        <td>20260326 &mdash; 20260330</td>
-        <td>3</td>
-        <td>최종 검증. IS 최적화 결과의 일반화 확인.</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <p><b>Top-10 symbols</b> (by tick count on 20260316, descending liquidity):</p>
-  <table>
-    <thead><tr><th>Code</th><th>Name</th><th>Ticks</th><th>Price (KRW)</th><th>Sector</th></tr></thead>
-    <tbody>
-      <tr><td><code>005930</code></td><td>Samsung Electronics</td><td>71,497</td><td>184,750</td><td>Semiconductor</td></tr>
-      <tr><td><code>000660</code></td><td>SK Hynix</td><td>66,914</td><td>934,500</td><td>Semiconductor</td></tr>
-      <tr><td><code>005380</code></td><td>Hyundai Motor</td><td>63,742</td><td>501,500</td><td>Auto</td></tr>
-      <tr><td><code>034020</code></td><td>Doosan Enerbility</td><td>59,228</td><td>106,150</td><td>Heavy Industry</td></tr>
-      <tr><td><code>010140</code></td><td>Samsung Heavy Ind.</td><td>51,261</td><td>28,825</td><td>Shipbuilding</td></tr>
-      <tr><td><code>006800</code></td><td>Mirae Asset</td><td>45,600</td><td>69,850</td><td>Finance</td></tr>
-      <tr><td><code>272210</code></td><td>HD Hyundai</td><td>43,133</td><td>145,650</td><td>Heavy Industry</td></tr>
-      <tr><td><code>042700</code></td><td>Hanmi Semiconductor</td><td>42,590</td><td>294,250</td><td>Semicon Equipment</td></tr>
-      <tr><td><code>015760</code></td><td>KEPCO</td><td>42,174</td><td>46,775</td><td>Utility</td></tr>
-      <tr><td><code>035420</code></td><td>NAVER</td><td>38,680</td><td>217,250</td><td>IT/Platform</td></tr>
-    </tbody>
-  </table>
-
-  <!-- ==================== 10. Knowledge Graph ==================== -->
-  <h2>10. Knowledge Base</h2>
-  <p>각 이터레이션의 교훈은 Obsidian 호환 MD로 저장됩니다. <code>knowledge/graph.py</code>가 frontmatter + <code>[[wikilink]]</code>를 파싱하여 networkx DiGraph로 인덱싱.</p>
-
-  <div class="grid3">
-    <div class="card purple"><h4>45 Lessons</h4><p>Observation / Why / Alpha Critique / Execution Critique / How to apply next. 각각 source strategy + metric 태그.</p></div>
-    <div class="card purple"><h4>15 Patterns</h4><p>3+ lessons 공유 root cause. krx_fee_hurdle, lob_signal_fires_after_absorption, oos_regime_validity_gate 등.</p></div>
-    <div class="card purple"><h4>Seeds</h4><p>IS/OOS split 정의, methodology notes. 재현성 보장.</p></div>
-  </div>
-
-  <h3>Lesson Structure</h3>
-<pre><code><span class="cm">---</span>
-<span class="kw">id</span>: lesson_20260414_002_...
-<span class="kw">created</span>: <span class="num">2026-04-14T01:44:16</span>
-<span class="kw">tags</span>: <span class="str">[lesson, edge, turnover, adverse_selection]</span>
-<span class="kw">source</span>: strat_20260414_0002_...
-<span class="kw">metric</span>: <span class="str">"return_pct=-0.86 trades=292 fees=65405"</span>
-<span class="kw">links</span>:
-  - <span class="str">"[[lesson_20260414_001_...]]"</span>
-  - <span class="str">"[[pattern_krx_fee_hurdle_...]]"</span>
-<span class="cm">---</span>
-# Title
-
-Observation: ...
-Why: ...
-Alpha Critique: ...
-Execution Critique: ...
-How to apply next: ...</code></pre>
-
-  <!-- ==================== 11. Audit ==================== -->
-  <h2>11. Audit &amp; Validation</h2>
-  <p><code>scripts/audit_principles.py</code>: 12개 empirical invariant를 synthetic OrderBookSnapshot으로 검증.</p>
-
-  <table>
-    <thead><tr><th>#</th><th>Principle</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td>1</td><td>No lookahead (latency model)</td><td><span class="badge ok">PASS</span></td></tr>
-      <tr><td>2</td><td>Fee = commission + tax</td><td><span class="badge ok">PASS</span></td></tr>
-      <tr><td>3</td><td>No naked shorts (long-only)</td><td><span class="badge ok">PASS</span></td></tr>
-      <tr><td>4</td><td>No overdraft (cash check)</td><td><span class="badge ok">PASS</span></td></tr>
-      <tr><td>5</td><td>EOD forced close</td><td><span class="badge ok">PASS</span></td></tr>
-      <tr><td>6</td><td>Max position constraint</td><td><span class="badge ok">PASS</span></td></tr>
-      <tr><td>7</td><td>Walk-book partial fills</td><td><span class="badge ok">PASS</span></td></tr>
-      <tr><td>8</td><td>DSL primitives registered</td><td><span class="badge ok">PASS</span></td></tr>
-      <tr><td>9</td><td>Multi-symbol isolation</td><td><span class="badge ok">PASS</span></td></tr>
-      <tr><td>10</td><td>Python strategy loads</td><td><span class="badge ok">PASS</span></td></tr>
-      <tr><td>11</td><td>Resting limit queue-ahead fill</td><td><span class="badge ok">PASS</span></td></tr>
-      <tr><td>12</td><td>Resting limit EOD cancel</td><td><span class="badge ok">PASS</span></td></tr>
-    </tbody>
-  </table>
-
-  <!-- ==================== 12. 확장 ==================== -->
-  <h2>12. Roadmap</h2>
-  <div class="grid2">
-    <div class="card">
-      <h4>Walk-forward Optuna</h4>
-      <p>IS 최적화 &rarr; OOS 자동 검증 파이프라인. 현재 Optuna는 IS 단독. OOS pass/fail gate 추가 필요.</p>
-    </div>
-    <div class="card">
-      <h4>Multi-day Overnight</h4>
-      <p>현재 매일 EOD 강제 청산. Overnight position 유지 + gap risk 모델 옵션.</p>
-    </div>
-    <div class="card">
-      <h4>Per-symbol Parameter Override</h4>
-      <p>현재 모든 종목에 동일 threshold. 종목별 OBI/spread 정규화 임계값 허용.</p>
-    </div>
-    <div class="card">
-      <h4>Execution Replay</h4>
-      <p>체결 프린트 데이터 통합으로 queue 모델 정밀도 향상. 현재는 LOB depth proxy.</p>
-    </div>
-  </div>
-
-  <footer>
-    Updated: 2026-04-15 &middot; 49 strategies &middot; 12/12 audit &middot; <code>docs/overview.html</code>
-  </footer>
 </div>
 </body>
 </html>
