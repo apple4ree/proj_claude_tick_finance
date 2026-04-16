@@ -126,6 +126,30 @@ python scripts/generate_signal_brief.py --symbol 005930 --features-dir data/sign
 python scripts/generate_signal_brief.py --symbol BTC --features-dir data/signal_research/crypto --fee 4.0
 ```
 
+## 3-Axis Trajectory System
+
+전략 생성을 3개 독립 축으로 분리하고, 각 축에서 최적 trajectory를 선택/mutation/crossover합니다.
+
+### 3개 축
+| 축 | 질문 | Agent | Pool 저장 |
+|---|---|---|---|
+| Alpha | "어떤 종목의 어떤 signal?" | alpha-designer | strategies/_trajectories/alpha_pool.json |
+| Execution | "PT/SL/trailing 어떻게?" | execution-designer | strategies/_trajectories/exec_pool.json |
+| Portfolio | "종목 배분 얼마나?" | portfolio-designer (NEW) | strategies/_trajectories/port_pool.json |
+
+### 핵심 연산
+- **Selection**: pool에서 score 상위 trajectory 선택
+- **Mutation**: 기존 trajectory의 파라미터를 ±10~20% 변형
+- **Crossover**: 서로 다른 iteration의 best α × ε × π 조합
+- **Localization**: 실패 시 어느 축이 원인인지 진단 → 그 축만 교체
+
+### 사용법
+```bash
+python scripts/trajectory_pool.py seed --briefs-dir data/signal_briefs
+python scripts/trajectory_pool.py summary
+python scripts/trajectory_pool.py top --axis alpha --n 5
+```
+
 ## Data Universe
 
 - **IS (In-Sample)**: 20260305 ~ 20260320 (12일) — 전략 개발용. 하락+상승 혼합 regime.
