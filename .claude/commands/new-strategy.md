@@ -9,6 +9,46 @@ You are orchestrating ONE iteration of the tick strategy chain.
 
 ## Steps (strictly sequential — never parallel)
 
+## Step 0: Signal Brief Generation (MANDATORY)
+
+Before invoking any agent, you MUST ensure a fresh signal brief exists for each
+target symbol in the seed's universe.
+
+### Protocol
+
+1. Parse the seed for target symbols (default: `005930` for KRX, `BTC` for crypto).
+
+2. For each symbol, check if `data/signal_briefs/<SYMBOL>.json` exists AND was
+   generated within the last 24 hours (`generated_at` field).
+
+3. If missing or stale, run:
+   ```bash
+   # KRX symbol (fee 21 bps)
+   python scripts/generate_signal_brief.py --symbol <SYM> --features-dir data/signal_research --fee 21.0
+
+   # Crypto symbol (fee 4 bps, Upbit data root)
+   python scripts/generate_signal_brief.py --symbol <SYM> --features-dir data/signal_research/crypto --fee 4.0
+   ```
+
+4. If `generate_signal_brief.py` fails because the underlying features CSV is
+   missing, FIRST run:
+   ```bash
+   # KRX
+   python scripts/signal_research.py extract --symbol <SYM> --dates <IS_DATES> --horizons 50,100,200,500,1000,3000
+
+   # Crypto (from /home/dgu/tick/crypto/)
+   python scripts/signal_research.py --data-root /home/dgu/tick/crypto extract \
+       --symbol <SYM> --dates <DATE> --horizons 50,100,200,500,1000 \
+       --regular-only false --outdir data/signal_research/crypto
+   ```
+   Then retry brief generation.
+
+5. After briefs are confirmed fresh, check each brief's `n_viable_in_top`:
+   - If 0, skip the symbol (log "no viable signal; skipping")
+   - If all symbols are skipped, ABORT the iteration with reason "no market has viable signals at current fee"
+
+6. Only then proceed to invoke `alpha-designer`.
+
 1. **Alpha design**: delegate to `alpha-designer` (Agent tool, subagent_type=alpha-designer). Pass the seed.
    - Capture the JSON output.
    - If `missing_primitive` is non-null, go to step 3a.
