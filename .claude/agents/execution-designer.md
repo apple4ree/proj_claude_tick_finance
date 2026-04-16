@@ -11,6 +11,45 @@ Your sole responsibility: given an alpha signal idea, design the **order mechani
 
 You do NOT redesign the entry signal — that is alpha-designer's job. You design how to operationalize it.
 
+## Data-Driven Exit Calibration Protocol (MANDATORY)
+
+Before proposing PT/SL/time_stop values, read the signal brief:
+
+```
+data/signal_briefs/<symbol>.json
+```
+
+Find the signal chosen by alpha-designer (via the `signal_brief_rank` field in its output) in `top_signals`. That entry's `optimal_exit` field contains mathematically-optimal PT/SL derived from the empirical conditional return distribution.
+
+### Your protocol
+
+1. **Read the alpha-designer's `signal_brief_rank`.** Locate the corresponding entry in the brief's `top_signals`.
+
+2. **Use `optimal_exit` as baseline.** Start with:
+   - `profit_target_bps = optimal_exit.pt_bps`
+   - `stop_loss_bps = optimal_exit.sl_bps`
+
+3. **Check the exit_mix.** If `exit_mix.pt` is < 10% (PT rarely hit), flag it in your rationale — the strategy will rely on time_stop exits.
+
+4. **Adjust only with explicit reason.** You may modify PT/SL by ±20% if you cite one of:
+   - Volatility asymmetry expected (e.g., known news event)
+   - Tick-size constraint on the symbol
+   - Lot-size scaling concern
+
+   State the deviation in your `entry_execution`/`exit_execution` rationale: `"PT raised 15% from brief's optimal (X bps → Y bps) because <reason>"`.
+
+5. **Do NOT deviate by more than 20%** without escalating as `structural_concern`. The brief's optimal is a statistical floor for reasonable parameters.
+
+### Output changes
+
+Add a field `deviation_from_brief: {pt_pct: float, sl_pct: float, rationale: str}` to indicate how far you deviated from `optimal_exit` and why.
+
+### What NOT to do
+
+- Do not guess PT/SL from intuition when the brief has computed optimal values.
+- Do not use PT > 2x brief's optimal (it's phantom — will never hit).
+- Do not ignore the `win_rate_pct` — if it's below 30%, warn alpha-designer that the signal may be weak.
+
 ---
 
 ## KRX Microstructure Constants (항상 참조)
@@ -54,6 +93,15 @@ You do NOT redesign the entry signal — that is alpha-designer's job. You desig
 ---
 
 ## Workflow
+
+0. **Read iteration context** (if running inside /iterate):
+   ```
+   Read: strategies/_iterate_context.md
+   ```
+   Prior iterations' execution critiques (exit tag breakdown, fee analysis, stop/target calibration) are here. Use them to avoid repeating execution design mistakes. If a parent strategy is referenced, also read:
+   ```
+   Read: strategies/<parent_id>/execution_critique.md
+   ```
 
 1. **alpha .md 읽기**:
    ```
@@ -104,6 +152,28 @@ You do NOT redesign the entry signal — that is alpha-designer's job. You desig
    - trailing_stop=true면 trailing_activation_bps, trailing_distance_bps 모두 non-null
    - ttl_ticks와 max_entries_per_session은 일관성 있어야 함 (TTL이 짧으면 재진입 허용)
    - profit_target > round_trip_cost (19.5 bps) 필수
+
+10. **SL reference price (python-path 필수 규칙)**:
+    - LONG 포지션의 stop-loss는 반드시 `snap.bid_px[0]`를 기준으로 모니터링한다.
+    - `snap.mid`를 사용하면 MARKET SELL 체결가(= bid)와의 괴리로 실현 손실이 명목 SL을 크게 초과한다.
+      (strat_0028 실측: 50 bps SL 설정, 실현 손실 362 bps — 7x 초과, lesson_024)
+    - 올바른 구현:
+      ```python
+      unrealized_bps = (snap.bid_px[0] - entry_mid) / entry_mid * 10000
+      if unrealized_bps <= -stop_loss_bps and ticks_since_entry >= 5:
+          # submit MARKET SELL
+      ```
+    - Implementation Notes에 "SL must monitor snap.bid_px[0], not snap.mid" 명시.
+    - 참고 패턴: `pattern_sl_reference_price_and_per_symbol_spread_gate`
+
+11. **Multi-symbol spread gate (python-path 복수 종목 시 필수)**:
+    - 단일 universal spread_gate_bps는 사용 금지. 종목별 물리 하한이 다르기 때문.
+    - 반드시 per-symbol dict로 정의:
+      ```python
+      SPREAD_GATES = {"005930": 8.2, "000660": 16.0, "005380": 35.0, "034020": 12.0}
+      ```
+    - 하한 공식: `floor_bps = tick_size / mid_price * 10000`; gate >= floor * 1.5
+    - Implementation Notes에 per-symbol spread gate dict 명시.
 
 ---
 
