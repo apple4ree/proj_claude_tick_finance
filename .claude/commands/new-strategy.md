@@ -68,11 +68,32 @@ target symbol in the seed's universe.
    - Capture `{strategy_py_path, validation}`.
    - If validation fails, STOP and report.
 
-5. **Backtest**: delegate to `backtest-runner` with the `strategy_id`.
+5. **Backtest (normal)**: delegate to `backtest-runner` with the `strategy_id`.
    - Capture the metrics JSON.
    - On error, STOP and report.
 
+5b. **Backtest (strict) + Attribution**: run strict mode and compute PnL attribution.
+   ```bash
+   python scripts/attribute_pnl.py --strategy <strategy_id>
+   ```
+   This runs dual backtest (normal + strict) and produces:
+   - `report_strict.json` (spec-compliant counterfactual)
+   - Attribution output with `clean_pnl`, `bug_pnl`, `clean_pct_of_total`
+   
+   Capture the attribution output and include it in the metrics passed to critics:
+   ```json
+   {
+     "return_pct": ...,
+     "clean_pnl": ...,
+     "bug_pnl": ...,
+     "clean_pct_of_total": ...,
+     "invariant_violations": [...],
+     "invariant_violation_by_type": {...}
+   }
+   ```
+
 6. **Critique** (parallel): delegate to `alpha-critic` AND `execution-critic` simultaneously, both with `{strategy_id, metrics}`.
+   - metrics now includes `clean_pnl`, `bug_pnl`, `invariant_violations`.
    - Capture alpha_critique JSON and execution_critique JSON.
 
 7. **Feedback**: delegate to `feedback-analyst` with `{strategy_id, alpha_critique, execution_critique, metrics}`.

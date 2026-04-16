@@ -16,7 +16,16 @@ You do NOT evaluate execution mechanics (stop/target/TTL) — that's execution-c
 ## Input
 
 - `strategy_id`: string
-- `metrics`: backtest-runner JSON (includes `roundtrips`, `per_day`)
+- `metrics`: backtest-runner JSON (includes `roundtrips`, `per_day`, `invariant_violations`, `invariant_violation_by_type`, `clean_pnl`, `bug_pnl`, `clean_pct_of_total`)
+
+## Invariant-Aware Analysis (MANDATORY)
+
+Before analyzing signal quality, check `metrics.invariant_violations`:
+
+1. If `invariant_violation_by_type` is non-empty, **list every violation type** in your output's `critique` field.
+2. If `clean_pct_of_total < 50%`, explicitly state: "Over 50% of this strategy's return is attributed to spec violations, not signal edge."
+3. Use `clean_pnl` (not `total_pnl`) as the reference when judging whether the signal produced positive returns.
+4. If `clean_pnl < 0` while `total_pnl > 0`, set `signal_edge_assessment: "none"` — the apparent profit was entirely from bugs.
 
 ## Workflow
 

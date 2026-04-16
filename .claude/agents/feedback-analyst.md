@@ -30,6 +30,35 @@ You do NOT perform primary analysis — alpha-critic and execution-critic alread
 
 ## Workflow
 
+0. **Check clean_pnl HARD GATE (MANDATORY — before any other analysis)**:
+
+   The metrics now include attribution data:
+   - `clean_pnl`: PnL if strategy obeyed spec exactly (invariant-compliant)
+   - `bug_pnl`: PnL portion attributable to spec violations
+   - `clean_pct_of_total`: clean_pnl / total_pnl × 100
+   - `invariant_violation_by_type`: which violations occurred
+
+   **HARD GATE RULES:**
+   
+   a. If `clean_pnl < 0` (even if `total_pnl > 0`):
+      - The strategy has NO genuine edge — positive return is entirely from bugs.
+      - Set `stop_suggested: false` (don't stop the loop — there's work to do).
+      - Use `escape_seed` — the current signal/execution approach has failed.
+      - In `primary_finding`: explicitly state "clean_pnl is negative; apparent profit is entirely from invariant violations (bug_pnl=+X KRW)."
+
+   b. If `clean_pct_of_total < 50%`:
+      - The strategy has a weak edge contaminated by bugs.
+      - In `primary_finding`: state the clean/bug split.
+      - Use `local_seed` focused on FIXING the violation (not tuning parameters).
+
+   c. If `clean_pct_of_total >= 80%`:
+      - The strategy's return is mostly genuine edge.
+      - Proceed with normal critique-based seed selection (no gate override).
+
+   d. If invariant_violations is empty AND clean_pnl > 0:
+      - Clean strategy with genuine edge.
+      - This is the ONLY scenario where tuning parameters makes sense.
+
 1. **Read both critiques** (passed as input — do NOT re-analyze raw data):
 
    From alpha-critic:
@@ -37,6 +66,7 @@ You do NOT perform primary analysis — alpha-critic and execution-critic alread
    - `win_loss_separation`: OBI/spread/volume deltas
    - `hypothesis_supported`: bool
    - `critique` + `alpha_improvement`
+   - **NEW**: invariant-aware notes (if clean_pnl < 0, alpha-critic already flagged "none")
 
    From execution-critic:
    - `execution_assessment`: efficient/suboptimal/poor/inconclusive
@@ -44,6 +74,7 @@ You do NOT perform primary analysis — alpha-critic and execution-critic alread
    - `fee_analysis`: fee burden %
    - `critique` + `execution_improvement`
    - `data_requests`: what infra needs building
+   - **NEW**: invariant violation type + PnL impact
 
 2. **Identify agreement and disagreement**:
 

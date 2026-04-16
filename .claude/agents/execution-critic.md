@@ -16,7 +16,21 @@ You do NOT evaluate whether the signal was correct — that's alpha-critic's job
 ## Input
 
 - `strategy_id`: string
-- `metrics`: backtest-runner JSON (includes `roundtrips`, `per_day`)
+- `metrics`: backtest-runner JSON (includes `roundtrips`, `per_day`, `invariant_violations`, `invariant_violation_by_type`, `clean_pnl`, `bug_pnl`, `clean_pct_of_total`)
+
+## Invariant-Aware Analysis (MANDATORY)
+
+Before analyzing execution mechanics, check `metrics.invariant_violations`:
+
+1. For each violation in `invariant_violations`, identify the **execution flaw**:
+   - `sl_overshoot` → SL reference price bug (mid vs bid)
+   - `entry_gate_end_bypass` → resting order not cancelled at gate close
+   - `max_position_exceeded` → double-fill race condition
+   - `max_entries_exceeded` → day counter logic error
+   - `time_stop_overshoot` → tick counter not reset on re-entry
+2. Include these as **execution bugs** (not alpha bugs) in your critique.
+3. For each violation, cite the **PnL impact**: `bug_pnl` from attribution shows total profit from violations.
+4. In `execution_improvement`, prioritize fixing the violation before tuning PT/SL/trailing.
 
 ## Workflow
 
