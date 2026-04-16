@@ -51,7 +51,7 @@ def _spec_description_html(spec: dict) -> str:
         para = esc.replace("\n\n", "</p><p>").replace("\n", "<br>")
         sections.append(
             '<div class="spec-section">'
-            '<div class="spec-section-title">Description</div>'
+            '<div class="spec-section-title">전략 설명</div>'
             f"<p>{para}</p>"
             "</div>"
         )
@@ -65,9 +65,9 @@ def _spec_description_html(spec: dict) -> str:
         )
         sections.append(
             '<div class="spec-section">'
-            '<div class="spec-section-title">Parameters</div>'
+            '<div class="spec-section-title">파라미터</div>'
             '<table class="spec-table">'
-            "<thead><tr><th>Parameter</th><th>Value</th></tr></thead>"
+            "<thead><tr><th>파라미터</th><th>값</th></tr></thead>"
             f"<tbody>{rows}</tbody>"
             "</table></div>"
         )
@@ -89,14 +89,14 @@ def _spec_description_html(spec: dict) -> str:
         lot_str = f"  ·  lot = {lot}" if lot is not None else ""
 
         formula_rows = [
-            ("Round-trip cost",
-             f"commission ({comm} bps) + sell tax ({tax} bps) = <b>{rtt:.1f} bps</b>"),
-            ("Break-even win rate",
-             f"stop / (target + stop) = {sl_f:.0f} / ({pt_f:.0f} + {sl_f:.0f}) = <b>{be_wr:.1f}%</b>"),
-            ("Payoff ratio (P:L)",
-             f"target / stop = {pt_f:.0f} / {sl_f:.0f} = <b>{payoff:.2f}</b>{lot_str}"),
-            ("Min edge required",
-             f"actual WR must exceed {be_wr:.1f}% to be profitable after {rtt:.1f} bps fees"),
+            ("왕복 비용",
+             f"수수료 ({comm} bps) + 매도세 ({tax} bps) = <b>{rtt:.1f} bps</b>"),
+            ("손익분기 승률",
+             f"손절 / (익절 + 손절) = {sl_f:.0f} / ({pt_f:.0f} + {sl_f:.0f}) = <b>{be_wr:.1f}%</b>"),
+            ("손익비 (P:L)",
+             f"익절 / 손절 = {pt_f:.0f} / {sl_f:.0f} = <b>{payoff:.2f}</b>{lot_str}"),
+            ("최소 요구 edge",
+             f"실제 승률이 {be_wr:.1f}%를 초과해야 {rtt:.1f} bps 비용 후 수익 가능"),
         ]
         rows_f = "".join(
             f'<tr><td class="pk">{k}</td><td class="pv">{v}</td></tr>'
@@ -104,9 +104,9 @@ def _spec_description_html(spec: dict) -> str:
         )
         sections.append(
             '<div class="spec-section">'
-            '<div class="spec-section-title">Payoff &amp; Fee Structure</div>'
+            '<div class="spec-section-title">손익 구조 및 수수료</div>'
             '<table class="spec-table">'
-            "<thead><tr><th>Formula</th><th>Value</th></tr></thead>"
+            "<thead><tr><th>항목</th><th>값</th></tr></thead>"
             f"<tbody>{rows_f}</tbody>"
             "</table></div>"
         )
@@ -119,18 +119,18 @@ def _spec_description_html(spec: dict) -> str:
 
     syms = universe.get("symbols", [])
     if syms:
-        meta.append(("Symbols", ", ".join(syms)))
+        meta.append(("종목", ", ".join(syms)))
     dates = universe.get("dates", [])
     if dates:
-        meta.append(("Dates", f"{dates[0]} → {dates[-1]}  ({len(dates)} days)"))
+        meta.append(("기간", f"{dates[0]} → {dates[-1]}  ({len(dates)}일)"))
     if spec.get("capital"):
-        meta.append(("Capital", f"{spec['capital']:,} KRW"))
+        meta.append(("자본금", f"{spec['capital']:,} KRW"))
     if fees:
         comm = fees.get("commission_bps", 0)
         tax = fees.get("tax_bps", 0)
-        meta.append(("Fees", f"commission {comm} bps + sell tax {tax} bps → {comm + tax} bps total round-trip"))
+        meta.append(("수수료", f"수수료 {comm} bps + 매도세 {tax} bps → 왕복 {comm + tax} bps"))
     if latency:
-        meta.append(("Latency", f"submit {latency.get('submit_ms', 0)} ms ± {latency.get('jitter_ms', 0)} ms jitter"))
+        meta.append(("지연시간", f"제출 {latency.get('submit_ms', 0)} ms ± {latency.get('jitter_ms', 0)} ms 변동"))
 
     if meta:
         rows = "".join(
@@ -139,9 +139,9 @@ def _spec_description_html(spec: dict) -> str:
         )
         sections.append(
             '<div class="spec-section">'
-            '<div class="spec-section-title">Universe &amp; Config</div>'
+            '<div class="spec-section-title">유니버스 및 설정</div>'
             '<table class="spec-table">'
-            "<thead><tr><th>Field</th><th>Value</th></tr></thead>"
+            "<thead><tr><th>항목</th><th>값</th></tr></thead>"
             f"<tbody>{rows}</tbody>"
             "</table></div>"
         )
@@ -334,18 +334,18 @@ def _sensitivity_panel_html(spec: dict, report: dict) -> str:
 
 def _metric_cards(report: dict) -> str:
     cards = [
-        ("Return", f"{report.get('return_pct', 0):.3f}%"),
-        ("Total PnL", f"{report.get('total_pnl', 0):,.0f}"),
-        ("Sharpe (raw)", f"{report.get('sharpe_raw', 0):.3f}"),
-        ("Sharpe (ann.)", f"{report.get('sharpe_annualized', 0):.3f}"),
+        ("수익률", f"{report.get('return_pct', 0):.3f}%"),
+        ("총 손익", f"{report.get('total_pnl', 0):,.0f}"),
+        ("샤프 (raw)", f"{report.get('sharpe_raw', 0):.3f}"),
+        ("샤프 (연환산)", f"{report.get('sharpe_annualized', 0):.3f}"),
         ("MDD", f"{report.get('mdd_pct', 0):.3f}%"),
-        ("Trades", f"{report.get('n_trades', 0)}"),
-        ("Roundtrips", f"{report.get('n_roundtrips', 0)}"),
-        ("Win rate", f"{report.get('win_rate_pct', 0):.1f}%"),
+        ("주문 수", f"{report.get('n_trades', 0)}"),
+        ("라운드트립", f"{report.get('n_roundtrips', 0)}"),
+        ("승률", f"{report.get('win_rate_pct', 0):.1f}%"),
         ("Avg trade", f"{report.get('avg_trade_pnl', 0):,.0f}"),
-        ("Best trade", f"{report.get('best_trade', 0):,.0f}"),
-        ("Worst trade", f"{report.get('worst_trade', 0):,.0f}"),
-        ("Total fees", f"{report.get('total_fees', 0):,.0f}"),
+        ("최대 수익 거래", f"{report.get('best_trade', 0):,.0f}"),
+        ("최대 손실 거래", f"{report.get('worst_trade', 0):,.0f}"),
+        ("총 수수료", f"{report.get('total_fees', 0):,.0f}"),
     ]
     return "".join(
         f'<div class="card"><div class="label">{label}</div><div class="value">{val}</div></div>'
@@ -358,7 +358,7 @@ def _build_figure(report: dict, trace: dict) -> go.Figure:
         rows=3,
         cols=1,
         shared_xaxes=True,
-        subplot_titles=("Price & Trades", "Equity", "Drawdown (%)"),
+        subplot_titles=("가격 및 체결", "자산곡선", "낙폭 (%)"),
         vertical_spacing=0.05,
         row_heights=[0.52, 0.24, 0.24],
     )
@@ -464,7 +464,7 @@ def _build_figure(report: dict, trace: dict) -> go.Figure:
                 x=eq_x,
                 y=dd_pct.tolist(),
                 mode="lines",
-                name="Drawdown %",
+                name="낙폭 %",
                 line=dict(color="#dc2626", width=1),
                 fill="tozeroy",
                 fillcolor="rgba(220,38,38,0.18)",
@@ -979,12 +979,12 @@ def _sym_metric_cards(sym_data: dict) -> str:
     wr = sym_data.get("win_rate_pct", 0)
     wr_color = "#16a34a" if wr >= 35.5 else "#dc2626"
     cards = [
-        ("Return %", f'<span style="color:{ret_color}">{ret:+.4f}%</span>'),
-        ("Roundtrips", str(sym_data.get("n_roundtrips", 0))),
-        ("Win rate", f'<span style="color:{wr_color}">{wr:.1f}%</span>'),
-        ("Best trade", f'{sym_data.get("best_trade", 0):,.0f}'),
-        ("Worst trade", f'{sym_data.get("worst_trade", 0):,.0f}'),
-        ("Total fees", f'{sym_data.get("total_fees", 0):,.0f}'),
+        ("수익률", f'<span style="color:{ret_color}">{ret:+.4f}%</span>'),
+        ("라운드트립", str(sym_data.get("n_roundtrips", 0))),
+        ("승률", f'<span style="color:{wr_color}">{wr:.1f}%</span>'),
+        ("최대 수익", f'{sym_data.get("best_trade", 0):,.0f}'),
+        ("최대 손실", f'{sym_data.get("worst_trade", 0):,.0f}'),
+        ("총 수수료", f'{sym_data.get("total_fees", 0):,.0f}'),
     ]
     return "".join(
         f'<div class="card"><div class="label">{label}</div>'
@@ -1005,7 +1005,7 @@ def _build_comparison_chart(per_symbol: dict, starting_cash: float) -> str:
     fig = make_subplots(
         rows=1,
         cols=2,
-        subplot_titles=("Return % per symbol", "Win rate % per symbol"),
+        subplot_titles=("종목별 수익률 (%)", "종목별 승률 (%)"),
         horizontal_spacing=0.12,
     )
 
@@ -1018,7 +1018,7 @@ def _build_comparison_chart(per_symbol: dict, starting_cash: float) -> str:
             text=[f"{r:+.4f}%" for r in returns],
             textposition="outside",
             hovertemplate="%{y}: %{x:+.4f}%<extra></extra>",
-            name="Return %",
+            name="수익률 %",
             showlegend=False,
         ),
         row=1,
@@ -1033,7 +1033,7 @@ def _build_comparison_chart(per_symbol: dict, starting_cash: float) -> str:
             text=[f"{w:.1f}% ({r}rt)" for w, r in zip(win_rates, roundtrips)],
             textposition="outside",
             hovertemplate="%{y}: %{x:.1f}% win rate<extra></extra>",
-            name="Win rate %",
+            name="승률 %",
             showlegend=False,
         ),
         row=1,
@@ -1252,11 +1252,11 @@ def render_per_symbol(strategy_dir: Path) -> Path:
     avg_ret = agg.get("avg_return_pct", 0)
     avg_ret_color = "#16a34a" if avg_ret >= 0 else "#dc2626"
     agg_card_data = [
-        ("Avg return %", f'<span style="color:{avg_ret_color}">{avg_ret:+.4f}%</span>'),
-        ("Pooled win rate", f'{agg.get("pooled_win_rate_pct", 0):.1f}%'),
-        ("Total roundtrips", str(agg.get("total_roundtrips", 0))),
-        ("Total fees", f'{agg.get("total_fees", 0):,.0f}'),
-        ("Symbols traded", f'{agg.get("n_symbols_traded", 0)} / {agg.get("n_symbols_traded", 0) + agg.get("n_symbols_skipped", 0)}'),
+        ("평균 수익률", f'<span style="color:{avg_ret_color}">{avg_ret:+.4f}%</span>'),
+        ("통합 승률", f'{agg.get("pooled_win_rate_pct", 0):.1f}%'),
+        ("총 라운드트립", str(agg.get("total_roundtrips", 0))),
+        ("총 수수료", f'{agg.get("total_fees", 0):,.0f}'),
+        ("거래 종목", f'{agg.get("n_symbols_traded", 0)} / {agg.get("n_symbols_traded", 0) + agg.get("n_symbols_skipped", 0)}'),
     ]
     agg_cards_html = "".join(
         f'<div class="card"><div class="label">{label}</div>'
