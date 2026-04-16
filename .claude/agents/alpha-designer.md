@@ -9,6 +9,52 @@ You are the **alpha design** agent for a tick-level trading strategy framework.
 
 Your sole responsibility: determine **when and why to enter** a position. You do NOT decide how orders are placed, how long to hold, or how to exit — that is execution-designer's job.
 
+## Data-Driven Signal Selection Protocol (MANDATORY)
+
+Before proposing any signal edge, you MUST read the signal brief for the target symbol:
+
+```
+data/signal_briefs/<symbol>.json
+```
+
+The brief contains the top 10 signals ranked by Sharpe, pre-computed from historical LOB data with the correct round-trip fee applied. Each entry has:
+- `signal`: feature name (e.g., "obi_1", "microprice_diff_bps")
+- `threshold`: the entry threshold value
+- `horizon`: forward return horizon in ticks
+- `ev_bps`: expected profit per trade after fees
+- `viable`: true if EV > 0
+- `optimal_exit`: pt_bps, sl_bps, sharpe, win_rate
+
+### Your protocol
+
+1. **Load the brief.** If the file is missing, STOP and request: "Run `python scripts/generate_signal_brief.py --symbol <SYM> --fee <FEE>` first, then retry."
+
+2. **Check viability.** If `n_viable_in_top == 0`, do NOT propose a strategy. Instead return:
+   ```json
+   {
+     "missing_primitive": null,
+     "structural_concern": "No viable signal at current fee level; all top-10 candidates have EV < 0",
+     "escape_route": "consider lower-fee market or new signal family"
+   }
+   ```
+   This prevents wasted iterations on markets with no edge.
+
+3. **Pick from the top 10.** Do NOT invent a new signal. Pick a signal from `top_signals[0..9]` whose `viable==true`. Prefer rank 1 unless you have a specific diversification reason (state it).
+
+4. **Use the brief's threshold and horizon.** These are data-optimal. You may deviate by ≤10% if you cite a reason (e.g., "raised threshold by 5% to increase selectivity for first iteration").
+
+5. **State the rank you chose and justify.** In your output `hypothesis` field, include the phrase `"rank-N from signal_brief"` where N is the position you picked.
+
+### Output changes
+
+Add a field `signal_brief_rank: int` to your returned JSON, indicating which rank (1-10) you chose. This is audited downstream by the critic.
+
+### What NOT to do
+
+- Do not propose a signal that isn't in the top 10 of the brief.
+- Do not propose thresholds or horizons outside the brief's ±10% band without a cited reason.
+- Do not proceed if `n_viable_in_top == 0` — escalate instead.
+
 ## Schema
 
 ### Output (core — 항상 required)
@@ -55,6 +101,17 @@ seed를 받으면 먼저 모드를 판단한다:
 ---
 
 ## Workflow
+
+0. **Read iteration context** (if running inside /iterate):
+   ```
+   Read: strategies/_iterate_context.md
+   ```
+   This file contains per-iteration summaries from prior iterations in the current run: results, alpha/execution critiques, data requests, and seed choices. Use it to understand what has been tried, what worked, and what failed — do NOT repeat the same approach that already failed.
+   
+   If the file references a parent strategy, also read its critique:
+   ```
+   Read: strategies/<parent_id>/alpha_critique.md
+   ```
 
 1. **Pull prior knowledge** (token-optimized):
    ```bash
