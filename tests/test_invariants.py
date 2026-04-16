@@ -267,3 +267,75 @@ def test_runner_permissive_mode_does_not_block():
         symbol="005930", current_pos_qty=0, current_day_entries=0,
     )
     assert block is False
+
+
+# -- Task 2 (strict_mode): should_force_sell ------------------------------
+
+def test_runner_force_sell_on_sl_threshold():
+    """Engine should force SELL when bid-based loss crosses stop_loss_bps."""
+    r = InvariantRunner(
+        invariants=infer_invariants({"params": {"stop_loss_bps": 50.0}}),
+        strict_mode=True,
+    )
+    # Seed an open entry
+    r.on_fill(
+        fill_index=0, side="BUY", qty=5, price=100000, tag="passive_entry",
+        kst_sec=36500, date_str="20260316", symbol="005930",
+    )
+    # bid dropped to 99400 -> loss = 60 bps (> 50)
+    force, tag = r.should_force_sell(
+        symbol="005930", current_bid=99400, current_mid=99450,
+        ticks_held=10,
+    )
+    assert force is True
+    assert tag == "strict_sl"
+
+
+def test_runner_force_sell_on_time_stop():
+    r = InvariantRunner(
+        invariants=infer_invariants({"params": {"time_stop_ticks": 3000}}),
+        strict_mode=True,
+    )
+    r.on_fill(
+        fill_index=0, side="BUY", qty=5, price=100000, tag="passive_entry",
+        kst_sec=36500, date_str="20260316", symbol="005930",
+    )
+    # ticks_held = 3001 > threshold 3000
+    force, tag = r.should_force_sell(
+        symbol="005930", current_bid=100100, current_mid=100150,
+        ticks_held=3001,
+    )
+    assert force is True
+    assert tag == "strict_time_stop"
+
+
+def test_runner_no_force_before_threshold():
+    r = InvariantRunner(
+        invariants=infer_invariants({
+            "params": {"stop_loss_bps": 50.0, "time_stop_ticks": 3000}
+        }),
+        strict_mode=True,
+    )
+    r.on_fill(
+        fill_index=0, side="BUY", qty=5, price=100000, tag="passive_entry",
+        kst_sec=36500, date_str="20260316", symbol="005930",
+    )
+    # bid dropped only 10 bps (under 50) and ticks_held 500 (under 3000)
+    force, tag = r.should_force_sell(
+        symbol="005930", current_bid=99900, current_mid=99950,
+        ticks_held=500,
+    )
+    assert force is False
+
+
+def test_runner_force_without_open_entry_returns_false():
+    r = InvariantRunner(
+        invariants=infer_invariants({"params": {"stop_loss_bps": 50.0}}),
+        strict_mode=True,
+    )
+    # No entry was opened
+    force, tag = r.should_force_sell(
+        symbol="005930", current_bid=99000, current_mid=99050,
+        ticks_held=10,
+    )
+    assert force is False

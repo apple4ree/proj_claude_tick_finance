@@ -198,6 +198,49 @@ class InvariantRunner:
 
         return False, ""
 
+    def should_force_sell(
+        self,
+        symbol: str,
+        current_bid: float,
+        current_mid: float,
+        ticks_held: int,
+    ) -> tuple[bool, str]:
+        """In strict_mode, return (True, exit_tag) if the open position should be forced out.
+
+        FORCE-type interventions (synthetic SELL emitted by engine):
+          - strict_sl: bid-based loss crossed stop_loss_bps (no tolerance — strict spec)
+          - strict_time_stop: ticks_held crossed time_stop_ticks (no tolerance)
+
+        Note: pt_overshoot is not forced by the engine because PT is a natural
+        upper bound — if the strategy's PT logic is correct, overshoot is rare
+        and small (spec tolerance=20 bps).
+        """
+        if not self.strict_mode:
+            return False, ""
+        entry = self._open_entry.get(symbol)
+        if entry is None:
+            return False, ""
+        entry_price = entry["price"]
+        if entry_price <= 0:
+            return False, ""
+
+        # Bid-anchored SL (spec-compliant): exit as soon as bid crosses threshold
+        if "sl_overshoot" in self._by_name:
+            sl = self._by_name["sl_overshoot"]
+            threshold = sl["threshold"]
+            loss_bps = (entry_price - current_bid) / entry_price * 1e4
+            if loss_bps >= threshold:
+                return True, "strict_sl"
+
+        # time_stop (spec-compliant): exit at exact tick threshold
+        if "time_stop_overshoot" in self._by_name:
+            ts = self._by_name["time_stop_overshoot"]
+            threshold = ts["threshold"]
+            if ticks_held >= threshold:
+                return True, "strict_time_stop"
+
+        return False, ""
+
     def on_fill(
         self,
         fill_index: int,
