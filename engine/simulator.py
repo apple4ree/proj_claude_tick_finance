@@ -32,7 +32,12 @@ from typing import Callable, Iterable, Protocol
 import numpy as np
 
 from engine.data_loader import OrderBookSnapshot, iter_events
+from datetime import datetime, timedelta, timezone
+
+from engine.invariants import InvariantRunner, infer_invariants
 from engine.metrics import BacktestReport, SymbolResult
+
+_KST_TZ = timezone(timedelta(hours=9))
 
 
 # ---------------------------------------------------------------------------
@@ -300,6 +305,8 @@ class Backtester:
         symbols: Iterable[str],
         strategy: Strategy,
         config: BacktestConfig | None = None,
+        spec_dict: dict | None = None,
+        strict_mode: bool = False,
     ) -> None:
         self.dates = list(dates)
         self.symbols = [str(s).zfill(6) for s in symbols]
@@ -320,10 +327,83 @@ class Backtester:
             "short": 0,             # SELL rejected: insufficient long position
             "no_liquidity": 0,      # book empty → walk_book returned 0
             "non_marketable": 0,    # LIMIT order that was never marketable
+            "strict_invariant": 0,  # strict-mode intervention blocks
         }
         # Trace samples for HTML rendering (kept in memory; serialized by runner)
         self.equity_samples: list[tuple[int, float]] = []
         self.mid_samples: dict[str, list[tuple[int, float]]] = {}
+
+        # Invariant checker (auto-inferred from spec.yaml; zero agent involvement)
+        self._invariants = infer_invariants(spec_dict or {})
+        self._invariant_runner = InvariantRunner(
+            invariants=self._invariants, strict_mode=strict_mode,
+        )
+        self._strict_mode = strict_mode
+        # lot_size — needed to scale max_position_per_symbol into shares
+        _params = (spec_dict or {}).get("params") or {}
+        self._invariant_lot_size = int(_params.get("lot_size", 1))
+        # Per-symbol entry event counter for time_stop tick-held tracking
+        self._event_count_per_symbol: dict[str, int] = {}
+        self._entry_event_count: dict[str, int] = {}
+
+    def _record_fill_for_invariants(self, fill: Fill) -> None:
+        """Hook every Fill into the invariant runner. O(1) overhead."""
+        if not self._invariants:
+            return
+        dt = datetime.fromtimestamp(fill.ts_ns / 1e9, tz=_KST_TZ)
+        kst_sec = dt.hour * 3600 + dt.minute * 60 + dt.second
+        date_str = dt.strftime("%Y%m%d")
+        fill_index = len(self.portfolio.fills) - 1
+        sym = fill.symbol
+        ticks_held: int | None = None
+        if fill.side == BUY:
+            self._entry_event_count[sym] = self._event_count_per_symbol.get(sym, 0)
+        elif fill.side == SELL and sym in self._entry_event_count:
+            ticks_held = self._event_count_per_symbol.get(sym, 0) - self._entry_event_count[sym]
+        self._invariant_runner.on_fill(
+            fill_index=fill_index,
+            side=fill.side,
+            qty=int(fill.qty),
+            price=float(fill.avg_price),
+            tag=fill.tag or "",
+            kst_sec=kst_sec,
+            date_str=date_str,
+            symbol=sym,
+            ticks_held=ticks_held,
+        )
+        # Position invariant check — scale max_position_per_symbol by lot_size
+        pos = self.portfolio.positions.get(sym)
+        if pos:
+            self._invariant_runner.on_position_update(
+                symbol=sym, qty=int(pos.qty), lot_size=self._invariant_lot_size,
+                fill_index=fill_index, date_str=date_str,
+            )
+
+    def get_invariant_violations(self) -> list[dict]:
+        return [v.to_dict() for v in self._invariant_runner.get_violations()]
+
+    def _strict_should_block_buy(self, order: Order, snap: OrderBookSnapshot) -> tuple[bool, str]:
+        """Check if a BUY order should be blocked in strict mode. Returns (block, reason)."""
+        if not self._strict_mode:
+            return False, ""
+        dt = datetime.fromtimestamp(snap.ts_ns / 1e9, tz=_KST_TZ)
+        kst_sec = dt.hour * 3600 + dt.minute * 60 + dt.second
+        date_str = dt.strftime("%Y%m%d")
+        pos = self.portfolio.positions.get(order.symbol)
+        pos_qty = int(pos.qty) if pos else 0
+        entries_today = self._invariant_runner._entries_per_day.get(
+            (date_str, order.symbol), 0
+        )
+        return self._invariant_runner.should_block_order(
+            side=order.side,
+            kst_sec=kst_sec,
+            date_str=date_str,
+            symbol=order.symbol,
+            current_pos_qty=pos_qty,
+            current_day_entries=entries_today,
+            incoming_qty=int(order.qty),
+            lot_size=self._invariant_lot_size,
+        )
 
     def _match_pending(self, snap: OrderBookSnapshot) -> None:
         if not self.pending:
@@ -358,6 +438,13 @@ class Backtester:
                     self.rejected["short"] += 1
                     continue
 
+            # Strict-mode: block BUYs that would violate invariants (reject-type).
+            if order.side == BUY:
+                blocked, reason = self._strict_should_block_buy(order, snap)
+                if blocked:
+                    self.rejected["strict_invariant"] += 1
+                    continue
+
             filled_qty, avg_px = walk_book(snap, order.side, order.qty)
             if filled_qty <= 0:
                 self.rejected["no_liquidity"] += 1
@@ -386,6 +473,7 @@ class Backtester:
                 context=_snap_context(snap),
             )
             self.portfolio.apply_fill(fill)
+            self._record_fill_for_invariants(fill)
         self.pending = still
 
     def _check_resting_limits(self, snap: OrderBookSnapshot) -> None:
@@ -439,6 +527,13 @@ class Backtester:
 
             fee = self.config.fee_model.compute(order.side, filled_qty, avg_px)
 
+            # Strict-mode: block BUYs that would violate invariants (reject-type).
+            if order.side == BUY:
+                blocked, reason = self._strict_should_block_buy(order, snap)
+                if blocked:
+                    self.rejected["strict_invariant"] += 1
+                    continue
+
             if order.side == BUY:
                 cost = filled_qty * avg_px + fee
                 if cost > self.portfolio.cash:
@@ -456,6 +551,7 @@ class Backtester:
                 context=_snap_context(snap),
             )
             self.portfolio.apply_fill(fill)
+            self._record_fill_for_invariants(fill)
         self.resting_limits = remaining
 
     def _eod_close(self, last_ts_ns: int) -> None:
@@ -491,6 +587,7 @@ class Backtester:
                 tag="exit_eod",
             )
             self.portfolio.apply_fill(fill)
+            self._record_fill_for_invariants(fill)
 
     def run(self) -> BacktestReport:
         import time
@@ -512,6 +609,8 @@ class Backtester:
                 sr.last_mid = snap.mid
                 sr.last_ts_ns = snap.ts_ns
                 sr.n_events += 1
+                # Per-symbol event counter for invariant time_stop checks
+                self._event_count_per_symbol[snap.symbol] = sr.n_events
 
                 # 1) settle any orders whose latency window has elapsed
                 self._match_pending(snap)
@@ -580,6 +679,7 @@ class Backtester:
         report.pending_at_end = len(self.pending)
         report.n_resting_cancelled = self.n_resting_cancelled
         report.rejected = dict(self.rejected)
+        report.invariant_violations = self.get_invariant_violations()
         return report
 
 
