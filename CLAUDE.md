@@ -160,5 +160,6 @@ python scripts/search_knowledge.py --query "keyword" --top 5
 - **비가역 작업** (파일 삭제, git push, 대규모 refactor)은 사전 확인.
 - **engine/ 수정 후** 반드시 `python scripts/audit_principles.py` 실행. regression 시 revert.
 - **코드 리뷰 요청** 시 직접 리뷰하지 않고 `Skill` 도구로 `co-review` 호출.
+- **코드 생성/수정 후** 반드시 `Skill` 도구로 `co-review`를 호출하여 Codex 코드 리뷰를 받는다. 리뷰 결과의 지적 사항을 수정/보완한 뒤 다시 `co-review`를 호출하여 통과할 때까지 반복.
 - **OOS 날짜(20260326~30)는 전략 개발 중 절대 사용 금지.**
 - **report.html 작성 시에는 반드시 한국어 위주로 작성할 것**
