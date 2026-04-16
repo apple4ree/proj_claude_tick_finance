@@ -405,6 +405,51 @@ class Backtester:
             lot_size=self._invariant_lot_size,
         )
 
+    def _strict_force_sell_check(self, snap: OrderBookSnapshot) -> None:
+        """In strict mode, synthesize SELL fills when spec thresholds cross.
+
+        Checks only the symbol in the current snapshot. Emits a synthetic Fill
+        at the current bid price if should_force_sell returns True.
+        """
+        sym = snap.symbol
+        pos = self.portfolio.positions.get(sym)
+        if pos is None or pos.qty <= 0:
+            return
+        # ticks_held = current event count - entry event count
+        entry_event = self._entry_event_count.get(sym)
+        if entry_event is None:
+            return
+        ticks_held = self._event_count_per_symbol.get(sym, 0) - entry_event
+        current_bid = float(snap.bid_px[0]) if int(snap.bid_px[0]) > 0 else float(snap.mid)
+        current_mid = float(snap.mid)
+
+        force, tag = self._invariant_runner.should_force_sell(
+            symbol=sym,
+            current_bid=current_bid,
+            current_mid=current_mid,
+            ticks_held=ticks_held,
+        )
+        if not force:
+            return
+
+        # Synthesize SELL: execute MARKET SELL at current bid (same as walk_book sell)
+        filled_qty, avg_px = walk_book(snap, SELL, pos.qty)
+        if filled_qty <= 0:
+            return
+        fee = self.config.fee_model.compute(SELL, filled_qty, avg_px)
+        fill = Fill(
+            ts_ns=snap.ts_ns,
+            symbol=sym,
+            side=SELL,
+            qty=filled_qty,
+            avg_price=avg_px,
+            fee=fee,
+            tag=tag,  # "strict_sl" or "strict_time_stop"
+            context=_snap_context(snap),
+        )
+        self.portfolio.apply_fill(fill)
+        self._record_fill_for_invariants(fill)
+
     def _match_pending(self, snap: OrderBookSnapshot) -> None:
         if not self.pending:
             return
@@ -611,6 +656,10 @@ class Backtester:
                 sr.n_events += 1
                 # Per-symbol event counter for invariant time_stop checks
                 self._event_count_per_symbol[snap.symbol] = sr.n_events
+
+                # Strict-mode: force exits when spec thresholds cross (bid-based SL, time_stop)
+                if self._strict_mode and self._invariants:
+                    self._strict_force_sell_check(snap)
 
                 # 1) settle any orders whose latency window has elapsed
                 self._match_pending(snap)
