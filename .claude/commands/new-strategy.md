@@ -16,7 +16,10 @@ target symbol in the seed's universe.
 
 ### Protocol
 
-1. Parse the seed for target symbols (default: `005930` for KRX, `BTC` for crypto).
+1. Parse the seed for target symbols.
+   - KRX 기본값: top-10 전체 `["005930","000660","005380","034020","010140","006800","272210","042700","015760","035420"]`
+   - Crypto 기본값: `["BTC","ETH","XRP"]`
+   - 시드에서 명시적으로 종목을 지정하면 그것만 사용.
 
 2. For each symbol, check if `data/signal_briefs/<SYMBOL>.json` exists AND was
    generated within the last 24 hours (`generated_at` field).
@@ -44,10 +47,16 @@ target symbol in the seed's universe.
    Then retry brief generation.
 
 5. After briefs are confirmed fresh, check each brief's `n_viable_in_top`:
-   - If 0, skip the symbol (log "no viable signal; skipping")
-   - If all symbols are skipped, ABORT the iteration with reason "no market has viable signals at current fee"
+   - If 0 → skip that symbol (log "no viable signal for <SYM>; skipping")
+   - If > 0 → add to `viable_symbols` list
+   - If ALL symbols skipped → ABORT with reason "no market has viable signals at current fee"
 
-6. Only then proceed to invoke `alpha-designer`.
+6. Pass `viable_symbols` list to alpha-designer.
+   - alpha-designer는 viable_symbols 중에서 선택 (multi-symbol 전략도 가능)
+   - 단일 종목이 가장 유망하면 단일도 OK
+   - 여러 종목이 viable하면 multi-symbol 전략 설계 가능
+
+7. Only then proceed to invoke `alpha-designer`.
 
 1. **Alpha design**: delegate to `alpha-designer` (Agent tool, subagent_type=alpha-designer). Pass the seed.
    - Capture the JSON output.
