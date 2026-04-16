@@ -133,6 +133,8 @@ If unsure, try to write the DSL expression first; if either `entry.when` or `exi
 
    Required top-level keys: `name`, `description`, `capital`, `universe`, `fees`, `latency`, `params`, `signals`, `entry`, `exit`, `risk`.
 
+   **`description` 필드는 반드시 한국어로 작성한다.** 전략의 핵심 로직, 진입/청산 조건, 사용 signal, 근거 lesson을 한국어로 서술. 파라미터 이름(profit_target_bps 등)은 영문 그대로 유지하되 설명 문장은 한국어로.
+
    For Python path, set:
    ```yaml
    signals: {}
