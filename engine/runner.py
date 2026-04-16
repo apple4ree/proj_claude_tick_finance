@@ -331,6 +331,7 @@ def run(
     write_trace: bool = True,
     write_html: bool = True,
     report_out: Path | None = None,
+    strict: bool = False,
 ) -> dict:
     """Execute a backtest and persist all stage artifacts.
 
@@ -341,16 +342,25 @@ def run(
 
     Returns the JSON payload augmented with an `artifacts` block.
     """
+    import yaml as _yaml
     spec_path = Path(spec_path)
     strategy_dir = spec_path.parent
     spec = load_spec(spec_path)
     cfg = _build_config(spec)
     strategy = _build_strategy(spec, spec_path)
+    # Load raw spec as dict for invariant inference
+    try:
+        with open(spec_path, "r") as _f:
+            spec_dict = _yaml.safe_load(_f) or {}
+    except Exception:
+        spec_dict = {}
     bt = Backtester(
         dates=spec.universe.dates,
         symbols=spec.universe.symbols,
         strategy=strategy,
         config=cfg,
+        spec_dict=spec_dict,
+        strict_mode=strict,
     )
     report = bt.run()
     report.spec_name = spec.name
@@ -382,7 +392,8 @@ def run(
     if write_trace:
         _write_trace(bt, strategy_dir)
 
-    report_path = report_out if report_out is not None else strategy_dir / "report.json"
+    report_fname = "report_strict.json" if strict else "report.json"
+    report_path = report_out if report_out is not None else strategy_dir / report_fname
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2))
 
@@ -413,6 +424,7 @@ def run_per_symbol(
     *,
     write_html: bool = True,
     report_out: Path | None = None,
+    strict: bool = False,
 ) -> dict:
     """Run one independent backtest per symbol and aggregate results.
 
@@ -433,10 +445,17 @@ def run_per_symbol(
 
     Returns the aggregate payload dict.
     """
+    import yaml as _yaml
     spec_path = Path(spec_path)
     strategy_dir = spec_path.parent
     spec = load_spec(spec_path)
     cfg = _build_config(spec)
+    # Load raw spec as dict for invariant inference
+    try:
+        with open(spec_path, "r") as _f:
+            spec_dict = _yaml.safe_load(_f) or {}
+    except Exception:
+        spec_dict = {}
 
     symbols = spec.universe.symbols
     dates = spec.universe.dates
@@ -447,7 +466,7 @@ def run_per_symbol(
 
     for sym in symbols:
         strategy = _build_strategy(spec, spec_path)
-        bt = Backtester(dates=dates, symbols=[sym], strategy=strategy, config=cfg)
+        bt = Backtester(dates=dates, symbols=[sym], strategy=strategy, config=cfg, spec_dict=spec_dict, strict_mode=strict)
         report = bt.run()
         report.starting_cash = cfg.starting_cash
         report.total_fees = bt.portfolio.total_fees
@@ -518,8 +537,9 @@ def run_per_symbol(
         "per_symbol": per_symbol,
     }
 
+    report_fname = "report_per_symbol_strict.json" if strict else "report_per_symbol.json"
     report_path = (
-        report_out if report_out is not None else strategy_dir / "report_per_symbol.json"
+        report_out if report_out is not None else strategy_dir / report_fname
     )
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -549,6 +569,11 @@ def main() -> None:
         action="store_true",
         help="run one backtest per symbol and aggregate; writes report_per_symbol.json",
     )
+    ap.add_argument(
+        "--strict",
+        action="store_true",
+        help="Run with strict mode: engine intervenes to prevent invariant violations",
+    )
     args = ap.parse_args()
 
     if args.per_symbol:
@@ -556,6 +581,7 @@ def main() -> None:
             args.spec,
             write_html=not args.no_html,
             report_out=Path(args.out) if args.out else None,
+            strict=args.strict,
         )
     else:
         payload = run(
@@ -563,6 +589,7 @@ def main() -> None:
             write_trace=not args.no_trace,
             write_html=not args.no_html,
             report_out=Path(args.out) if args.out else None,
+            strict=args.strict,
         )
     if args.summary:
         print(json.dumps(payload, ensure_ascii=False))
