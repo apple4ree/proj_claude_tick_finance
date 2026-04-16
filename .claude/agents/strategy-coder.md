@@ -225,6 +225,49 @@ def _tick_size(self, sym: str) -> int:
 
 ---
 
+## Invariant Checklist (MANDATORY)
+
+The engine auto-checks 7 invariants from spec.yaml. Your generated strategy.py MUST honor each:
+
+1. **sl_overshoot** (stop_loss_bps): SL monitoring MUST use bid_px[0], NOT mid.
+   ```python
+   current_bid = float(snap.bid_px[0])
+   loss_bps = (entry_price - current_bid) / entry_price * 1e4
+   if loss_bps >= self.stop_loss_bps:  # correct
+       submit MARKET SELL
+   ```
+   Add a 5-tick guard to avoid false triggers from the fill-spread gap:
+   `if ticks_held >= 5:` before the SL check.
+
+2. **entry_gate_end_bypass** (entry_end_time_seconds): Cancel resting BUY when `kst_sec >= entry_end_sec`.
+   ```python
+   if sym in self._pending_buy and kst_sec >= self.entry_end_sec:
+       del self._pending_buy[sym]
+       return [Order(sym, None, 0, order_type=CANCEL, tag="cancel_past_entry_end")]
+   ```
+
+3. **entry_gate_start_bypass** (entry_start_time_seconds): Do not submit BUY before `entry_start_sec`.
+
+4. **max_entries_exceeded** (max_entries_per_session): Track `self._entries_today[sym]`, increment on submit, compare before submitting.
+
+5. **max_position_exceeded** (max_position_per_symbol): BEFORE submitting a new BUY, check:
+   ```python
+   pos = ctx.portfolio.positions.get(sym)
+   if pos and pos.qty > 0:   # already holding — do not submit second BUY
+       return []
+   if sym in self._pending_buy:   # pending order in flight — wait for confirmation
+       return []
+   ```
+   This prevents the double-fill bug where two BUYs fill on the same tick.
+
+6. **time_stop_overshoot** (time_stop_ticks): Track `self._ticks_in_position[sym]` and increment each tick while in position. Submit MARKET SELL when it reaches the threshold. Reset to 0 on every new fill.
+
+7. **pt_overshoot** (profit_target_bps): LIMIT SELL at exactly `entry_price * (1 + pt_bps/1e4)` — do not overshoot.
+
+**Verification**: After running the backtest, check `report.json.invariant_violations`. A well-written strategy has an empty list.
+
+---
+
 ## Output (JSON only)
 
 ```json
