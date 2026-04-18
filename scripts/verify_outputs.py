@@ -23,10 +23,23 @@ import subprocess
 import sys
 from pathlib import Path
 
+from pydantic import ValidationError
+
 ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 STRATEGIES = ROOT / "strategies"
 KNOWLEDGE = ROOT / "knowledge"
 LESSONS = KNOWLEDGE / "lessons"
+
+
+# Lazy import to keep verify_outputs importable even if engine/schemas/ is absent
+def _import_schemas():
+    from engine.schemas.alpha import AlphaHandoff
+    from engine.schemas.execution import ExecutionHandoff
+    from engine.schemas.feedback import FeedbackOutput
+    return AlphaHandoff, ExecutionHandoff, FeedbackOutput
 
 
 def _read_json(path: Path) -> dict | None:
@@ -110,6 +123,16 @@ def check_spec_writer(output: dict, failures: list, warnings: list) -> None:
 
 
 def check_feedback_analyst(output: dict, failures: list, warnings: list) -> None:
+    try:
+        _, _, FeedbackOutput = _import_schemas()
+        FeedbackOutput.model_validate(output)
+    except ValidationError as e:
+        for err in e.errors():
+            loc = ".".join(str(x) for x in err["loc"])
+            failures.append(f"feedback-analyst: {loc} — {err['msg']}")
+    except Exception as e:
+        failures.append(f"feedback-analyst: schema import or unexpected error — {e}")
+
     strategy_id = output.get("strategy_id", "")
 
     if not strategy_id:
@@ -243,7 +266,35 @@ def check_meta_reviewer(output: dict, failures: list, warnings: list) -> None:
 # Main
 # ---------------------------------------------------------------------------
 
+def check_alpha_designer(output: dict, failures: list, warnings: list) -> None:
+    """Pydantic validation for alpha-designer output."""
+    try:
+        AlphaHandoff, _, _ = _import_schemas()
+        AlphaHandoff.model_validate(output)
+    except ValidationError as e:
+        for err in e.errors():
+            loc = ".".join(str(x) for x in err["loc"])
+            failures.append(f"alpha-designer: {loc} — {err['msg']}")
+    except Exception as e:
+        failures.append(f"alpha-designer: schema import or unexpected error — {e}")
+
+
+def check_execution_designer(output: dict, failures: list, warnings: list) -> None:
+    """Pydantic validation for execution-designer output."""
+    try:
+        _, ExecutionHandoff, _ = _import_schemas()
+        ExecutionHandoff.model_validate(output)
+    except ValidationError as e:
+        for err in e.errors():
+            loc = ".".join(str(x) for x in err["loc"])
+            failures.append(f"execution-designer: {loc} — {err['msg']}")
+    except Exception as e:
+        failures.append(f"execution-designer: schema import or unexpected error — {e}")
+
+
 AGENT_CHECKERS = {
+    "alpha-designer": check_alpha_designer,
+    "execution-designer": check_execution_designer,
     "spec-writer": check_spec_writer,
     "feedback-analyst": check_feedback_analyst,
     "backtest-runner": check_backtest_runner,
