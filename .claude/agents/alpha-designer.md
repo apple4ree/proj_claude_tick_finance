@@ -191,10 +191,15 @@ created: <YYYY-MM-DD>
 ```
 ```
 
-**Step 2 — JSON 출력** (no narration):
+**Step 2 — JSON 출력** (no narration). Must conform to `engine.schemas.alpha.AlphaHandoff`:
 
 ```json
 {
+  "strategy_id": null,
+  "timestamp": "2026-04-17T12:34:56",
+  "agent_name": "alpha-designer",
+  "model_version": "claude-sonnet-4-6",
+  "draft_md_path": "strategies/_drafts/<name>_alpha.md",
   "name": "<slug>",
   "hypothesis": "<1 sentence>",
   "entry_condition": "<plain English>",
@@ -202,12 +207,26 @@ created: <YYYY-MM-DD>
   "signals_needed": ["<p1>", "<p2>"],
   "missing_primitive": null,
   "needs_python": true,
-  "paradigm": null,
+  "paradigm": "mean_reversion",
   "multi_date": true,
   "parent_lesson": null,
+  "signal_brief_rank": 1,
   "universe_rationale": "<why these symbols>",
   "escape_route": null,
-  "alpha_draft_path": "strategies/_drafts/<name>_alpha.md"
+  "brief_realism": {
+    "brief_ev_bps_raw": 1.5,
+    "entry_order_type": "LIMIT_AT_BID",
+    "spread_cross_cost_bps": -2.0,
+    "brief_horizon_ticks": 3000,
+    "planned_holding_ticks_estimate": 3000,
+    "horizon_scale_factor": 1.0,
+    "symbol_trend_pct_during_target_window": 0.5,
+    "regime_compatibility": "match",
+    "regime_adjustment_bps": 0.0,
+    "adjusted_ev_bps": 3.5,
+    "decision": "proceed",
+    "rationale": "passive maker; spread capture positive, regime matches mean-reversion premise"
+  }
 }
 ```
 

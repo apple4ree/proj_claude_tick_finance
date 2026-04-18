@@ -235,20 +235,18 @@ created: <YYYY-MM-DD>
 ```
 ```
 
-**Step 2 — JSON 출력** (no narration):
+**Step 2 — JSON 출력** (no narration). Must conform to `engine.schemas.execution.ExecutionHandoff`. Nest the alpha-designer's validated JSON under `alpha`:
 
 ```json
 {
-  "name": "<slug>",
-  "hypothesis": "<from alpha>",
-  "entry_condition": "<from alpha>",
-  "market_context": "<from alpha>",
-  "signals_needed": ["<from alpha>"],
-  "missing_primitive": null,
-  "needs_python": true,
-  "paradigm": "<from alpha>",
-  "multi_date": true,
-  "parent_lesson": null,
+  "strategy_id": null,
+  "timestamp": "2026-04-17T12:35:10",
+  "agent_name": "execution-designer",
+  "model_version": "claude-sonnet-4-6",
+  "draft_md_path": "strategies/_drafts/<name>_execution.md",
+  "alpha": {
+    "...": "the full AlphaHandoff JSON returned by alpha-designer — nest as-is"
+  },
   "entry_execution": {
     "price": "bid",
     "ttl_ticks": 50,
@@ -265,8 +263,11 @@ created: <YYYY-MM-DD>
     "lot_size": 2,
     "max_entries_per_session": 1
   },
-  "alpha_draft_path": "strategies/_drafts/<name>_alpha.md",
-  "execution_draft_path": "strategies/_drafts/<name>_execution.md"
+  "deviation_from_brief": {
+    "pt_pct": 0.0,
+    "sl_pct": 0.0,
+    "rationale": "brief's optimal_exit used as-is"
+  }
 }
 ```
 
