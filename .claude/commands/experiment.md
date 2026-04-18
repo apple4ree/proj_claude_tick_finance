@@ -86,6 +86,8 @@ For each symbol × rank:
    ```
    python scripts/verify_outputs.py --agent alpha-designer --output '<alpha_json>'
    ```
+   Parsing convention: the script prints a JSON object on stdout with `ok: bool` and `failures: list[str]`, and exits with status 0/1. The `ok` field in the JSON is authoritative; the exit code mirrors it. Read stdout JSON — do NOT rely solely on the exit code (you will not see the failure messages).
+
    If `ok=false`: log `failures` to `strategies/_iterate_context.md` as `"<iter>: alpha-designer schema fail — <first failure>"`, SKIP execution-designer, advance to next seed (or abort run).
 
 2. `Agent(subagent_type="execution-designer", prompt="…")`
@@ -96,9 +98,14 @@ For each symbol × rank:
    ```
    If `ok=false`: log failure, SKIP spec-writer and all downstream steps, advance.
 
-   **Adapter (before invoking spec-writer):** The returned `ExecutionHandoff` nests `alpha: AlphaHandoff`. Spec-writer expects a flat shape with `entry_execution`, `exit_execution`, `position`, and alpha fields at the top level. The orchestrator flattens before calling spec-writer:
+   **Adapter (before invoking spec-writer):** The returned `ExecutionHandoff` nests `alpha: AlphaHandoff`. Spec-writer expects a flat shape with `entry_execution`, `exit_execution`, `position`, alpha fields at the top level, plus `alpha_draft_path` and `execution_draft_path` (legacy field names). The orchestrator flattens before calling spec-writer, and explicitly injects both draft-path fields so spec-writer can read the MD rationales:
    ```
-   flat = {**execution_json["alpha"], **{k: v for k, v in execution_json.items() if k != "alpha"}}
+   alpha_json = execution_json["alpha"]
+   exec_rest = {k: v for k, v in execution_json.items() if k != "alpha"}
+   flat = {**alpha_json, **exec_rest}
+   # Legacy path keys that spec-writer.md reads
+   flat["alpha_draft_path"] = alpha_json["draft_md_path"]
+   flat["execution_draft_path"] = execution_json["draft_md_path"]
    Agent(subagent_type="spec-writer", prompt=f"... input={json.dumps(flat)} ...")
    ```
 
