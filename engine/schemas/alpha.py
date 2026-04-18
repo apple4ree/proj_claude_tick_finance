@@ -52,15 +52,25 @@ class BriefRealismCheck(BaseModel):
             - self.spread_cross_cost_bps
             - self.regime_adjustment_bps
         )
-        if abs(self.adjusted_ev_bps - expected) > 0.5:
+        tolerance = max(0.5, 0.05 * abs(expected))
+        if abs(self.adjusted_ev_bps - expected) > tolerance:
             raise ValueError(
                 f"adjusted_ev_bps ({self.adjusted_ev_bps}) inconsistent with components "
-                f"(expected ≈ {expected:.2f})"
+                f"(expected ≈ {expected:.2f}, tolerance {tolerance:.2f})"
             )
-        if self.adjusted_ev_bps < 0 and self.decision == "proceed":
+        if self.adjusted_ev_bps <= 0 and self.decision == "proceed":
             raise ValueError(
                 "adjusted_ev_bps < 0 but decision='proceed' — inconsistent; "
                 "use 'reject' or 'proceed_with_caveat'"
+            )
+        # Regime consistency: 'match' cannot coexist with large adjustment; 'mismatch' requires adverse adjustment
+        if self.regime_compatibility == "match" and abs(self.regime_adjustment_bps) > 2.0:
+            raise ValueError(
+                f"regime_compatibility='match' but |regime_adjustment_bps|={abs(self.regime_adjustment_bps):.2f} > 2.0 — inconsistent"
+            )
+        if self.regime_compatibility == "mismatch" and self.regime_adjustment_bps <= 0.0:
+            raise ValueError(
+                "regime_compatibility='mismatch' requires positive (adverse) regime_adjustment_bps"
             )
         return self
 

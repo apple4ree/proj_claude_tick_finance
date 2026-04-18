@@ -105,3 +105,69 @@ def test_alpha_handoff_spread_cross_can_be_negative_for_limit_bid():
         rationale="passive maker captures spread",
     )
     AlphaHandoff(**_valid_alpha(brief_realism=realism))
+
+
+def test_brief_realism_zero_adjusted_ev_with_proceed_rejected():
+    """adjusted_ev_bps == 0 (break-even) with decision='proceed' must also fail — not just <0."""
+    from engine.schemas.alpha import BriefRealismCheck
+    # Construct so adjusted_ev = 0: brief=5, scale=1, spread=5, regime=0
+    with pytest.raises(ValidationError, match="decision='proceed'"):
+        BriefRealismCheck(**_valid_realism(
+            brief_ev_bps_raw=5.0,
+            spread_cross_cost_bps=5.0,
+            adjusted_ev_bps=0.0,
+            decision="proceed",
+            rationale="break-even attempt",
+        ))
+
+
+def test_brief_realism_tolerance_scales_with_magnitude():
+    """For large expected values, relative tolerance (5%) should apply rather than absolute 0.5."""
+    from engine.schemas.alpha import BriefRealismCheck
+    # expected = 100 * 1.0 - 10 - 0 = 90; 5% tolerance = 4.5 bps. Delta of 3.0 should pass.
+    BriefRealismCheck(**_valid_realism(
+        brief_ev_bps_raw=100.0,
+        spread_cross_cost_bps=10.0,
+        adjusted_ev_bps=93.0,  # expected 90, delta 3.0 — within 5% tolerance (4.5)
+        decision="proceed",
+        rationale="relative tolerance applies at large magnitudes",
+    ))
+    # But delta of 10 should fail (> 5% of 90 = 4.5)
+    with pytest.raises(ValidationError, match="inconsistent with components"):
+        BriefRealismCheck(**_valid_realism(
+            brief_ev_bps_raw=100.0,
+            spread_cross_cost_bps=10.0,
+            adjusted_ev_bps=100.0,  # expected 90, delta 10 — exceeds 5% tolerance
+            decision="proceed",
+            rationale="over tolerance",
+        ))
+
+
+def test_brief_realism_match_regime_with_large_adjustment_rejected():
+    """regime_compatibility='match' cannot coexist with |regime_adjustment_bps| > 2.0."""
+    from engine.schemas.alpha import BriefRealismCheck
+    with pytest.raises(ValidationError, match="regime_compatibility='match'"):
+        BriefRealismCheck(**_valid_realism(
+            brief_ev_bps_raw=10.0,
+            spread_cross_cost_bps=0.0,
+            regime_compatibility="match",
+            regime_adjustment_bps=5.0,  # large for a 'match' regime
+            adjusted_ev_bps=5.0,  # 10 - 0 - 5 = 5; consistent numerically
+            decision="proceed",
+            rationale="agent claims match but applied large adj",
+        ))
+
+
+def test_brief_realism_mismatch_regime_requires_adverse_adjustment():
+    """regime_compatibility='mismatch' requires regime_adjustment_bps > 0."""
+    from engine.schemas.alpha import BriefRealismCheck
+    with pytest.raises(ValidationError, match="regime_compatibility='mismatch'"):
+        BriefRealismCheck(**_valid_realism(
+            brief_ev_bps_raw=10.0,
+            spread_cross_cost_bps=5.0,
+            regime_compatibility="mismatch",
+            regime_adjustment_bps=0.0,  # claims mismatch but didn't subtract
+            adjusted_ev_bps=5.0,  # 10 - 5 - 0 = 5; numerically consistent
+            decision="proceed",
+            rationale="claimed mismatch without adjustment",
+        ))
