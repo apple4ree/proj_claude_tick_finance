@@ -170,9 +170,15 @@ Seeds that cite specific evidence from the critiques (WIN/LOSS deltas, fill-time
 
 ## Output (JSON only)
 
+Conforms to `engine.schemas.feedback.FeedbackOutput` (see `## Schema` above for field-level docs).
+
 ```json
 {
   "strategy_id": "<id>",
+  "timestamp": "2026-04-17T12:34:56",
+  "agent_name": "feedback-analyst",
+  "model_version": "claude-sonnet-4-6",
+  "draft_md_path": "strategies/<id>/feedback_notes.md",
   "lesson_id": "<lesson_id>",
   "pattern_id": null,
   "primary_finding": "<1 sentence synthesized from both critiques>",
