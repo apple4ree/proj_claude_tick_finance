@@ -69,26 +69,37 @@ Add a field `deviation_from_brief: {pt_pct: float, sl_pct: float, rationale: str
 - `needs_python`, `paradigm`, `multi_date`
 - `alpha_draft_path`: alpha .md 파일 경로 (반드시 읽는다)
 
-### Output (core — 항상 required)
-모든 alpha 필드를 carry-over하고 아래를 추가:
+### Output
 
-**entry_execution**:
-- `price`: `"bid"` | `"bid_minus_1tick"` | `"mid"` — 진입 주문 가격
-- `ttl_ticks`: integer | null — 미체결 시 CANCEL까지 대기 틱 수 (null = 만기 없음)
-- `cancel_on_bid_drop_ticks`: integer | null — 제출 시점 bid 대비 N틱 하락 시 CANCEL (null = 비활성)
+Return JSON that conforms to `engine.schemas.execution.ExecutionHandoff` (defined in `engine/schemas/execution.py`). The orchestrator validates via `scripts/verify_outputs.py --agent execution-designer`; failures abort before spec-writer is called.
 
-**exit_execution**:
-- `profit_target_bps`: float — LIMIT SELL 목표 bps
-- `stop_loss_bps`: float — MARKET SELL stop bps
-- `trailing_stop`: boolean — trailing stop 활성화 여부
-- `trailing_activation_bps`: float | null — 이 bps 이익 발생 후 trailing 시작 (trailing_stop=true 시 required)
-- `trailing_distance_bps`: float | null — 고점 대비 이 bps 하락 시 청산
+Top-level fields:
 
-**position**:
-- `lot_size`: integer — 주문 수량
-- `max_entries_per_session`: integer — 세션당 최대 진입 횟수
+- All `HandoffBase` fields (`strategy_id`, `timestamp`, `agent_name="execution-designer"`, `model_version`, `draft_md_path`)
+- `alpha: AlphaHandoff` — full carry-over of alpha-designer's validated JSON (nest the object as-is)
+- `entry_execution`:
+  - `price` — `bid | bid_minus_1tick | mid | ask`
+  - `ttl_ticks` — int ≥ 1 or null (null = no expiry); zero and negatives rejected
+  - `cancel_on_bid_drop_ticks` — int ≥ 1 or null
+- `exit_execution`:
+  - `profit_target_bps` — float, > 0
+  - `stop_loss_bps` — float, > 0
+  - `trailing_stop` — bool
+  - `trailing_activation_bps` — float or null (**required when `trailing_stop=true`**; schema enforces)
+  - `trailing_distance_bps` — float or null (**required when `trailing_stop=true`**; schema enforces)
+- `position`:
+  - `lot_size` — int, ≥ 1
+  - `max_entries_per_session` — int, ≥ 1
+- `deviation_from_brief`:
+  - `pt_pct` — signed fraction relative to brief's `optimal_exit.pt_bps`; absolute value must be ≤ 0.20
+  - `sl_pct` — same constraint
+  - `rationale` — required; explain any non-zero deviation
 
-**execution_draft_path**: string — 저장한 .md 파일 경로
+If you need deviation > ±20%, do NOT return a handoff — escalate via `structural_concern` in your MD draft and skip JSON return; the orchestrator will treat this as an abort.
+
+The `.md` draft at `draft_md_path` remains your adverse-selection narrative and exit-structure rationale — keep writing it in full.
+
+The schema forbids extra fields. Do NOT include keys not listed in `ExecutionHandoff`.
 
 ---
 
