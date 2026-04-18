@@ -57,25 +57,31 @@ Add a field `signal_brief_rank: int` to your returned JSON, indicating which ran
 
 ## Schema
 
-### Output (core — 항상 required)
-- `name`: string — short slug (lowercase, underscores)
-- `hypothesis`: string — 1 sentence: what market inefficiency are you exploiting?
-- `entry_condition`: string — plain English: exact conditions that signal an entry opportunity
-- `market_context`: string — what state must the market be in? (regime, time of day, volume profile)
-- `signals_needed`: array — only the primitives required for the entry signal
-- `missing_primitive`: string | null
-- `needs_python`: boolean — true if entry logic requires stateful computation across ticks
-- `paradigm`: string | null — `mean_reversion` | `trend_follow` | `passive_maker` | `fee_escape`
-- `multi_date`: boolean
-- `parent_lesson`: string | null
-- `alpha_draft_path`: string — path where the .md output was saved
+### Output
 
-### Output (extensions — 필요시 추가)
-- `universe_rationale`: string — why these symbols?
-- `escape_route`: string — (ESCAPE 모드) 기존 접근의 한계와 우회 방법
+Return JSON that conforms to `engine.schemas.alpha.AlphaHandoff` (defined in `engine/schemas/alpha.py`). The orchestrator pipes your JSON through `scripts/verify_outputs.py --agent alpha-designer`; any validation failure aborts the iteration.
 
-### Input handling
-- 모르는 입력 필드는 `extensions`에 보존하고 아이디어 생성 시 참조한다
+Mandatory fields (hard-fail if missing or malformed):
+
+- All fields from `HandoffBase`: `strategy_id` (nullable at this stage — field must be present, value may be `null`), `timestamp`, `agent_name="alpha-designer"`, `model_version`, `draft_md_path`
+- Alpha core: `name`, `hypothesis`, `entry_condition`, `market_context`, `signals_needed`, `missing_primitive`, `needs_python`, `paradigm`, `multi_date`, `parent_lesson`
+- Brief-grounded: `signal_brief_rank` (int 1–10), `universe_rationale`, `escape_route` (nullable)
+- **`brief_realism: BriefRealismCheck`** — you MUST compute and report:
+  - `brief_ev_bps_raw` — copy from signal brief
+  - `entry_order_type` — one of `MARKET | LIMIT_AT_BID | LIMIT_AT_ASK | LIMIT_MID`
+  - `spread_cross_cost_bps` — signed; positive = half-spread cost (MARKET BUY); negative allowed for passive LIMIT at bid (but must account for adverse selection expectation)
+  - `brief_horizon_ticks`, `planned_holding_ticks_estimate`
+  - `horizon_scale_factor` — `planned / brief`; must be in (0, 2.0]; if outside, re-plan the hold or reject
+  - `symbol_trend_pct_during_target_window` — look up buy-hold return over the target backtest window
+  - `regime_compatibility` — `match | partial | mismatch | unknown`; set `mismatch` if symbol trend contradicts the paradigm (e.g., mean-reversion into a >3% directional trend). Validator enforces: `match` cannot coexist with `|regime_adjustment_bps| > 2.0`, and `mismatch` requires `regime_adjustment_bps > 0`.
+  - `regime_adjustment_bps` — subtractive; larger when mismatch
+  - `adjusted_ev_bps` = `brief_ev_bps_raw * horizon_scale_factor − spread_cross_cost_bps − regime_adjustment_bps` (validator enforces `max(0.5, 5%)` tolerance on this formula)
+  - `decision` — `proceed | proceed_with_caveat | reject`; must NOT be `proceed` when `adjusted_ev_bps <= 0`
+  - `rationale` — 1–3 sentences
+
+The `.md` draft at `draft_md_path` remains your human-readable rationale — keep writing it for critics and audit. The pydantic JSON is the machine-readable contract.
+
+The schema forbids extra fields. Do NOT include any keys not listed in `AlphaHandoff`.
 
 ---
 
