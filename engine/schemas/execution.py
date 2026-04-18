@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Literal, Optional
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from engine.schemas.alpha import AlphaHandoff
 from engine.schemas.base import HandoffBase
@@ -29,8 +29,8 @@ class DeviationFromBrief(BaseModel):
 class EntryExecution(BaseModel):
     model_config = ConfigDict(extra="forbid")
     price: Literal["bid", "bid_minus_1tick", "mid", "ask"]
-    ttl_ticks: Optional[int]
-    cancel_on_bid_drop_ticks: Optional[int]
+    ttl_ticks: Optional[int] = Field(default=None, ge=1)
+    cancel_on_bid_drop_ticks: Optional[int] = Field(default=None, ge=1)
 
 
 class ExitExecution(BaseModel):
@@ -40,6 +40,16 @@ class ExitExecution(BaseModel):
     trailing_stop: bool
     trailing_activation_bps: Optional[float]
     trailing_distance_bps: Optional[float]
+
+    @model_validator(mode="after")
+    def _trailing_requires_params(self):
+        if self.trailing_stop and (
+            self.trailing_activation_bps is None or self.trailing_distance_bps is None
+        ):
+            raise ValueError(
+                "trailing_stop=True requires both trailing_activation_bps and trailing_distance_bps"
+            )
+        return self
 
 
 class PositionConfig(BaseModel):

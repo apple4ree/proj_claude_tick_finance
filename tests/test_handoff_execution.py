@@ -70,3 +70,48 @@ def test_execution_carries_alpha_nested():
     h = ExecutionHandoff(**_valid_exec())
     assert h.alpha.signal_brief_rank == 1
     assert h.alpha.brief_realism.decision == "reject"
+
+
+def test_exit_execution_trailing_stop_requires_activation_bps():
+    from engine.schemas.execution import ExecutionHandoff
+    bad = _valid_exec()
+    bad["exit_execution"]["trailing_stop"] = True
+    bad["exit_execution"]["trailing_activation_bps"] = None  # still None — invalid
+    bad["exit_execution"]["trailing_distance_bps"] = 10.0
+    with pytest.raises(ValidationError, match="trailing_stop=True requires"):
+        ExecutionHandoff(**bad)
+
+
+def test_exit_execution_trailing_stop_requires_distance_bps():
+    from engine.schemas.execution import ExecutionHandoff
+    bad = _valid_exec()
+    bad["exit_execution"]["trailing_stop"] = True
+    bad["exit_execution"]["trailing_activation_bps"] = 20.0
+    bad["exit_execution"]["trailing_distance_bps"] = None
+    with pytest.raises(ValidationError, match="trailing_stop=True requires"):
+        ExecutionHandoff(**bad)
+
+
+def test_exit_execution_trailing_stop_enabled_with_both_params_ok():
+    from engine.schemas.execution import ExecutionHandoff
+    good = _valid_exec()
+    good["exit_execution"]["trailing_stop"] = True
+    good["exit_execution"]["trailing_activation_bps"] = 20.0
+    good["exit_execution"]["trailing_distance_bps"] = 10.0
+    ExecutionHandoff(**good)
+
+
+def test_entry_execution_rejects_zero_ttl():
+    from engine.schemas.execution import ExecutionHandoff
+    bad = _valid_exec()
+    bad["entry_execution"]["ttl_ticks"] = 0
+    with pytest.raises(ValidationError):
+        ExecutionHandoff(**bad)
+
+
+def test_entry_execution_rejects_negative_bid_drop():
+    from engine.schemas.execution import ExecutionHandoff
+    bad = _valid_exec()
+    bad["entry_execution"]["cancel_on_bid_drop_ticks"] = -1
+    with pytest.raises(ValidationError):
+        ExecutionHandoff(**bad)
