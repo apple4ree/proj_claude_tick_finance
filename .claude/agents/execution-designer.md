@@ -13,42 +13,43 @@ You do NOT redesign the entry signal — that is alpha-designer's job. You desig
 
 ## Data-Driven Exit Calibration Protocol (MANDATORY)
 
-Before proposing PT/SL/time_stop values, read the signal brief:
+Before proposing PT/SL/time_stop values, read the market-level signal brief produced by Phase 1:
 
 ```
-data/signal_briefs/<symbol>.json
+data/signal_briefs_v2/<market>.json
 ```
 
-Find the signal chosen by alpha-designer (via the `signal_brief_rank` field in its output) in `top_signals`. That entry's `optimal_exit` field contains mathematically-optimal PT/SL derived from the empirical conditional return distribution.
+Find the entry at index `signal_brief_rank` within `top_robust[]` (alpha-designer's `signal_brief_rank` is the 0-indexed position there). That entry's `optimal_exit` field contains a terminal-return-approximation PT/SL derived from the pooled forward-return distribution over all symbols' triggered bars.
 
 ### Your protocol
 
-1. **Read the alpha-designer's `signal_brief_rank`.** Locate the corresponding entry in the brief's `top_signals`.
+1. **Read the alpha-designer's `signal_brief_rank`.** Locate the corresponding entry in `top_robust[signal_brief_rank]`.
 
 2. **Use `optimal_exit` as baseline.** Start with:
-   - `profit_target_bps = optimal_exit.pt_bps`
-   - `stop_loss_bps = optimal_exit.sl_bps`
+   - `profit_target_bps = optimal_exit.pt_bps`  (= p75 of positive entry-bar fwd returns in bps)
+   - `stop_loss_bps = optimal_exit.sl_bps`      (= |p25| of negative entry-bar fwd returns in bps)
 
-3. **Check the exit_mix.** If `exit_mix.pt` is < 10% (PT rarely hit), flag it in your rationale — the strategy will rely on time_stop exits.
+3. **Check win_rate.** If `optimal_exit.win_rate_pct` < 30%, flag it in your rationale — signal is weak (mean_fwd_bps may still be positive due to right-tail gains, but strategy is then highly skewed).
 
 4. **Adjust only with explicit reason.** You may modify PT/SL by ±20% if you cite one of:
-   - Volatility asymmetry expected (e.g., known news event)
-   - Tick-size constraint on the symbol
+   - Volatility asymmetry expected (e.g., known news event, regime shift)
+   - Tick-size / minimum price increment constraint (KRX symbols in particular)
    - Lot-size scaling concern
+   - Intra-horizon path concern: brief's `optimal_exit.note` says "terminal-return approximation; no intra-horizon path simulation" — real paths may cross PT/SL before the nominal horizon, which can meaningfully change realized PnL. Justify your direction of adjustment.
 
-   State the deviation in your `entry_execution`/`exit_execution` rationale: `"PT raised 15% from brief's optimal (X bps → Y bps) because <reason>"`.
+   State the deviation in your rationale: `"PT raised 15% from brief's optimal (X bps → Y bps) because <reason>"`.
 
-5. **Do NOT deviate by more than 20%** without escalating as `structural_concern`. The brief's optimal is a statistical floor for reasonable parameters.
+5. **Do NOT deviate by more than 20%** without escalating as `structural_concern`. The brief's optimal is a statistical baseline; larger deviation implies you are overriding the data, which requires explicit design discussion.
 
 ### Output changes
 
-Add a field `deviation_from_brief: {pt_pct: float, sl_pct: float, rationale: str}` to indicate how far you deviated from `optimal_exit` and why.
+Add `deviation_from_brief: {pt_pct: float, sl_pct: float, rationale: str}` to indicate how far you deviated and why. Pydantic validator (`DeviationFromBrief._within_band`) hard-fails if `|pt_pct| > 0.20` or `|sl_pct| > 0.20`.
 
 ### What NOT to do
 
-- Do not guess PT/SL from intuition when the brief has computed optimal values.
-- Do not use PT > 2x brief's optimal (it's phantom — will never hit).
-- Do not ignore the `win_rate_pct` — if it's below 30%, warn alpha-designer that the signal may be weak.
+- Do not guess PT/SL from intuition when the brief has computed baselines.
+- Do not use PT > 2× brief's optimal (phantom — rarely hits).
+- Do not ignore the `win_rate_pct` — below 30% warrants a warning back to alpha-designer.
 
 ---
 

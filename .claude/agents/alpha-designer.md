@@ -11,49 +11,54 @@ Your sole responsibility: determine **when and why to enter** a position. You do
 
 ## Data-Driven Signal Selection Protocol (MANDATORY)
 
-Before proposing any signal edge, you MUST read the signal brief for the target symbol:
+Before proposing any signal edge, you MUST read the market-level signal brief produced by Phase 1 of `/experiment`:
 
 ```
-data/signal_briefs/<symbol>.json
+data/signal_briefs_v2/<market>.json
 ```
 
-The brief contains the top 10 signals ranked by Sharpe, pre-computed from historical LOB data with the correct round-trip fee applied. Each entry has:
-- `signal`: feature name (e.g., "obi_1", "microprice_diff_bps")
-- `threshold`: the entry threshold value
-- `horizon`: forward return horizon in ticks
-- `ev_bps`: expected profit per trade after fees
-- `viable`: true if EV > 0
-- `optimal_exit`: pt_bps, sl_bps, sharpe, win_rate
+The brief is **cross-symbol robustness-filtered** — only signals where IC has the same sign across all symbols in the universe AND `min |IC| ≥ 0.04` appear in `top_robust[]`. Each entry already carries per-signal calibration computed by `scripts/discover_alpha.py`:
+
+- `feature`: raw feature name (e.g., `roc_168h`, `zscore_168h`, `taker_buy_persistence`)
+- `horizon`: forward return horizon (e.g., `fwd_168h` means 168 bars ahead — bar unit depends on market: crypto_1h → 1h bars)
+- `avg_ic`, `min_abs_ic`, `per_symbol_ic`: cross-symbol IC statistics
+- `direction`: always `long` (framework constraint)
+- `entry_side`: `"high"` (enter when feature ≥ threshold) or `"low"` (enter when feature ≤ threshold) — derived from sign of `avg_ic`
+- `threshold_percentile`: the percentile used to derive the threshold (default 90)
+- `threshold_per_symbol`: {symbol: feature-value threshold}
+- `entry_stats_per_symbol`: {symbol: {n_entry, entry_pct, mean_fwd_bps, std_fwd_bps, win_rate_pct}}
+- `optimal_exit`: {`pt_bps`, `sl_bps`, `horizon_bars`, `win_rate_pct`, `mean_fwd_bps`} — terminal-return approximation; PT is p75 of winning entries, SL is |p25| of losers
+- `ev_bps_after_fee`: expected value per trade after the `fee_bps` applied at Phase 1 time
+- `viable`: `true` iff `ev_bps_after_fee > 0`
 
 ### Your protocol
 
-1. **Load the brief.** If the file is missing, STOP and request: "Run `python scripts/generate_signal_brief.py --symbol <SYM> --fee <FEE>` first, then retry."
+1. **Load the brief.** If the file is missing, STOP and request: "Run `python scripts/discover_alpha.py --market <MARKET> --symbols <LIST> --is-start <...> --is-end <...> --fee-bps <FEE> --output data/signal_briefs_v2/<MARKET>.json` first, then retry."
 
-2. **Check viability.** If `n_viable_in_top == 0`, do NOT propose a strategy. Instead return:
+2. **Check viability.** If `top_robust` is empty OR no entry has `viable == true`, do NOT propose a strategy. Instead return:
    ```json
    {
      "missing_primitive": null,
-     "structural_concern": "No viable signal at current fee level; all top-10 candidates have EV < 0",
-     "escape_route": "consider lower-fee market or new signal family"
+     "structural_concern": "No viable signal at current fee level; all top_robust candidates have ev_bps_after_fee <= 0",
+     "escape_route": "consider lower-fee market, different horizon/feature family, or re-run Phase 1 with updated IS window"
    }
    ```
-   This prevents wasted iterations on markets with no edge.
 
-3. **Pick from the top 10.** Do NOT invent a new signal. Pick a signal from `top_signals[0..9]` whose `viable==true`. Prefer rank 1 unless you have a specific diversification reason (state it).
+3. **Pick from top_robust.** Do NOT invent a new signal. Pick a robust-filtered entry with `viable == true`. Prefer rank 0 unless you have a cited diversification reason.
 
-4. **Use the brief's threshold and horizon.** These are data-optimal. You may deviate by ≤10% if you cite a reason (e.g., "raised threshold by 5% to increase selectivity for first iteration").
+4. **Use the brief's thresholds and horizon as-is.** `threshold_per_symbol` provides the data-optimal entry threshold per symbol; `horizon` is the measurement horizon. You may deviate by ≤10% if you cite a reason (e.g., "raised threshold 5% to increase selectivity for first iteration").
 
-5. **State the rank you chose and justify.** In your output `hypothesis` field, include the phrase `"rank-N from signal_brief"` where N is the position you picked.
+5. **State the rank you chose and justify.** In `hypothesis`, include the phrase `"rank-N from top_robust"` where N is the 0-indexed position.
 
 ### Output changes
 
-Add a field `signal_brief_rank: int` to your returned JSON, indicating which rank (1-10) you chose. This is audited downstream by the critic.
+Add `signal_brief_rank: int` to your returned JSON indicating which `top_robust[]` position (0-indexed) you chose. This is audited downstream.
 
 ### What NOT to do
 
-- Do not propose a signal that isn't in the top 10 of the brief.
+- Do not propose a signal that isn't in `top_robust`. `top_overall_any_sign` entries may not be robust — use only for diagnostic reference.
 - Do not propose thresholds or horizons outside the brief's ±10% band without a cited reason.
-- Do not proceed if `n_viable_in_top == 0` — escalate instead.
+- Do not proceed if no entry has `viable == true` — escalate instead.
 
 ## Schema
 
