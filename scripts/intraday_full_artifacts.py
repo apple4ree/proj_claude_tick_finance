@@ -37,7 +37,7 @@ STRATEGIES_DIR = REPO / "strategies"
 
 sys.path.insert(0, str(REPO))
 from scripts.bar_full_artifacts import (
-    _match_roundtrips, _compute_summary, _write_md,
+    _match_roundtrips, _compute_summary, _write_md, _enrich_roundtrips_with_mfe_mae,
 )
 from scripts.perf_ic_metrics import compute_signal_metrics
 
@@ -235,6 +235,10 @@ def run(strat_dir: Path) -> dict:
     }
 
     roundtrips = _match_roundtrips(fills)
+    # 2026-04-19 Fix A: enrich each roundtrip with MFE / MAE / capture_pct from
+    # the mid price trajectory. Without this, critics/designers cannot see
+    # give-back patterns (realized < peak profit) that are visible on the chart.
+    _enrich_roundtrips_with_mfe_mae(roundtrips, trace.get("mid_series", {}))
     summary = _compute_summary(roundtrips)
 
     report = {

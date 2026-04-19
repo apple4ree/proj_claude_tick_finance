@@ -34,12 +34,32 @@ Before analyzing execution mechanics, check `metrics.invariant_violations`:
 
 ## Workflow
 
-1. **Read the execution design intent**:
+1. **Read the execution design intent AND trajectory-level MFE/MAE data**:
    ```
    Read: strategies/<strategy_id>/execution_design.md
    Read: strategies/<strategy_id>/spec.yaml   (params section only)
+   Read: strategies/<strategy_id>/analysis_trace.md   # ← MANDATORY: Give-Back Summary + per-RT MFE/MAE/capture%
    ```
-   Extract: entry_price_mode, ttl_ticks, cancel_on_bid_drop_ticks, profit_target_bps, stop_loss_bps, trailing_stop settings, lot_size, max_entries_per_session.
+   Extract design params: entry_price_mode, ttl_ticks, cancel_on_bid_drop_ticks,
+   profit_target_bps, stop_loss_bps, trailing_stop settings, lot_size, max_entries_per_session.
+
+   The `analysis_trace.md` file now carries the **Give-Back Summary** block:
+   `avg_mfe_bps`, `avg_mae_bps`, `avg_capture_pct`, `sum_missed_profit_bps`, `n_give_back_trades`.
+   You MUST use these when diagnosing exit calibration. Key patterns to flag:
+
+   - **`capture_pct < 50%` systematically** → PT too high (phantom) or trailing
+     activation threshold too high, strategy gives back profit between MFE and exit.
+     Concrete fix: lower PT toward observed p75 MFE; lower trailing activation
+     toward p50 MFE.
+   - **`n_give_back_trades > 50% of total`** → exit structure is miscalibrated
+     for this signal's forward-return distribution.
+   - **MFE > 100 bps but result = LOSS** on losses → "shook out" pattern;
+     SL triggered before the bounce that the signal eventually produced.
+     Fix: widen SL, or add re-entry-after-SL rule.
+   - **Sum_missed_profit_bps** = sum of (MFE − realized) — this is the
+     upper-bound improvement a perfect exit would have captured. If it's
+     comparable to total realized loss, exit redesign alone could flip the
+     strategy.
 
 2. **Analyze exit outcomes from roundtrips**:
 

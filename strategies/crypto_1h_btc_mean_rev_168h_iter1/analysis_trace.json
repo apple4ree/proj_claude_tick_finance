@@ -25,6 +25,13 @@
         "losses": 2,
         "avg_net_bps": 294.99
       }
+    },
+    "give_back_summary": {
+      "avg_mfe_bps": 379.4,
+      "avg_mae_bps": -347.89,
+      "avg_capture_pct": -523.2,
+      "sum_missed_profit_bps": 4556.88,
+      "n_give_back_trades": 8
     }
   },
   "roundtrips": [
@@ -49,7 +56,10 @@
       },
       "sell_context": {
         "bar_close": 111511.55
-      }
+      },
+      "mfe_bps": 156.8,
+      "mae_bps": -324.0,
+      "capture_pct": -189.8
     },
     {
       "symbol": "BTCUSDT",
@@ -72,7 +82,10 @@
       },
       "sell_context": {
         "bar_close": 107800.8
-      }
+      },
+      "mfe_bps": 335.65,
+      "mae_bps": -196.5,
+      "capture_pct": -21.6
     },
     {
       "symbol": "BTCUSDT",
@@ -95,7 +108,10 @@
       },
       "sell_context": {
         "bar_close": 120506.61
-      }
+      },
+      "mfe_bps": 1072.55,
+      "mae_bps": 0.22,
+      "capture_pct": 94.0
     },
     {
       "symbol": "BTCUSDT",
@@ -118,7 +134,10 @@
       },
       "sell_context": {
         "bar_close": 109232.43
-      }
+      },
+      "mfe_bps": 133.55,
+      "mae_bps": -500.37,
+      "capture_pct": -382.0
     },
     {
       "symbol": "BTCUSDT",
@@ -141,7 +160,10 @@
       },
       "sell_context": {
         "bar_close": 111241.71
-      }
+      },
+      "mfe_bps": 383.6,
+      "mae_bps": -430.37,
+      "capture_pct": 22.0
     },
     {
       "symbol": "BTCUSDT",
@@ -164,7 +186,10 @@
       },
       "sell_context": {
         "bar_close": 101114.83
-      }
+      },
+      "mfe_bps": 11.35,
+      "mae_bps": -632.09,
+      "capture_pct": -4720.7
     },
     {
       "symbol": "BTCUSDT",
@@ -187,7 +212,10 @@
       },
       "sell_context": {
         "bar_close": 103401.07
-      }
+      },
+      "mfe_bps": 547.91,
+      "mae_bps": -146.03,
+      "capture_pct": 38.3
     },
     {
       "symbol": "BTCUSDT",
@@ -210,7 +238,10 @@
       },
       "sell_context": {
         "bar_close": 90842.72
-      }
+      },
+      "mfe_bps": 82.13,
+      "mae_bps": -521.67,
+      "capture_pct": -644.1
     },
     {
       "symbol": "BTCUSDT",
@@ -233,7 +264,10 @@
       },
       "sell_context": {
         "bar_close": 86921.28
-      }
+      },
+      "mfe_bps": 292.42,
+      "mae_bps": -479.56,
+      "capture_pct": -167.3
     },
     {
       "symbol": "BTCUSDT",
@@ -256,7 +290,10 @@
       },
       "sell_context": {
         "bar_close": 82703.61
-      }
+      },
+      "mfe_bps": 131.69,
+      "mae_bps": -542.26,
+      "capture_pct": -419.1
     },
     {
       "symbol": "BTCUSDT",
@@ -279,7 +316,10 @@
       },
       "sell_context": {
         "bar_close": 91437.64
-      }
+      },
+      "mfe_bps": 1105.98,
+      "mae_bps": -47.63,
+      "capture_pct": 99.0
     },
     {
       "symbol": "BTCUSDT",
@@ -302,7 +342,10 @@
       },
       "sell_context": {
         "bar_close": 87180.01
-      }
+      },
+      "mfe_bps": 299.15,
+      "mae_bps": -354.44,
+      "capture_pct": 12.5
     }
   ]
 }

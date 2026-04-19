@@ -272,6 +272,72 @@ def _fmt_hold(sec: float) -> str:
     return f"{sec // 60}m"
 
 
+def _enrich_roundtrips_with_mfe_mae(roundtrips: list[dict], mid_series_per_sym: dict[str, list]) -> None:
+    """Add Maximum Favorable / Adverse Excursion to each roundtrip in-place.
+
+    For each completed long roundtrip, scan the mid-price series between the
+    entry fill and the exit fill. Record:
+        mfe_bps  — best unrealized P&L during the hold (in bps)
+        mae_bps  — worst unrealized P&L during the hold (in bps, signed negative)
+        capture_pct — realized / MFE × 100.  < 50% flags a give-back pattern;
+                      negative means price peaked favorably then reversed past entry.
+
+    Without this enrichment, trajectory-level give-back patterns are invisible
+    to critics and designer agents — only entry/exit endpoints are logged.
+    """
+    if not roundtrips or not mid_series_per_sym:
+        return
+
+    # Build per-symbol timestamp + price arrays once
+    sym_arrs: dict[str, tuple[np.ndarray, np.ndarray]] = {}
+    for sym, series in mid_series_per_sym.items():
+        if not series:
+            continue
+        ts_arr = np.fromiter((int(s[0]) for s in series), dtype=np.int64, count=len(series))
+        px_arr = np.fromiter((float(s[1]) for s in series), dtype=np.float64, count=len(series))
+        sym_arrs[sym] = (ts_arr, px_arr)
+
+    for r in roundtrips:
+        sym = r["symbol"]
+        if sym not in sym_arrs:
+            r["mfe_bps"] = None
+            r["mae_bps"] = None
+            r["capture_pct"] = None
+            continue
+        ts_arr, px_arr = sym_arrs[sym]
+        # Parse entry / exit timestamps from buy_time / sell_time (KST+9)
+        KST = timezone(timedelta(hours=9))
+        b_ts = int(datetime.strptime(r["buy_time"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=KST).timestamp() * 1e9)
+        s_ts = int(datetime.strptime(r["sell_time"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=KST).timestamp() * 1e9)
+        lo = int(np.searchsorted(ts_arr, b_ts, side="left"))
+        hi = int(np.searchsorted(ts_arr, s_ts, side="right"))
+        if lo >= hi:
+            r["mfe_bps"] = None
+            r["mae_bps"] = None
+            r["capture_pct"] = None
+            continue
+        window = px_arr[lo:hi]
+        entry_px = float(r["buy_px"])
+        if entry_px <= 0:
+            r["mfe_bps"] = None
+            r["mae_bps"] = None
+            r["capture_pct"] = None
+            continue
+        if r["direction"] == "long":
+            mfe = (float(window.max()) - entry_px) / entry_px * 1e4
+            mae = (float(window.min()) - entry_px) / entry_px * 1e4
+        else:  # short
+            mfe = (entry_px - float(window.min())) / entry_px * 1e4
+            mae = (entry_px - float(window.max())) / entry_px * 1e4
+        r["mfe_bps"] = round(mfe, 2)
+        r["mae_bps"] = round(mae, 2)
+        # capture_pct: how much of the peak did we realize?  mfe=0 → undefined
+        if mfe > 1e-6:
+            r["capture_pct"] = round(r["net_bps"] / mfe * 100, 1)
+        else:
+            r["capture_pct"] = None
+
+
 def _compute_summary(roundtrips: list[dict]) -> dict:
     if not roundtrips:
         return {"total_roundtrips": 0}
@@ -288,6 +354,33 @@ def _compute_summary(roundtrips: list[dict]) -> dict:
             "avg_net_bps": round(sum(r["net_bps"] for r in rs) / len(rs), 2),
         } for tag, rs in sorted(tag_groups.items())
     }
+    # Give-back aggregates (requires mfe_bps field — may be absent on older data).
+    mfe_vals = [r["mfe_bps"] for r in roundtrips if r.get("mfe_bps") is not None]
+    mae_vals = [r["mae_bps"] for r in roundtrips if r.get("mae_bps") is not None]
+    capture_vals = [r["capture_pct"] for r in roundtrips if r.get("capture_pct") is not None]
+    # "missed profit" = sum over trades where realized < MFE − 50 bps
+    missed = [
+        max(0.0, (r["mfe_bps"] - r["net_bps"]))
+        for r in roundtrips
+        if r.get("mfe_bps") is not None and r["mfe_bps"] > 50
+    ]
+    # Give-back trades: wins that gave up >= 50% of MFE, or losses that had MFE > 100 bps
+    give_back_trades = [
+        r for r in roundtrips
+        if r.get("mfe_bps") is not None
+        and r["mfe_bps"] > 100
+        and (r["result"] == "LOSS" or (r.get("capture_pct") is not None and r["capture_pct"] < 50))
+    ]
+    give_back_summary = None
+    if mfe_vals:
+        give_back_summary = {
+            "avg_mfe_bps": round(float(np.mean(mfe_vals)), 2),
+            "avg_mae_bps": round(float(np.mean(mae_vals)), 2),
+            "avg_capture_pct": round(float(np.mean(capture_vals)), 1) if capture_vals else None,
+            "sum_missed_profit_bps": round(float(sum(missed)), 2),
+            "n_give_back_trades": len(give_back_trades),
+        }
+
     return {
         "total_roundtrips": len(roundtrips),
         "wins": len(wins),
@@ -300,6 +393,7 @@ def _compute_summary(roundtrips: list[dict]) -> dict:
         "avg_hold_sec_wins": round(np.mean([r["hold_sec"] for r in wins])) if wins else None,
         "avg_hold_sec_losses": round(np.mean([r["hold_sec"] for r in losses])) if losses else None,
         "exit_tag_breakdown": tag_breakdown,
+        "give_back_summary": give_back_summary,
     }
 
 
@@ -324,11 +418,26 @@ def _write_md(strat_id: str, roundtrips: list, summary: dict, out: Path):
               "| tag | total | WIN | LOSS | avg_net_bps |", "|---|---|---|---|---|"]
     for tag, info in summary.get("exit_tag_breakdown", {}).items():
         lines.append(f"| {tag} | {info['total']} | {info['wins']} | {info['losses']} | {info['avg_net_bps']:+.2f} |")
-    lines += ["", "## Roundtrips", "",
-              "| # | sym | buy_time | sell_time | hold | tag | net_bps | result |",
-              "|---|---|---|---|---|---|---|---|"]
+    # Give-back summary (MFE/MAE aggregate) — helps critic see trajectory leakage
+    gb = summary.get("give_back_summary")
+    if gb:
+        lines += ["## Give-Back Summary (MFE / MAE)", "",
+                  "| Metric | Value | 해석 |", "|---|---|---|",
+                  f"| Avg MFE (peak profit during hold) | {gb['avg_mfe_bps']:+.2f} bps | — |",
+                  f"| Avg MAE (worst drawdown during hold) | {gb['avg_mae_bps']:+.2f} bps | — |",
+                  f"| Avg capture_pct | {gb['avg_capture_pct'] if gb['avg_capture_pct'] is not None else '-'}% | 100% = 피크 완전 캡처; < 50% = give-back 패턴 |",
+                  f"| Sum of missed profit | {gb['sum_missed_profit_bps']:+.2f} bps | MFE − realized 합계. 크면 exit 재설계 신호. |",
+                  f"| n_give_back_trades | {gb['n_give_back_trades']} / {summary['total_roundtrips']} | MFE > 100 bps 였으나 LOSS or capture < 50% |",
+                  ""]
+
+    lines += ["## Roundtrips", "",
+              "| # | sym | buy_time | sell_time | hold | tag | net_bps | mfe_bps | mae_bps | capture% | result |",
+              "|---|---|---|---|---|---|---|---|---|---|---|"]
     for i, r in enumerate(roundtrips, 1):
-        lines.append(f"| {i} | {r['symbol']} | {r['buy_time']} | {r['sell_time']} | {r['hold']} | {r['exit_tag']} | {r['net_bps']:+.2f} | {r['result']} |")
+        mfe = f"{r['mfe_bps']:+.1f}" if r.get("mfe_bps") is not None else "-"
+        mae = f"{r['mae_bps']:+.1f}" if r.get("mae_bps") is not None else "-"
+        cap = f"{r['capture_pct']:+.0f}%" if r.get("capture_pct") is not None else "-"
+        lines.append(f"| {i} | {r['symbol']} | {r['buy_time']} | {r['sell_time']} | {r['hold']} | {r['exit_tag']} | {r['net_bps']:+.2f} | {mfe} | {mae} | {cap} | {r['result']} |")
     lines.append("")
     out.write_text("\n".join(lines))
 

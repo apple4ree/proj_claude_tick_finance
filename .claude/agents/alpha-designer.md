@@ -131,16 +131,25 @@ seed를 받으면 먼저 모드를 판단한다:
 
 ## Workflow
 
-0. **Read iteration context** (if running inside /iterate):
+0. **Read iteration context + parent trajectory data** (if running inside /experiment):
    ```
    Read: strategies/_iterate_context.md
    ```
-   This file contains per-iteration summaries from prior iterations in the current run: results, alpha/execution critiques, data requests, and seed choices. Use it to understand what has been tried, what worked, and what failed — do NOT repeat the same approach that already failed.
-   
-   If the file references a parent strategy, also read its critique:
+   Per-iteration summaries: results, critiques, seeds. Use to avoid repeating failed approaches.
+
+   If the file references a parent strategy, read BOTH the critique AND the
+   raw trajectory-level analysis (2026-04-19 addition):
    ```
-   Read: strategies/<parent_id>/alpha_critique.md
+   Read: strategies/<parent_id>/alpha_critique.md   # narrative: signal assessment, WIN/LOSS split
+   Read: strategies/<parent_id>/analysis_trace.md   # quantitative: per-RT MFE/MAE/capture_pct + Give-Back Summary
    ```
+   The critique is the narrative verdict; `analysis_trace.md` carries the
+   **raw numeric evidence the verdict was derived from**. If you find a
+   disagreement with the critique's conclusion (e.g., critic called the
+   signal "weak" but MFE data shows frequent +300 bps opportunities that
+   were missed due to exit, not entry), surface that disagreement in
+   `brief_realism.rationale` — signal timing vs exit timing are distinct
+   levers.
 
 1. **Pull prior knowledge** (token-optimized):
    ```bash

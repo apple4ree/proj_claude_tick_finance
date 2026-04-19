@@ -120,14 +120,24 @@ The schema forbids extra fields. Do NOT include keys not listed in `ExecutionHan
 
 ## Workflow
 
-0. **Read iteration context** (if running inside /iterate):
+0. **Read iteration context + parent exit trajectory** (if running inside /experiment):
    ```
    Read: strategies/_iterate_context.md
    ```
-   Prior iterations' execution critiques (exit tag breakdown, fee analysis, stop/target calibration) are here. Use them to avoid repeating execution design mistakes. If a parent strategy is referenced, also read:
+   Prior iterations' execution critiques (exit tag breakdown, fee analysis, stop/target calibration). Use to avoid repeating mistakes.
+
+   If a parent strategy is referenced, read BOTH critique AND the raw
+   trajectory-level analysis (2026-04-19 addition):
    ```
-   Read: strategies/<parent_id>/execution_critique.md
+   Read: strategies/<parent_id>/execution_critique.md   # narrative: exit assessment
+   Read: strategies/<parent_id>/analysis_trace.md       # quantitative: per-RT MFE/MAE + Give-Back Summary
    ```
+   The `analysis_trace.md` carries hard numbers for exit re-design:
+   - `avg_mfe_bps` and p75 MFE → where to set `profit_target_bps` realistically
+   - `avg_mae_bps` → hint for `stop_loss_bps` (tight SL cuts both losses AND winners that first dipped)
+   - `n_give_back_trades` + `sum_missed_profit_bps` → total upside lost to poor exit
+   - `capture_pct` distribution → if systematically < 50%, trailing needs looser activation + tighter distance
+   Always cite specific numbers from this file in your `deviation_from_brief.rationale`.
 
 1. **alpha .md 읽기**:
    ```

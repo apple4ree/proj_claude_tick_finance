@@ -29,12 +29,22 @@ Before analyzing signal quality, check `metrics.invariant_violations`:
 
 ## Workflow
 
-1. **Read the alpha design intent**:
+1. **Read the alpha design intent AND trajectory-level data**:
    ```
    Read: strategies/<strategy_id>/alpha_design.md
    Read: strategies/<strategy_id>/spec.yaml   (params section only)
+   Read: strategies/<strategy_id>/analysis_trace.md   # ← MANDATORY: MFE/MAE/capture_pct
    ```
-   Extract: hypothesis, entry_condition, signals_needed, expected edge.
+   The `analysis_trace.md` contains per-roundtrip Maximum Favorable Excursion
+   (MFE), Maximum Adverse Excursion (MAE), and capture_pct. You MUST analyze
+   the give-back pattern:
+   - How many trades had mfe_bps > 100 but realized as LOSS?  (missed bounces)
+   - What fraction had capture_pct < 50%?  (profit leakage)
+   - For wins: were they close to MFE (good capture) or small fraction?
+   - For losses: did the trade EVER show positive MFE before going to SL?
+     (classic "shook out early" pattern)
+   This is the only place give-back / falling-knife signal-timing issues
+   show up in quantitative form — always include it in the critique.
 
 2. **Analyze entry signal quality from roundtrips**:
 
