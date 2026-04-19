@@ -285,6 +285,17 @@ def run(strat_dir: Path) -> dict:
          "summary": summary, "roundtrips": roundtrips}, indent=2, default=str))
     _write_md(strat_dir.name, roundtrips, summary, strat_dir / "analysis_trace.md")
 
+    # Render interactive Plotly HTML dashboard (price + fills, equity, drawdown,
+    # metric cards, sensitivity panel). Without this step, report.html either
+    # does not exist or carries a stale empty-trace template from another
+    # rendering path. Safe to ignore failures — report.json/trace.json are
+    # still canonical.
+    try:
+        from engine.report_html import render as _render_html
+        _render_html(strat_dir)
+    except Exception as e:  # pragma: no cover — defensive
+        print(f"[warn] report.html render failed for {strat_dir.name}: {e}")
+
     return report
 
 
