@@ -11,7 +11,7 @@ Runs the full alpha-discovery-to-feedback loop as a single sequence. Supersedes 
 
 | Key | Default | Example |
 |---|---|---|
-| `--market` | **required** | `crypto_1h` `crypto_1d` `crypto_15m` |
+| `--market` | **required** | `crypto_1d` `crypto_1h` `crypto_15m` `crypto_5m` `crypto_lob` |
 | `--symbols` | **required** | `BTCUSDT,ETHUSDT,SOLUSDT` |
 | `--is-start --is-end` | **required** | `2025-07-01 2025-10-31` |
 | `--oos-start --oos-end` | **required** | `2025-11-01 2025-12-31` |
@@ -19,9 +19,26 @@ Runs the full alpha-discovery-to-feedback loop as a single sequence. Supersedes 
 | `--feedback-mode` | `both` | `programmatic` · `agent` · `both` |
 | `--ranks` | `0,1,2` | top_robust ranks to promote to strategies |
 | `--strategies-pattern` | derived | Glob pattern for an existing set |
-| `--n-iterations` | `1` | Number of design→validate→feedback cycles |
+| `--n-iterations` | **10** (**minimum enforced**) | Number of design→validate→feedback cycles; **must be ≥ 10** per 2026-04-19 policy |
 | `--meta-review-every` | `5` | Invoke meta-reviewer every K iterations |
 | `--output-dir` | `experiments/run_<date>` | — |
+| `--smoke-test` | off | Bypass the n-iterations ≥ 10 enforcement. Only use for infrastructure verification, NOT for strategy evaluation. |
+
+## Iteration budget policy (2026-04-19)
+
+**Hard rule**: `/experiment` requires `--n-iterations >= 10`. Single-shot or low-N runs are rejected at Step 0 with a clear error, unless `--smoke-test` is provided (for pipeline plumbing verification only).
+
+Rationale: one iteration produces noise; autonomous learning requires enough cycles for `feedback-analyst` lessons to propagate back into `alpha-designer` / `execution-designer` decisions. 10 is the empirical floor below which the loop's self-correction cannot demonstrate directional improvement.
+
+Enforcement sequence: at Step 0, after audit_principles succeeds but before Phase 1:
+
+```
+if args.n_iterations < 10 and not args.smoke_test:
+    abort with message:
+      "[/experiment] policy violation: --n-iterations=<N> < 10.
+       Set --n-iterations >= 10, or pass --smoke-test for infra-only runs.
+       (See CLAUDE.md Rules section, 2026-04-19 policy.)"
+```
 
 ## Top-level execution flow
 
