@@ -5,9 +5,12 @@ uses `name`, `universe.symbols`, `universe.dates`. Later phases will consume
 `signals`, `entry`, `exit`, `risk` via the DSL evaluator.
 
 Universe shorthands in the symbols list:
-  "*"     — all symbols that have data for at least one of the specified dates
-  "top10" — top-10 symbols by tick count (liquidity) on the IS universe;
-             fixed list for reproducibility (measured on 20260316)
+  "*"     — all symbols that have CSV data in any of the bar-data directories
+  "top3"  — crypto standard 3-symbol universe (BTCUSDT, ETHUSDT, SOLUSDT)
+
+Note: pre-2026-04-19 supported "top10" as a KRX 10-symbol shorthand; that
+shorthand has been retired with the crypto pivot. KRX legacy data is in
+`data/_archive/krx_legacy/`.
 """
 from __future__ import annotations
 
@@ -17,51 +20,45 @@ from typing import Any
 
 import yaml
 
-_DATA_ROOT = Path("/home/dgu/tick/open-trading-api/data/realtime/H0STASP0")
+# Bar-data roots searched for "*" expansion. Resolved at call-time.
+_BAR_DATA_ROOTS = (
+    Path("data/binance_daily"),
+    Path("data/binance_multi/1h"),
+    Path("data/binance_multi/15m"),
+    Path("data/binance_multi/5m"),
+)
 
-# Top-10 KRX symbols by tick count on 20260316 (IS reference date).
-# Order: descending liquidity. Fixed for reproducibility across runs.
-TOP10_SYMBOLS: list[str] = [
-    "005930",  # 삼성전자      71,497 ticks  184,750 KRW  반도체
-    "000660",  # SK하이닉스    66,914 ticks  934,500 KRW  반도체
-    "005380",  # 현대자동차    63,742 ticks  501,500 KRW  자동차
-    "034020",  # 두산에너빌    59,228 ticks  106,150 KRW  중공업
-    "010140",  # 삼성중공업    51,261 ticks   28,825 KRW  조선
-    "006800",  # 미래에셋증권  45,600 ticks   69,850 KRW  금융
-    "272210",  # HD현대        43,133 ticks  145,650 KRW  중공업
-    "042700",  # 한미반도체    42,590 ticks  294,250 KRW  반도체 장비
-    "015760",  # 한국전력      42,174 ticks   46,775 KRW  유틸리티
-    "035420",  # NAVER         38,680 ticks  217,250 KRW  IT
-]
+# Standard crypto universe — Binance top-3 by liquidity for cross-symbol robustness.
+TOP3_SYMBOLS: list[str] = ["BTCUSDT", "ETHUSDT", "SOLUSDT"]
 
 
 def _expand_symbols(symbols: list[str], dates: list[str]) -> list[str]:
     """Expand wildcards in the symbols list.
 
-    "top10" → TOP10_SYMBOLS (fixed list, reproducible)
-    "*"     → all symbols present for any of the given dates
+    "top3" → TOP3_SYMBOLS (BTC/ETH/SOL)
+    "*"    → union of symbols with CSVs under any bar-data root
     """
-    if "top10" not in symbols and "*" not in symbols:
+    if "top3" not in symbols and "*" not in symbols:
         return symbols
 
     result: list[str] = []
     seen: set[str] = set()
 
     for s in symbols:
-        if s == "top10":
-            for sym in TOP10_SYMBOLS:
+        if s == "top3":
+            for sym in TOP3_SYMBOLS:
                 if sym not in seen:
                     result.append(sym)
                     seen.add(sym)
         elif s == "*":
-            for d in dates:
-                day_dir = _DATA_ROOT / d
-                if day_dir.exists():
-                    for f in sorted(day_dir.glob("*.csv")):
-                        sym = f.stem.zfill(6)
-                        if sym not in seen:
-                            result.append(sym)
-                            seen.add(sym)
+            for root in _BAR_DATA_ROOTS:
+                if not root.exists():
+                    continue
+                for f in sorted(root.glob("*.csv")):
+                    sym = f.stem
+                    if sym not in seen:
+                        result.append(sym)
+                        seen.add(sym)
         else:
             if s not in seen:
                 result.append(s)
