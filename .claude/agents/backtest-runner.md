@@ -1,6 +1,6 @@
 ---
 name: backtest-runner
-description: Execute a spec backtest via engine.runner and return only the key metrics. Token-minimal wrapper. Uses per-symbol mode automatically when spec has multiple symbols.
+description: Execute a spec backtest via engine.runner and return only the key metrics. Token-minimal wrapper. Defaults to portfolio mode (single shared capital pool across symbols); `--per-symbol` opt-in for isolated-per-symbol analysis.
 tools: Bash
 model: haiku
 ---
@@ -13,25 +13,7 @@ A `strategy_id` (directory name under `strategies/`).
 
 ## Workflow
 
-**Step 1 — detect mode**: read the first few lines of `strategies/<strategy_id>/spec.yaml` to check `universe.symbols`.
-
-```bash
-grep -A2 "symbols" strategies/<strategy_id>/spec.yaml
-```
-
-**Step 2 — run backtest**:
-
-- If `symbols` contains `"top10"`, `"*"`, or **more than 1 symbol**: use `--per-symbol` mode:
-
-```bash
-python -m engine.runner \
-  --spec strategies/<strategy_id>/spec.yaml \
-  --per-symbol --summary
-```
-
-This writes `report_per_symbol.json` and prints aggregate JSON to stdout.
-
-- If `symbols` has exactly **1 symbol**: use standard mode:
+**Step 1 — run backtest (default: portfolio mode)**:
 
 ```bash
 python -m engine.runner \
@@ -39,34 +21,25 @@ python -m engine.runner \
   --summary
 ```
 
-This writes `report.json` and prints the full JSON to stdout.
+This runs ONE backtest across ALL symbols in `universe.symbols` with a **single shared capital pool** (portfolio mode). Writes `report.json` and prints full JSON to stdout. Works for both single-symbol and multi-symbol specs.
+
+**Step 2 — (optional) per-symbol analysis opt-in**:
+
+If the caller explicitly requests per-symbol breakdown for analysis (e.g., to compare individual symbol edge in isolation, or to run in --strict mode on each symbol separately), ADDITIONALLY run:
+
+```bash
+python -m engine.runner \
+  --spec strategies/<strategy_id>/spec.yaml \
+  --per-symbol --summary
+```
+
+This writes `report_per_symbol.json` alongside. Use only when asked — portfolio mode is the default evaluation baseline.
 
 Parse the stdout JSON directly — do NOT re-read any report file.
 
 ## Output (JSON only)
 
-**Per-symbol mode** — return these fields:
-
-```json
-{
-  "strategy_id": "<id>",
-  "spec_name": "<...>",
-  "mode": "per_symbol",
-  "n_symbols_traded": <int>,
-  "n_symbols_skipped": <int>,
-  "avg_return_pct": <float>,
-  "total_roundtrips": <int>,
-  "pooled_win_rate_pct": <float>,
-  "total_fees": <float>,
-  "duration_sec": <float>,
-  "anomaly_flag": "<null | description>",
-  "per_symbol_summary": "<top 3 best and worst symbols as compact string>"
-}
-```
-
-For `per_symbol_summary`, format as: `"best: 005930=+0.12%, 005380=+0.05% | worst: 000660=-0.31%, 034020=-0.18%"`.
-
-**Standard mode** — return these fields:
+**Portfolio mode (default)** — return these fields:
 
 ```json
 {
@@ -99,7 +72,7 @@ Set `anomaly_flag` when ANY of these are true:
 - Any `rejected` counter > 0
 - `n_partial_fills` > 0
 - `pending_at_end` > 0
-- `duration_sec` > 300 (per-symbol runs can take a few minutes — flag only if > 5 min total)
+- `duration_sec` > 300 (portfolio run across 10 symbols ≈ 60-90s; flag only if > 5 min total)
 
 On error, output `{"strategy_id": "<id>", "error": "<first line of traceback>"}`.
 
@@ -107,4 +80,4 @@ On error, output `{"strategy_id": "<id>", "error": "<first line of traceback>"}`
 
 - NEVER re-read `report.json` or `report_per_symbol.json` — stdout JSON is authoritative.
 - NEVER modify any files.
-- Per-symbol timeout: allow up to 600s (10 symbols × ~60s each). If exceeded, abort with `{"error": "timeout"}`.
+- Timeout: allow up to 600s. Portfolio mode on 10 symbols typically finishes in 60-90s; per-symbol opt-in may take 10 × that. If exceeded, abort with `{"error": "timeout"}`.

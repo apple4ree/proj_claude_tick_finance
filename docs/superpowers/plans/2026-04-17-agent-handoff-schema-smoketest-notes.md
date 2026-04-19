@@ -17,16 +17,16 @@
 
 The `/experiment --design-mode=agent` invocation requires running LLM agents (alpha-designer, execution-designer, etc.) which cannot be fully automated by a subagent in this session. To validate the happy path end-to-end, you should run one iteration manually.
 
-**Recommended command (multi-symbol, per-symbol backtest mode — standard eval universe):**
+**Recommended command (top10 universe, portfolio-mode backtest — new default):**
 
 ```
 /experiment --market krx --symbols top10 --is-start 20260316 --oos-start 20260323 \
             --design-mode agent --feedback-mode programmatic --n-iterations 1
 ```
 
-`top10` expands to `005930, 000660, 005380, 034020, 010140, 006800, 272210, 042700, 015760, 035420` per `CLAUDE.md`. This exercises the validator across multiple signal briefs (not just one), including `042700` where the weakly-profitable baseline `pilot_s1_042700_obi10` exists — so Success Criterion #3 is checked as part of the multi-symbol sweep.
+`top10` expands to `005930, 000660, 005380, 034020, 010140, 006800, 272210, 042700, 015760, 035420` per `CLAUDE.md`. The validator is exercised across multiple signal briefs including `042700` (where the weakly-profitable baseline `pilot_s1_042700_obi10` exists — Success Criterion #3).
 
-Per-symbol backtest mode is the standard evaluation convention (memory: `project_standard_eval_universe.md`); the runner handles the per-symbol split automatically when multiple symbols are specified.
+The backtest runs in **portfolio mode** (single shared capital pool across all 10 symbols — one `engine.runner` call without `--per-symbol`). This is the new evaluation default (policy C, 2026-04-19): realistic capital-constrained run; per-symbol isolation is an analysis opt-in (`--per-symbol`) when debugging. Update reflected in `backtest-runner.md` and memory `project_standard_eval_universe.md`.
 
 ## What To Watch
 
