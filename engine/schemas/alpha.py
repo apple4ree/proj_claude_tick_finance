@@ -87,7 +87,11 @@ class AlphaHandoff(HandoffBase):
     signals_needed: list[str]
     missing_primitive: Optional[str]
     needs_python: bool
-    paradigm: Optional[Literal["mean_reversion", "trend_follow", "passive_maker", "fee_escape"]]
+    paradigm: Optional[Literal[
+        "mean_reversion", "trend_follow", "passive_maker", "fee_escape",
+        "market_making",     # 2026-04-19 X4: passive two-sided quoting on LOB (ping-pong)
+        "spread_capture",    # 2026-04-19 X4: single-side passive fill harvesting half-spread
+    ]]
     multi_date: bool
     parent_lesson: Optional[str]
 

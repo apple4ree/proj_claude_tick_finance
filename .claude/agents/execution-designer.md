@@ -53,13 +53,27 @@ Add `deviation_from_brief: {pt_pct: float, sl_pct: float, rationale: str}` to in
 
 ---
 
-## KRX Microstructure Constants (항상 참조)
+## Market Microstructure Constants (2026-04-19 crypto-only)
 
-- **수수료**: commission 1.5 bps (매수+매도) + sell tax 18 bps = 총 19.5 bps round-trip
-- **Latency**: submit 5ms ± 1ms jitter (engine 시뮬레이션 기준)
-- **Tick size**: 종목별 상이 (일반적으로 호가단위 1~500원)
-- **Adverse selection 원칙**: passive BID LIMIT fill은 가격이 하락할 때 체결됨 → fill 직후 역방향 momentum이 있을 가능성 구조적으로 높음
-- **Break-even WR**: `avg_loss_bps / (avg_win_bps + avg_loss_bps)` — profit_target=150, stop=50 기준 ≈ 42%
+**Binance spot (bar + LOB)**:
+- **수수료 (taker)**: 4 bps round-trip
+- **수수료 (maker)**: 0 bps or NEGATIVE (rebate VIP tier) — material edge for market-making paradigms
+- **Latency**: ~50 ms submit (WebSocket round-trip) with ±10 ms jitter; engine uses 5 ms default for bar, can parametrize
+- **Tick size**: BTC $0.01, ETH $0.01, SOL $0.001 (price precision vs crypto price level = near-zero bps)
+- **Adverse selection principle**: passive BID LIMIT fill occurs when price is falling → post-fill reversal likely. Stronger signal than KRX because crypto is 24/7 with no auction.
+- **Break-even WR**: `avg_loss_bps / (avg_win_bps + avg_loss_bps)` — depends on PT/SL. For directional long strategies with PT 100 / SL 50, break-even WR ≈ 33%.
+
+**Paradigm-specific exit mechanics** (2026-04-19 X4):
+
+When `alpha.paradigm` ∈ {`market_making`, `spread_capture`} (LOB only):
+- `entry_execution.price`: `"bid"` (passive at best bid) or `"bid_minus_1tick"`
+- `entry_execution.ttl_ticks`: short (e.g., 50-200 ticks @ 100 ms) — cancel if not filled; don't queue stale
+- `cancel_on_bid_drop_ticks`: 1-2 (avoid negative-adversity fills)
+- `exit_execution.profit_target_bps`: typically **= half-spread at entry** (quick ping to opposite side)
+- `exit_execution.stop_loss_bps`: tight (1-3 × half-spread) because holding long is not the edge
+- `exit_execution.trailing_stop`: usually false for MM/spread-capture (strategy is position-flat-seeking)
+- `position.lot_size`: small (1 unit) but `max_entries_per_session` can be higher (hundreds of quick round-trips expected)
+- `deviation_from_brief`: brief for MM paradigms doesn't emit `optimal_exit` in the same way — document `rationale` as "market-making paradigm; PT ≈ half-spread, SL = 3 × PT".
 
 ---
 

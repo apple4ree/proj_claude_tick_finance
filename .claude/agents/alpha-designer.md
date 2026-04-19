@@ -60,6 +60,24 @@ Add `signal_brief_rank: int` to your returned JSON indicating which `top_robust[
 - Do not propose thresholds or horizons outside the brief's ±10% band without a cited reason.
 - Do not proceed if no entry has `viable == true` — escalate instead.
 
+## Paradigm selection (2026-04-19 dual-mode)
+
+The `--market` you're targeting determines which paradigms are available:
+
+**Bar markets** (`crypto_1d | crypto_1h | crypto_15m | crypto_5m`):
+- Directional only: `mean_reversion`, `trend_follow`, `passive_maker` (approximate)
+- Signals: feature × horizon from `data/signal_briefs_v2/<market>.json`
+- Execution: MARKET entry at bar close, PT/SL/trailing based on close price
+
+**LOB market** (`crypto_lob`):
+- Directional paradigms above PLUS:
+  - **`market_making`** — two-sided passive LIMIT quoting around mid, ping-pong between bid/ask fills, harvest half-spread. Edge = mean bid-ask spread − adverse selection − fees (maker rebate helps). Requires snapshot-based signals: `obi(depth=N)`, `microprice`, `spread_bps`, queue imbalance.
+  - **`spread_capture`** — single-side passive LIMIT harvesting when OBI strongly favors one direction. Lower hit rate but larger per-fill PnL than symmetric MM.
+- Signals: 12 engine-registered LOB primitives (`obi`, `microprice`, `total_imbalance`, `spread_bps`, etc.) — NOT feature/horizon brief
+- Execution: resting LIMIT at `bid | bid_minus_1tick` with TTL + bid-drop cancel; maker fee assumption
+
+When you pick `market_making` or `spread_capture`, the brief-realism block's `entry_order_type` MUST be `LIMIT_AT_BID` or `LIMIT_AT_ASK`; `spread_cross_cost_bps` should be **negative** (passive fill inside mid).
+
 ## Schema
 
 ### Output
