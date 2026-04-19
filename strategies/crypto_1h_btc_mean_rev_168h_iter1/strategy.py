@@ -71,6 +71,7 @@ def generate_signal(df: pd.DataFrame, **params) -> pd.Series:
     close = df["close"].to_numpy(dtype=float)
     n = len(close)
     signal = np.zeros(n, dtype=int)
+    exit_tags: list[str] = [""] * n  # per-bar exit-reason; "" when no exit
 
     roc_168 = np.full(n, np.nan)
     for i in range(168, n):
@@ -118,14 +119,17 @@ def generate_signal(df: pd.DataFrame, **params) -> pd.Series:
                 trailing_armed = True
 
             exit_now = False
+            exit_reason = ""
 
             # 1. Profit target
             if gain_bps >= pt_bps:
                 exit_now = True
+                exit_reason = "pt_hit"
 
             # 2. Stop loss
             elif loss_bps >= sl_bps:
                 exit_now = True
+                exit_reason = "sl_hit"
 
             else:
                 # 3. Trailing stop (only after armed) — independent of time stop
@@ -133,16 +137,19 @@ def generate_signal(df: pd.DataFrame, **params) -> pd.Series:
                     drop_bps = (peak_price - px) / peak_price * 1e4 if peak_price > 0 else 0.0
                     if drop_bps >= trail_dist_bps:
                         exit_now = True
+                        exit_reason = "trailing_stop"
 
                 # 4. Time stop — always checked independently; overrides hanging trailing
                 if not exit_now and time_stop > 0 and bars_held >= time_stop:
                     exit_now = True
+                    exit_reason = "time_stop"
 
             if exit_now:
                 in_position = False
                 trailing_armed = False
                 bars_held = 0
                 signal[i] = 0
+                exit_tags[i] = exit_reason
             else:
                 signal[i] = 1
 
@@ -162,7 +169,13 @@ def generate_signal(df: pd.DataFrame, **params) -> pd.Series:
             else:
                 signal[i] = 0
 
-    return pd.Series(signal, index=df.index, dtype=int)
+    signal_series = pd.Series(signal, index=df.index, dtype=int)
+    exit_tag_series = pd.Series(exit_tags, index=df.index, dtype=object)
+    # Returning a tuple is the new (2026-04-19) bar-runner contract; downstream
+    # generate_fills uses exit_tag_series to label SELL fills with the actual
+    # exit reason (pt_hit / sl_hit / trailing_stop / time_stop) rather than the
+    # opaque legacy "exit_signal".
+    return signal_series, exit_tag_series
 
 
 # ---------------------------------------------------------------------------

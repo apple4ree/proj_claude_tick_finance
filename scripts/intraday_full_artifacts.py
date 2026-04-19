@@ -115,11 +115,41 @@ def backtest_signed(df: pd.DataFrame, signal: pd.Series, fee_side_bps: float,
 
 
 def generate_fills(df: pd.DataFrame, signal: pd.Series, symbol: str,
-                  lot_size: int, fee_side_bps: float) -> list[dict]:
-    """Signed signal → fills list (in standard GenericFill-style dict)."""
+                  lot_size: int, fee_side_bps: float,
+                  exit_tags: "pd.Series | None" = None) -> list[dict]:
+    """Signed signal → fills list (in standard GenericFill-style dict).
+
+    Parameters
+    ----------
+    exit_tags : optional Series aligned to df/signal index, containing per-bar
+        exit-reason strings (e.g. "pt_hit", "sl_hit", "trailing_stop",
+        "time_stop"). When provided, the value at the bar *before* the 1→0
+        flip is used as the SELL tag. When None or the value is empty/NaN,
+        falls back to the legacy generic "exit_signal" tag.
+
+    This lets strategies communicate *why* they exited (PT vs SL vs trailing
+    vs time stop) to the downstream critics/feedback analysis, instead of
+    collapsing all exits into a single opaque "exit_signal" label.
+    """
     fills: list[dict] = []
     position = 0
     prev_sig = 0
+
+    def _lookup_exit_tag(idx: int) -> str:
+        """Fetch the exit-reason at decision bar `idx` from exit_tags Series."""
+        if exit_tags is None:
+            return "exit_signal"
+        try:
+            v = exit_tags.iloc[idx]
+        except Exception:
+            return "exit_signal"
+        if v is None:
+            return "exit_signal"
+        if isinstance(v, float) and np.isnan(v):
+            return "exit_signal"
+        s = str(v).strip()
+        return s if s else "exit_signal"
+
     for i in range(1, len(df)):
         target = int(signal.iloc[i - 1])
         if target == prev_sig:
@@ -142,7 +172,7 @@ def generate_fills(df: pd.DataFrame, signal: pd.Series, symbol: str,
             })
 
         if prev_sig == 1 and target in (0, -1):
-            emit("SELL", lot_size, "exit_signal")
+            emit("SELL", lot_size, _lookup_exit_tag(i - 1))
         elif prev_sig == -1 and target in (0, 1):
             emit("BUY", lot_size, "exit_short_signal")
         if target == 1:
@@ -163,11 +193,25 @@ def run(strat_dir: Path) -> dict:
 
     module = _load_strategy(strat_dir / "strategy.py")
     df = load_horizon_data(symbol, horizon)
-    signal = module.generate_signal(df, **params)
+    result = module.generate_signal(df, **params)
+
+    # Accept three return shapes for backward compat:
+    #   1. pd.Series               — legacy signal-only
+    #   2. (pd.Series, pd.Series)  — signal + per-bar exit-reason tags
+    #   3. pd.DataFrame with "signal" (+ optional "exit_tag") columns
+    exit_tags = None
+    if isinstance(result, tuple) and len(result) == 2:
+        signal, exit_tags = result
+    elif isinstance(result, pd.DataFrame):
+        signal = result["signal"]
+        if "exit_tag" in result.columns:
+            exit_tags = result["exit_tag"]
+    else:
+        signal = result
 
     bpy = HORIZON_BARS_PER_YEAR[horizon]
     metrics = backtest_signed(df, signal, fee, bpy)
-    fills = generate_fills(df, signal, symbol, lot_size, fee)
+    fills = generate_fills(df, signal, symbol, lot_size, fee, exit_tags=exit_tags)
 
     close_arr = df["close"].to_numpy()
     fwd_ret = np.diff(close_arr) / close_arr[:-1]
