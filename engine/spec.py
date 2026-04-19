@@ -8,9 +8,10 @@ Universe shorthands in the symbols list:
   "*"     — all symbols that have CSV data in any of the bar-data directories
   "top3"  — crypto standard 3-symbol universe (BTCUSDT, ETHUSDT, SOLUSDT)
 
-Note: pre-2026-04-19 supported "top10" as a KRX 10-symbol shorthand; that
-shorthand has been retired with the crypto pivot. KRX legacy data is in
-`data/_archive/krx_legacy/`.
+Note: 2026-04-19 crypto-only pivot completed. KRX legacy + Qlib equity
+(CSI500/SP500) paths have been fully removed. Supported markets: crypto
+bar (Binance OHLCV) and crypto LOB (Binance L2 snapshot archive —
+collected forward-going via scripts/binance_lob_collector.py).
 """
 from __future__ import annotations
 
@@ -30,6 +31,17 @@ _BAR_DATA_ROOTS = (
 
 # Standard crypto universe — Binance top-3 by liquidity for cross-symbol robustness.
 TOP3_SYMBOLS: list[str] = ["BTCUSDT", "ETHUSDT", "SOLUSDT"]
+
+# Universe presets (2026-04-19 multi-market extension).
+# Concrete symbol lists for the equity presets are populated at export time
+# by scripts/qlib_export.py --top-n, which picks top-N by average daily
+# trading value inside the index-membership snapshot. These literal fallbacks
+# only matter if a spec references the preset before qlib_export has run;
+# normally the exporter writes CSVs and the universe is taken from the CSV
+# directory at runtime.
+UNIVERSE_PRESETS: dict[str, list[str]] = {
+    "top3": TOP3_SYMBOLS,
+}
 
 
 def _expand_symbols(symbols: list[str], dates: list[str]) -> list[str]:

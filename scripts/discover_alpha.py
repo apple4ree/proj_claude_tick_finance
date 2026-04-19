@@ -38,6 +38,7 @@ MARKET_PATHS = {
     "crypto_5m":  "data/binance_multi/5m/{sym}.csv",
 }
 
+# Bars per year for Sharpe annualization (crypto trades 24/7 = 365 days).
 MARKET_BARS_PER_YEAR = {
     "crypto_1d":  365.0,
     "crypto_1h":  24 * 365.0,
@@ -140,7 +141,17 @@ def compute_ic_matrix(market: str, symbols: list[str],
 
 
 def rank_signals(ic_df: pd.DataFrame, symbols: list[str],
-                 robustness_min_abs_ic: float = 0.04) -> pd.DataFrame:
+                 robustness_min_abs_ic: float = 0.04,
+                 same_sign_frac: float = 1.0) -> pd.DataFrame:
+    """Rank (feature, horizon) signals by cross-symbol IC robustness.
+
+    `same_sign_frac` — minimum fraction of symbols that must share the
+    majority IC sign for the signal to be flagged `robust`. 1.0 = all
+    symbols (original strict rule, reasonable for ≤5 symbols). For equity
+    universes with 20+ symbols, 0.7–0.8 is more realistic: sector
+    heterogeneity makes perfect unanimity near-impossible even when the
+    pooled signal is strong.
+    """
     pv = ic_df.pivot_table(index=["feature", "horizon"], columns="symbol",
                            values="ic").reset_index()
     missing = [s for s in symbols if s not in pv.columns]
@@ -149,7 +160,11 @@ def rank_signals(ic_df: pd.DataFrame, symbols: list[str],
     pv["ic_avg"] = pv[symbols].mean(axis=1)
     pv["ic_min_abs"] = pv[symbols].abs().min(axis=1)
     signs = np.sign(pv[symbols].values)
-    pv["same_sign"] = (signs == signs[:, [0]]).all(axis=1)
+    # Majority sign per row (+1 or -1); fraction of symbols agreeing with it
+    maj_sign = np.sign(pv["ic_avg"]).values[:, None]
+    agree = (signs == maj_sign).sum(axis=1) / len(symbols)
+    pv["same_sign_frac"] = agree
+    pv["same_sign"] = (agree >= same_sign_frac)
     pv["robust"] = pv["same_sign"] & (pv["ic_min_abs"] >= robustness_min_abs_ic)
     pv["abs_avg_ic"] = pv["ic_avg"].abs()
     return pv.sort_values("abs_avg_ic", ascending=False).reset_index(drop=True)
@@ -313,16 +328,24 @@ def main() -> None:
                     help="Round-trip fee in bps (Binance taker ≈ 4, KRX ≈ 21)")
     ap.add_argument("--threshold-percentile", type=int, default=90,
                     help="Entry percentile on the feature distribution (per symbol)")
+    ap.add_argument("--same-sign-frac", type=float, default=1.0,
+                    help="Minimum fraction of symbols agreeing on IC sign for "
+                         "robustness. 1.0 strict (≤5 symbols), 0.7 lenient "
+                         "(equity 20+ symbols). Default 1.0.")
+    ap.add_argument("--robust-min-abs-ic", type=float, default=0.04,
+                    help="Minimum |IC| per symbol required for robust flag")
     ap.add_argument("--output", required=True)
     args = ap.parse_args()
 
     symbols = [s.strip() for s in args.symbols.split(",") if s.strip()]
     horizons = [int(x) for x in args.horizons.split(",")]
 
-    print(f"[Phase 1] {args.market} {symbols} IS {args.is_start} → {args.is_end}")
+    print(f"[Phase 1] {args.market} {len(symbols)} symbols IS {args.is_start} → {args.is_end}")
     ic_df = compute_ic_matrix(args.market, symbols,
                               args.is_start, args.is_end, horizons)
-    ranked = rank_signals(ic_df, symbols)
+    ranked = rank_signals(ic_df, symbols,
+                          robustness_min_abs_ic=args.robust_min_abs_ic,
+                          same_sign_frac=args.same_sign_frac)
     brief = build_brief(ranked, args.market, symbols,
                         args.is_start, args.is_end, args.top_k,
                         fee_bps=args.fee_bps,

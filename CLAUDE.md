@@ -1,8 +1,11 @@
-# Crypto Strategy Framework
+# Crypto Strategy Framework (Dual-Mode: OHLCV + LOB)
 
-Binance OHLCV bar 데이터(1d / 1h / 15m / 5m) 기반으로 전략을 자율 생성 → 백테스트 → 학습하는 프레임워크.
+Binance crypto 데이터 기반 전략 자율 생성 → 백테스트 → 학습 프레임워크. **두 가지 데이터 모드**를 동시 지원:
 
-**Scope note (2026-04-19)**: 이 프로젝트는 2026-04-15 crypto pivot 이후 크립토 bar 데이터 전용으로 정리되었습니다. KRX tick(H0STASP0) 관련 legacy 자산은 `data/_archive/krx_legacy/` 및 `scripts/_legacy/`로 이동됐으며, unified `/experiment` 프레임워크는 KRX를 지원하지 않습니다. (이유: KRX 21 bps round-trip fee가 tick horizon edge를 잠식, lessons 반복 확인.)
+- **Bar OHLCV** (1d / 1h / 15m / 5m): directional strategies (mean-reversion, momentum, breakout)
+- **L2 Order Book (LOB)** (10-level, 100ms snapshot): LOB-aware strategies (market-making / ping-pong / spread capture)
+
+**Scope note (2026-04-19 전면 재구조화)**: KRX tick legacy + Qlib CSI500/SP500 경로 **완전 제거됨**. 크립토 전용으로 집중. LOB 데이터는 `scripts/binance_lob_collector.py`가 forward-going으로 수집 (과거 데이터 없음 → 수주간 축적 필요). 초기에는 OHLCV만, LOB 축적 후 market-making paradigm 활성화.
 
 ## Architecture
 
@@ -85,11 +88,12 @@ python scripts/verify_outputs.py --agent alpha-designer --output '<json>'
 
 ## Market Constraints (Crypto)
 
-- **Fee (default)**: Binance taker ≈ 4 bps round-trip (`--fee-bps` 로 설정; maker/네트워크/대체 거래소별 조정 가능)
+- **Fee (default)**: Binance taker ≈ 4 bps round-trip (`--fee-bps`로 설정). Market-making paradigm에서는 maker fee 0 bps 또는 negative (rebate) 가정 가능.
 - **Order types**: MARKET, LIMIT (resting, queue-ahead model), CANCEL
-- **Long-only**: 엔진은 현재 naked short 금지 (crypto spot 기준)
-- **Session**: 크립토는 24/7 연속 거래, 명시적 EOD 강제 청산 없음 (bar 프레임워크 특성상 bar 경계가 실질적 evaluation 포인트)
-- **Bar units**: `crypto_1d` (1일), `crypto_1h` (1시간), `crypto_15m` / `crypto_5m`
+- **Long-only**: 엔진은 현재 naked short 금지 (crypto spot 기준; perpetual futures는 별도 모드로 추가 가능)
+- **Session**: 크립토는 24/7 연속 거래, 명시적 EOD 강제 청산 없음
+- **Bar markets**: `crypto_1d` (1일), `crypto_1h` (1시간), `crypto_15m` / `crypto_5m`
+- **LOB market (forward-going)**: `crypto_lob` — 10-level order book snapshot @ 100ms. `data/binance_lob/<sym>/<date>/<hour>.parquet`. `scripts/binance_lob_collector.py`가 WebSocket 으로 수집. **과거 데이터 없음 — 수주간 축적 후 사용**.
 
 ## Spec-Invariant Checker
 
@@ -268,4 +272,5 @@ python3 -m pytest tests/test_handoff_*.py tests/test_verify_outputs_schema.py -v
 - **OOS window는 전략 개발 중 절대 사용 금지.** 실험별로 `--oos-start`, `--oos-end`로 명시하고 `scripts/validate_strategy.py`에서만 평가.
 - **report.html 작성 시에는 반드시 한국어 위주로 작성할 것**
 - **평가는 multi-symbol (크립토 standard universe BTC/ETH/SOL) portfolio mode 기본**. 단일 심볼 / per-symbol은 debugging/analysis opt-in.
-- **KRX 복원 금지 (2026-04-19 결정)**. KRX tick 자산은 `data/_archive/krx_legacy/`, `scripts/_legacy/`로 이동. 복원이 필요하면 별도 설계 task로 올릴 것.
+- **Iteration budget**: `/experiment --n-iterations`는 **반드시 ≥ 10** (2026-04-19 policy). 1-shot 실행 금지. 이유: 자율 루프가 실제로 lesson을 축적하려면 최소 10 iterations 이상 필요 (한 번 실행은 noise). `--smoke-test` 플래그가 있는 경우에만 예외.
+- **KRX / 非-crypto 시장 복원 금지 (2026-04-19 결정)**. 크립토 전용 프레임워크로 확정. 다른 시장이 필요하면 별도 fork 프로젝트로.
