@@ -292,10 +292,66 @@ def check_execution_designer(output: dict, failures: list, warnings: list) -> No
         failures.append(f"execution-designer: schema import or unexpected error — {e}")
 
 
+def _check_critique_md(agent_name: str, output: dict, failures: list, warnings: list) -> None:
+    """Shared checker for alpha-critic / execution-critic: require critique_md file exists and is non-trivial."""
+    md_path_str = output.get("critique_md", "")
+    if not md_path_str:
+        failures.append(f"{agent_name}: 'critique_md' missing from output")
+        return
+    md_path = ROOT / md_path_str
+    if not md_path.exists():
+        failures.append(f"{agent_name}: critique_md not found at {md_path}")
+        return
+    try:
+        text = md_path.read_text()
+    except Exception as e:
+        failures.append(f"{agent_name}: cannot read critique_md — {e}")
+        return
+    if len(text.strip()) < 100:
+        failures.append(
+            f"{agent_name}: critique_md at {md_path_str} is suspiciously short "
+            f"({len(text.strip())} chars); expected a full critique"
+        )
+
+
+def check_alpha_critic(output: dict, failures: list, warnings: list) -> None:
+    """File-presence check for alpha-critic output (critique_md)."""
+    _check_critique_md("alpha-critic", output, failures, warnings)
+
+
+def check_execution_critic(output: dict, failures: list, warnings: list) -> None:
+    """File-presence check for execution-critic output (critique_md)."""
+    _check_critique_md("execution-critic", output, failures, warnings)
+
+
+def check_strategy_coder(output: dict, failures: list, warnings: list) -> None:
+    """Verify strategy.py exists and is syntactically importable."""
+    strategy_id = output.get("strategy_id", "")
+    if not strategy_id:
+        failures.append("strategy-coder: 'strategy_id' missing from output")
+        return
+    strat_py = STRATEGIES / strategy_id / "strategy.py"
+    if not strat_py.exists():
+        failures.append(f"strategy-coder: strategy.py not found at {strat_py}")
+        return
+    result = subprocess.run(
+        [sys.executable, "-c", f"import importlib.util; "
+         f"spec = importlib.util.spec_from_file_location('s', '{strat_py}'); "
+         f"m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)"],
+        capture_output=True, text=True, cwd=ROOT, timeout=15,
+    )
+    if result.returncode != 0:
+        err = (result.stderr or result.stdout).strip().splitlines()[-1] if (result.stderr or result.stdout) else "unknown error"
+        failures.append(f"strategy-coder: strategy.py import failed — {err}")
+
+
 AGENT_CHECKERS = {
     "alpha-designer": check_alpha_designer,
     "execution-designer": check_execution_designer,
     "spec-writer": check_spec_writer,
+    "strategy-coder": check_strategy_coder,
+    "alpha-critic": check_alpha_critic,
+    "execution-critic": check_execution_critic,
     "feedback-analyst": check_feedback_analyst,
     "backtest-runner": check_backtest_runner,
     "meta-reviewer": check_meta_reviewer,

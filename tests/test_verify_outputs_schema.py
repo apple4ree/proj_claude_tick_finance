@@ -97,3 +97,54 @@ def test_feedback_analyst_rejects_missing_priority():
     out = _run_verify("feedback-analyst", fb)
     assert out["ok"] is False
     assert any("priority_action" in f for f in out["failures"])
+
+
+def test_alpha_critic_rejects_missing_critique_md():
+    out = _run_verify("alpha-critic", {})
+    assert out["ok"] is False
+    assert any("critique_md" in f for f in out["failures"])
+
+
+def test_execution_critic_rejects_missing_file():
+    out = _run_verify("execution-critic",
+                      {"critique_md": "strategies/nonexistent/execution_critique.md"})
+    assert out["ok"] is False
+    assert any("not found" in f for f in out["failures"])
+
+
+def test_alpha_critic_rejects_short_critique():
+    short_file = REPO_ROOT / "tests/fixtures/tmp_short_critique.md"
+    short_file.parent.mkdir(parents=True, exist_ok=True)
+    short_file.write_text("too short")
+    try:
+        out = _run_verify("alpha-critic",
+                          {"critique_md": "tests/fixtures/tmp_short_critique.md"})
+        assert out["ok"] is False
+        assert any("suspiciously short" in f for f in out["failures"])
+    finally:
+        short_file.unlink(missing_ok=True)
+
+
+def test_alpha_critic_accepts_real_critique():
+    real_file = REPO_ROOT / "tests/fixtures/tmp_real_critique.md"
+    real_file.parent.mkdir(parents=True, exist_ok=True)
+    real_file.write_text("# Alpha Critique\n\n" + ("content ipsum " * 20))
+    try:
+        out = _run_verify("alpha-critic",
+                          {"critique_md": "tests/fixtures/tmp_real_critique.md"})
+        assert out["ok"] is True
+        assert out["failures"] == []
+    finally:
+        real_file.unlink(missing_ok=True)
+
+
+def test_strategy_coder_rejects_missing_file():
+    out = _run_verify("strategy-coder", {"strategy_id": "nonexistent_strat_xyz"})
+    assert out["ok"] is False
+    assert any("strategy.py not found" in f for f in out["failures"])
+
+
+def test_strategy_coder_rejects_missing_strategy_id():
+    out = _run_verify("strategy-coder", {})
+    assert out["ok"] is False
+    assert any("strategy_id" in f for f in out["failures"])
