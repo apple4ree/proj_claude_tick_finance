@@ -1,0 +1,52 @@
+[
+  {
+    "strategy_id": "bar_s6_sol_bb_reversion",
+    "symbol": "SOLUSDT",
+    "is_sharpe": -0.6113619252137044,
+    "is_return_pct": -25.385730574760366,
+    "is_n_trades": 16,
+    "oos_sharpe": 1.6816153302762047,
+    "oos_return_pct": 37.90412402911896,
+    "oos_n_trades": 6
+  },
+  {
+    "strategy_id": "bar_s7_eth_bb_reversion",
+    "symbol": "ETHUSDT",
+    "is_sharpe": 0.033522087204119554,
+    "is_return_pct": -1.2960541604798093,
+    "is_n_trades": 9,
+    "oos_sharpe": 1.991481062546631,
+    "oos_return_pct": 28.972173154960256,
+    "oos_n_trades": 6
+  },
+  {
+    "strategy_id": "bar_s8_sol_vol_mom_loose",
+    "symbol": "SOLUSDT",
+    "is_sharpe": 1.1475588217967572,
+    "is_return_pct": 97.36953242323887,
+    "is_n_trades": 84,
+    "oos_sharpe": 0.6357184172464498,
+    "oos_return_pct": 12.296156273227442,
+    "oos_n_trades": 34
+  },
+  {
+    "strategy_id": "bar_s9_btc_vol_breakout",
+    "symbol": "BTCUSDT",
+    "is_sharpe": 1.3047872439507966,
+    "is_return_pct": 49.34105977421379,
+    "is_n_trades": 16,
+    "oos_sharpe": 1.3287776145649208,
+    "oos_return_pct": 9.003568004997398,
+    "oos_n_trades": 6
+  },
+  {
+    "strategy_id": "bar_s10_eth_vol_compress",
+    "symbol": "ETHUSDT",
+    "is_sharpe": 0.2716314628493461,
+    "is_return_pct": 6.85505367782937,
+    "is_n_trades": 39,
+    "oos_sharpe": 0.7880813617286191,
+    "oos_return_pct": 28.962587373350644,
+    "oos_n_trades": 21
+  }
+]

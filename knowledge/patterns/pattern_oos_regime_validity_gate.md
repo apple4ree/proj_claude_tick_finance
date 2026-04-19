@@ -123,4 +123,4 @@ There is no regime-neutral OOS window available in the current dataset. The IS W
 
 **Rule 5 (new)**: Before accepting IS WR as evidence of persistent edge, verify that the IS window is not the only non-bearish window in the full date range. If IS is the unique bullish window, flag IS WR as regime-attributed and require a multi-regime IS period for validation.
 
-Links: [[lesson_20260415_019_session_drop_regime_filter_cleanly_excises_downtrend_losses]] [[lesson_20260415_020_is_period_was_uniquely_bullish_window_passive_maker_is_wr_does_not_generalize_across_regimes]]
+Links: [[lesson_20260415_019_session_drop_regime_filter_cleanly_excises_downtrend_losses]] [[lesson_20260415_018_oos_regime_mismatch_invalidates_mean_reversion_passive_maker_evaluation]]

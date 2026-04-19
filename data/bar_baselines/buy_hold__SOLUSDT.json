@@ -1,0 +1,24 @@
+{
+  "strategy": "buy_hold",
+  "symbol": "SOLUSDT",
+  "is": {
+    "total_return_pct": 1794.155854924068,
+    "sharpe_annualized": 2.056499334305825,
+    "mdd_pct": -44.859101294744924,
+    "n_trades": 1,
+    "n_days_in_market": 730,
+    "avg_exposure": 1.0,
+    "n_days": 730,
+    "final_equity": 18.941558549240682
+  },
+  "oos": {
+    "total_return_pct": -35.86994405757622,
+    "sharpe_annualized": -0.08824342630755247,
+    "mdd_pct": -59.76638546398443,
+    "n_trades": 1,
+    "n_days_in_market": 364,
+    "avg_exposure": 1.0,
+    "n_days": 364,
+    "final_equity": 0.6413005594242378
+  }
+}

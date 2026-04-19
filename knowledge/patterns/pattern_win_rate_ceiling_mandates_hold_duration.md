@@ -4,11 +4,10 @@ created: 2026-04-14T00:00:00
 tags: [pattern, win-rate-estimate, fees, hold-time, anti-edge, krx, methodology, breakeven, oracle]
 severity: critical
 lessons:
-  - "[[lesson_20260414_002_obi_momentum_has_no_edge_over_spread_cost_at_tick_horizon]]"
+  - "[[lesson_20260414_003_tax_heavy_korean_market_tight_spread_entry_filter_increases_turnover_fees_dominate_pnl]]"
   - "[[lesson_20260414_013_obi_sign_flip_long_only_fee_math_kills_positive_ev_at_30_20_bps_targets]]"
   - "[[lesson_20260414_014_mean_reversion_at_15_30_min_timescale_is_anti_edge_with_18_win_rate_and_oversized_lots_causing_cash_rejections]]"
   - "[[lesson_20260414_021_time_exit_suppresses_avg_win_bps_below_resting_limit_target]]"
-  - "[[lesson_20260414_022_removing_time_exit_unlocks_first_positive_return_let_resting_limits_breathe]]"
 ---
 
 # Pattern: Oracle win-rate ceiling mandates minimum hold duration on 005930
@@ -80,4 +79,4 @@ Formula: breakeven_W = (stop_bps + 21) / (profit_bps + stop_bps)
 
 ## Empirical validation (resting-limit series)
 
-The oracle table predicted that 3000+ tick unbounded hold with 150/50 bps target was viable (oracle ceiling ~40% vs 35.5% breakeven). This was confirmed in practice: removing the 8000-tick time exit in strat_0024 produced the first positive return in the series. See [[lesson_20260414_021_time_exit_suppresses_avg_win_bps_below_resting_limit_target]] and [[lesson_20260414_022_removing_time_exit_unlocks_first_positive_return_let_resting_limits_breathe]].
+The oracle table predicted that 3000+ tick unbounded hold with 150/50 bps target was viable (oracle ceiling ~40% vs 35.5% breakeven). This was confirmed in practice: removing the 8000-tick time exit in strat_0024 produced the first positive return in the series. See [[lesson_20260414_021_time_exit_suppresses_avg_win_bps_below_resting_limit_target]] and [[lesson_20260414_021_time_exit_suppresses_avg_win_bps_below_resting_limit_target]].

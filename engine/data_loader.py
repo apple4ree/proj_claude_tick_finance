@@ -18,7 +18,22 @@ import numpy as np
 import pandas as pd
 
 DATA_ROOT = Path("/home/dgu/tick/open-trading-api/data/realtime/H0STASP0")
+CRYPTO_ROOT = Path("/home/dgu/tick/crypto")
 N_LEVELS = 10
+
+# Mutable override — set by engine.runner when spec has data_root
+_active_root: Path | None = None
+
+
+def set_data_root(root: Path | str) -> None:
+    """Override DATA_ROOT for this process (e.g., crypto data)."""
+    global _active_root
+    _active_root = Path(root)
+
+
+def get_data_root() -> Path:
+    """Return the currently active data root."""
+    return _active_root if _active_root is not None else DATA_ROOT
 
 ASK_PX_COLS = [f"ASKP{i}" for i in range(1, N_LEVELS + 1)]
 BID_PX_COLS = [f"BIDP{i}" for i in range(1, N_LEVELS + 1)]
@@ -51,7 +66,7 @@ class OrderBookSnapshot:
 
 
 def _csv_path(date: str, symbol: str) -> Path:
-    return DATA_ROOT / date / f"{symbol}.csv"
+    return get_data_root() / date / f"{symbol}.csv"
 
 
 _STR_COLS = ("MKSC_SHRN_ISCD", "HOUR_CLS_CODE", "tr_id")
@@ -166,14 +181,15 @@ def summarize(date: str, symbol: str) -> dict:
 
 
 def list_symbols(date: str) -> list[str]:
-    d = DATA_ROOT / date
+    d = get_data_root() / date
     if not d.exists():
         return []
     return sorted(p.stem for p in d.glob("*.csv"))
 
 
 def list_dates() -> list[str]:
-    return sorted(p.name for p in DATA_ROOT.iterdir() if p.is_dir())
+    root = get_data_root()
+    return sorted(p.name for p in root.iterdir() if p.is_dir())
 
 
 def main() -> None:

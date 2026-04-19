@@ -1,0 +1,30 @@
+name: obi_momentum_v0
+description: |
+  Entry when order book imbalance is strongly positive and short-term mid has ticked up.
+  Exit on imbalance flip or holding timeout. Single share per symbol.
+capital: 10000000
+universe:
+  symbols: ["005930", "000660"]
+  dates: ["20260313"]
+fees:
+  commission_bps: 1.5
+  tax_bps: 18.0
+latency:
+  submit_ms: 5.0
+  jitter_ms: 1.0
+  seed: 42
+signals:
+  obi5:
+    fn: obi
+    args: {depth: 5}
+  total_imb: total_imbalance
+  ret3:
+    fn: mid_return_bps
+    args: {lookback: 3}
+entry:
+  when: "obi5 > 0.3 and total_imb > 0.1 and ret3 > 0"
+  size: 1
+exit:
+  when: "obi5 < 0 or holding_ticks > 200"
+risk:
+  max_position_per_symbol: 1

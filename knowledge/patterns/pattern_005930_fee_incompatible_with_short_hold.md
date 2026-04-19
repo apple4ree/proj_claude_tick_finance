@@ -5,7 +5,7 @@ tags: [pattern, fees, krx, oracle, breakeven, methodology, dataset, universe, an
 severity: critical
 links:
   - "[[lesson_20260414_006_etf_universe_blocked_by_dataset_scope_kospi_equity_only]]"
-  - "[[lesson_20260414_002_obi_momentum_has_no_edge_over_spread_cost_at_tick_horizon]]"
+  - "[[lesson_20260414_003_tax_heavy_korean_market_tight_spread_entry_filter_increases_turnover_fees_dominate_pnl]]"
   - "[[lesson_20260414_013_obi_sign_flip_long_only_fee_math_kills_positive_ev_at_30_20_bps_targets]]"
   - "[[lesson_20260414_014_mean_reversion_at_15_30_min_timescale_is_anti_edge_with_18_win_rate_and_oversized_lots_causing_cash_rejections]]"
   - "[[pattern_win_rate_ceiling_mandates_hold_duration]]"

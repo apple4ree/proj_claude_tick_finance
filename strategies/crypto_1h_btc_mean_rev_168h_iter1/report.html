@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>crypto_1h_btc_mean_rev_168h_iter1</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+    background: #fafafa;
+    color: #111827;
+    margin: 0;
+    padding: 32px 24px 56px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  h1 { font-size: 26px; margin: 0 0 6px; font-weight: 800; letter-spacing: -0.015em; }
+  .sub { color: #6b7280; font-size: 13px; margin-bottom: 22px; }
+  .sub code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  @media (max-width: 960px) { .cards { grid-template-columns: repeat(4, 1fr); } }
+  @media (max-width: 560px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+  .card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    min-width: 0;
+  }
+  .card .label {
+    color: #6b7280;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 4px;
+  }
+  .card .value {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a1a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .chart-wrap {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 10px;
+  }
+  /* ── Sensitivity panel ───────────────────────── */
+  .sens-wrap {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 18px;
+  }
+  .sens-title {
+    font-size: 13px; font-weight: 700; color: #374151;
+    margin-bottom: 14px; letter-spacing: -0.01em;
+  }
+  .sens-section-label {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.06em; color: #9ca3af; margin: 12px 0 8px;
+  }
+  .sens-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+  }
+  .sens-name {
+    font-size: 12px; color: #6b7280;
+    min-width: 160px; font-family: 'Menlo','Consolas',monospace;
+  }
+  .sens-val {
+    font-size: 12px; font-weight: 600; color: #111827;
+    min-width: 38px; text-align: right; font-family: 'Menlo','Consolas',monospace;
+  }
+  .sens-slider {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 4px; border-radius: 2px; background: #e5e7eb; outline: none; cursor: pointer;
+  }
+  .sens-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px;
+    border-radius: 50%; background: #374151; cursor: pointer;
+  }
+  .sens-metrics {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; margin: 12px 0 8px;
+  }
+  @media (max-width: 700px) { .sens-metrics { grid-template-columns: repeat(2, 1fr); } }
+  .sens-card {
+    background: #f9fafb; border: 1px solid #e5e7eb;
+    border-radius: 8px; padding: 10px 12px;
+  }
+  .sens-label {
+    font-size: 10px; color: #9ca3af; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;
+  }
+  .sens-value {
+    font-size: 16px; font-weight: 700; color: #111827;
+    font-family: 'Menlo','Consolas',monospace;
+  }
+  /* WR comparison bar */
+  .wr-bar-wrap {
+    display: flex; align-items: center; gap: 8px; margin: 8px 0;
+  }
+  .wr-bar-label { font-size: 11px; color: #9ca3af; min-width: 52px; }
+  .wr-track {
+    flex: 1; height: 16px; background: #f3f4f6;
+    border-radius: 8px; position: relative; overflow: visible;
+  }
+  .wr-fill {
+    height: 100%; border-radius: 8px; transition: width .2s;
+  }
+  .wr-current { background: #2563eb; }
+  .wr-marker {
+    position: absolute; top: -4px; transform: translateX(-50%);
+    transition: left .2s;
+  }
+  .wr-marker-line {
+    width: 2px; height: 24px; background: #ef4444; margin: 0 auto;
+  }
+  .wr-marker-label {
+    font-size: 9px; color: #ef4444; font-weight: 700;
+    white-space: nowrap; text-align: center; margin-top: 2px;
+  }
+  /* Fee bar */
+  .fee-bar-wrap { margin: 10px 0 4px; }
+  .fee-bar-bg {
+    display: flex; height: 14px; border-radius: 7px; overflow: hidden;
+    background: #f3f4f6;
+  }
+  .fee-bar-cost {
+    background: #fca5a5; height: 100%; transition: width .2s;
+  }
+  .fee-bar-net {
+    background: #86efac; height: 100%; transition: width .2s;
+  }
+  .fee-bar-legend {
+    display: flex; gap: 12px; font-size: 11px; color: #9ca3af; margin-top: 5px;
+  }
+  .fee-dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 2px; margin-right: 4px; vertical-align: middle;
+  }
+  .fee-dot-cost { background: #fca5a5; }
+  .fee-dot-net  { background: #86efac; }
+  .sens-divider {
+    border: none; border-top: 1px solid #e5e7eb; margin: 14px 0;
+  }
+  /* ── end sensitivity panel ────────────────────── */
+  /* Symbol tabs */
+  .tab-bar {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px;
+  }
+  .tab-btn {
+    padding: 6px 16px; border: 1px solid #e5e7eb; border-radius: 8px;
+    cursor: pointer; font-size: 13px; font-weight: 600; background: white;
+    color: #374151; font-family: inherit; transition: all 0.12s;
+  }
+  .tab-btn:hover { background: #f3f4f6; }
+  .tab-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
+  .meta {
+    margin-top: 24px;
+    color: #6b7280;
+    font-size: 12px;
+  }
+  .meta details summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #374151;
+    padding: 6px 0;
+  }
+  .meta pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    overflow-x: auto;
+    line-height: 1.5;
+    margin-bottom: 0;
+  }
+  .spec-section {
+    margin-top: 18px;
+    border-top: 1px solid #334155;
+    padding-top: 14px;
+  }
+  .spec-section-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #94a3b8;
+    margin-bottom: 8px;
+  }
+  .spec-section p {
+    color: #cbd5e1;
+    line-height: 1.7;
+    font-size: 12.5px;
+    margin: 0;
+    white-space: pre-wrap;
+  }
+  .spec-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px;
+  }
+  .spec-table th {
+    text-align: left;
+    color: #64748b;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-bottom: 1px solid #334155;
+  }
+  .spec-table td {
+    padding: 4px 10px;
+    border-bottom: 1px solid #1e3a5f33;
+    vertical-align: top;
+  }
+  .pk {
+    color: #7dd3fc;
+    font-family: 'Menlo', 'Consolas', monospace;
+    white-space: nowrap;
+    width: 34%;
+  }
+  .pv {
+    color: #e2e8f0;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>crypto_1h_btc_mean_rev_168h_iter1</h1>
+  <div class="sub">
+    strategy <code>crypto_1h_btc_mean_rev_168h_iter1</code> ·
+    symbols BTCUSDT ·
+    dates 2025-07-01, 2025-12-31 ·
+    4,393 ticks ·
+    0.00s
+  </div>
+  <div class="cards"><div class="card"><div class="label">수익률</div><div class="value">-7.069%</div></div><div class="card"><div class="label">총 손익</div><div class="value">-706,943</div></div><div class="card"><div class="label">샤프 (raw)</div><div class="value">-0.004</div></div><div class="card"><div class="label">샤프 (연환산)</div><div class="value">-0.418</div></div><div class="card"><div class="label">MDD</div><div class="value">-22.703%</div></div><div class="card"><div class="label">IC (Pearson)</div><div class="value">+0.0012</div></div><div class="card"><div class="label">IC (Spearman)</div><div class="value">+0.0074</div></div><div class="card"><div class="label">ICIR</div><div class="value">+2.397</div></div><div class="card"><div class="label">IR (vs B&H)</div><div class="value">+0.709</div></div><div class="card"><div class="label">주문 수</div><div class="value">24</div></div><div class="card"><div class="label">라운드트립</div><div class="value">12</div></div><div class="card"><div class="label">승률</div><div class="value">41.7%</div></div><div class="card"><div class="label">Avg trade</div><div class="value">-562</div></div><div class="card"><div class="label">최대 수익 거래</div><div class="value">10,970</div></div><div class="card"><div class="label">최대 손실 거래</div><div class="value">-5,829</div></div><div class="card"><div class="label">총 수수료</div><div class="value">1,207</div></div></div>
+  <div class="chart-wrap"><div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.4.0.min.js" integrity="sha256-KEmPoupLpFyGMyGAiOsiNDbKDKAvxXAn/W+oQa0ZAfk=" crossorigin="anonymous"></script>                <div id="chart-root" class="plotly-graph-div" style="height:820px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("chart-root")) {                    Plotly.newPlot(                        "chart-root",                        [],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"matches":"x3","showticklabels":false,"showgrid":true,"gridcolor":"#e5e7eb"},"yaxis":{"anchor":"x","domain":[0.532,1.0],"showgrid":true,"gridcolor":"#e5e7eb"},"xaxis2":{"anchor":"y2","domain":[0.0,1.0],"matches":"x3","showticklabels":false,"showgrid":true,"gridcolor":"#e5e7eb"},"yaxis2":{"anchor":"x2","domain":[0.266,0.482],"showgrid":true,"gridcolor":"#e5e7eb"},"xaxis3":{"anchor":"y3","domain":[0.0,1.0],"showgrid":true,"gridcolor":"#e5e7eb"},"yaxis3":{"anchor":"x3","domain":[0.0,0.216],"showgrid":true,"gridcolor":"#e5e7eb"},"annotations":[{"font":{"size":16},"showarrow":false,"text":"\uac00\uaca9 \ubc0f \uccb4\uacb0","x":0.5,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"\uc790\uc0b0\uace1\uc120","x":0.5,"xanchor":"center","xref":"paper","y":0.482,"yanchor":"bottom","yref":"paper"},{"font":{"size":16},"showarrow":false,"text":"\ub099\ud3ed (%)","x":0.5,"xanchor":"center","xref":"paper","y":0.216,"yanchor":"bottom","yref":"paper"}],"margin":{"l":60,"r":20,"t":60,"b":40},"font":{"family":"system-ui, -apple-system, Pretendard, 'Noto Sans KR', sans-serif","size":11},"legend":{"orientation":"h","y":-0.08,"x":0},"height":820,"hovermode":"x unified","plot_bgcolor":"white","paper_bgcolor":"white"},                        {"responsive": true}                    )                };            </script>        </div></div>
+  
+<div class="sens-wrap">
+  <div class="sens-title">파라미터 민감도 분석</div>
+
+  <!-- ① 수익 구조 분석 -->
+  <div class="sens-section-label">① 수익 구조 — break-even WR</div>
+  <div class="sens-row">
+    <span class="sens-name">profit target (bps)</span>
+    <input class="sens-slider" type="range" min="30" max="400" step="5"
+           value="1312" id="pt-sl" oninput="sensUpdate()">
+    <span class="sens-val" id="pt-val">1312</span>
+  </div>
+  <div class="sens-row">
+    <span class="sens-name">stop loss (bps)</span>
+    <input class="sens-slider" type="range" min="10" max="200" step="5"
+           value="451" id="sl-sl" oninput="sensUpdate()">
+    <span class="sens-val" id="sl-val">451</span>
+  </div>
+
+  <div class="sens-metrics">
+    <div class="sens-card">
+      <div class="sens-label">Break-even WR</div>
+      <div class="sens-value" id="be-wr">—</div>
+    </div>
+    <div class="sens-card">
+      <div class="sens-label">실제 WR (고정)</div>
+      <div class="sens-value" style="color:#16a34a">41.7%</div>
+    </div>
+    <div class="sens-card">
+      <div class="sens-label">엣지 마진</div>
+      <div class="sens-value" id="edge-margin">—</div>
+    </div>
+    <div class="sens-card">
+      <div class="sens-label">손익비 (P:L)</div>
+      <div class="sens-value" id="payoff-ratio">—</div>
+    </div>
+  </div>
+
+  <!-- WR 비교 바 -->
+  <div class="wr-bar-wrap">
+    <div class="wr-bar-label">실제 WR</div>
+    <div class="wr-track">
+      <div class="wr-fill wr-current" id="wr-current-bar" style="width:41.7%"></div>
+      <div class="wr-marker" id="wr-be-marker" style="left:25.6%">
+        <div class="wr-marker-line"></div>
+        <div class="wr-marker-label" id="wr-be-label">BE 25.6%</div>
+      </div>
+    </div>
+    <div class="wr-bar-label" style="text-align:right">41.7%</div>
+  </div>
+
+  <div class="sens-divider"></div>
+
+  <!-- ② 수수료 부담 분석 -->
+  <div class="sens-section-label">② 수수료 부담 분석</div>
+  <div class="sens-row">
+    <span class="sens-name">lot size</span>
+    <input class="sens-slider" type="range" min="1" max="10" step="1"
+           value="1" id="lot-sl" oninput="sensUpdate()">
+    <span class="sens-val" id="lot-val">1</span>
+  </div>
+
+  <div class="sens-metrics">
+    <div class="sens-card">
+      <div class="sens-label">수수료 round-trip</div>
+      <div class="sens-value">2.0 bps</div>
+    </div>
+    <div class="sens-card">
+      <div class="sens-label">수수료 / profit target</div>
+      <div class="sens-value" id="fee-ratio">—</div>
+    </div>
+    <div class="sens-card">
+      <div class="sens-label">수수료 차감 순익 (bps)</div>
+      <div class="sens-value" id="net-profit">—</div>
+    </div>
+    <div class="sens-card">
+      <div class="sens-label">lot 변경 시 총 수수료 추정</div>
+      <div class="sens-value" id="fee-scaled">—</div>
+    </div>
+  </div>
+
+  <!-- 수수료 부담 바 -->
+  <div class="fee-bar-wrap">
+    <div class="fee-bar-bg">
+      <div class="fee-bar-cost" id="fee-bar-cost"></div>
+      <div class="fee-bar-net"  id="fee-bar-net"></div>
+    </div>
+    <div class="fee-bar-legend">
+      <span><span class="fee-dot fee-dot-cost"></span>수수료</span>
+      <span><span class="fee-dot fee-dot-net"></span>순 수익</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const CURRENT_WR     = 41.6700;
+  const ROUND_TRIP_BPS = 2.0000;
+  const TOTAL_FEES     = 1207.32;
+  const N_ROUNDTRIPS   = 12;
+  const ORIG_LOT       = 1;
+
+  function fmt1(v) { return v.toFixed(1); }
+  function fmt0(v) { return v.toFixed(0); }
+
+  window.sensUpdate = function() {
+    const profit  = parseFloat(document.getElementById('pt-sl').value);
+    const stop    = parseFloat(document.getElementById('sl-sl').value);
+    const lotSize = parseInt(document.getElementById('lot-sl').value);
+
+    document.getElementById('pt-val').textContent  = fmt0(profit);
+    document.getElementById('sl-val').textContent  = fmt0(stop);
+    document.getElementById('lot-val').textContent = lotSize;
+
+    // ① break-even WR
+    const beWR = stop / (profit + stop) * 100;
+    document.getElementById('be-wr').textContent = fmt1(beWR) + '%';
+
+    const edge = CURRENT_WR - beWR;
+    const edgeEl = document.getElementById('edge-margin');
+    edgeEl.textContent = (edge >= 0 ? '+' : '') + fmt1(edge) + 'pp';
+    edgeEl.style.color = edge >= 5 ? '#16a34a' : edge >= 0 ? '#d97706' : '#dc2626';
+
+    const payoff = profit / stop;
+    document.getElementById('payoff-ratio').textContent = fmt1(payoff) + ':1';
+
+    // WR bar
+    const beClamp = Math.min(Math.max(beWR, 0), 100);
+    document.getElementById('wr-be-marker').style.left = beClamp + '%';
+    document.getElementById('wr-be-label').textContent  = 'BE ' + fmt1(beWR) + '%';
+    document.getElementById('wr-current-bar').style.width = Math.min(CURRENT_WR, 100) + '%';
+
+    // ② fee burden
+    const feeRatio = ROUND_TRIP_BPS / profit * 100;
+    document.getElementById('fee-ratio').textContent = fmt1(feeRatio) + '%';
+
+    const netProfit = profit - ROUND_TRIP_BPS;
+    const netEl = document.getElementById('net-profit');
+    netEl.textContent = (netProfit >= 0 ? '+' : '') + fmt1(netProfit) + ' bps';
+    netEl.style.color = netProfit >= 0 ? '#16a34a' : '#dc2626';
+
+    // scale total fees proportional to lot change
+    const feeScaled = N_ROUNDTRIPS > 0
+      ? (TOTAL_FEES / ORIG_LOT * lotSize)
+      : 0;
+    document.getElementById('fee-scaled').textContent =
+      Math.round(feeScaled).toLocaleString() + ' KRW';
+
+    // fee bar (% breakdown of profit target)
+    const costPct = Math.min(feeRatio, 100);
+    const netPct  = Math.max(100 - costPct, 0);
+    document.getElementById('fee-bar-cost').style.width = costPct + '%';
+    document.getElementById('fee-bar-net').style.width  = netPct  + '%';
+  };
+
+  sensUpdate();
+})();
+</script>
+
+  
+  
+  <div class="meta">
+    <div class="spec-section"><div class="spec-section-title">전략 설명</div><p>BTCUSDT 1시간봉 168시간(7일) 수익률이 -5.6226% 이하로 하락했을 때 평균회귀 매수 진입.<br>트레일링 스탑(활성화 600 bps, 거리 300 bps)과 profit_target 1312 bps, stop_loss 450 bps로 청산.<br>신호: roc_168h &lt;= -0.056226 (trailing 168 bar rate-of-change).<br>근거: 7일 급락 후 단기 평균회귀 경향, Binance spot 4 bps fee 환경에서 edge 확보 가능.</p></div>
+<div class="spec-section"><div class="spec-section-title">파라미터</div><table class="spec-table"><thead><tr><th>파라미터</th><th>값</th></tr></thead><tbody><tr><td class="pk">roc_168h_threshold</td><td class="pv">-0.056226</td></tr><tr><td class="pk">entry_side</td><td class="pv">low</td></tr><tr><td class="pk">entry_price_mode</td><td class="pv">ask</td></tr><tr><td class="pk">entry_ttl_ticks</td><td class="pv">0</td></tr><tr><td class="pk">cancel_on_bid_drop_ticks</td><td class="pv">0</td></tr><tr><td class="pk">profit_target_bps</td><td class="pv">1312.07</td></tr><tr><td class="pk">stop_loss_bps</td><td class="pv">450.79</td></tr><tr><td class="pk">trailing_stop</td><td class="pv">True</td></tr><tr><td class="pk">trailing_activation_bps</td><td class="pv">600</td></tr><tr><td class="pk">trailing_distance_bps</td><td class="pv">300</td></tr><tr><td class="pk">lot_size</td><td class="pv">1</td></tr><tr><td class="pk">max_entries_per_session</td><td class="pv">1</td></tr></tbody></table></div>
+<div class="spec-section"><div class="spec-section-title">손익 구조 및 수수료</div><table class="spec-table"><thead><tr><th>항목</th><th>값</th></tr></thead><tbody><tr><td class="pk">왕복 비용</td><td class="pv">수수료 (2.0 bps) + 매도세 (0.0 bps) = <b>2.0 bps</b></td></tr><tr><td class="pk">손익분기 승률</td><td class="pv">손절 / (익절 + 손절) = 451 / (1312 + 451) = <b>25.6%</b></td></tr><tr><td class="pk">손익비 (P:L)</td><td class="pv">익절 / 손절 = 1312 / 451 = <b>2.91</b>  ·  lot = 1</td></tr><tr><td class="pk">최소 요구 edge</td><td class="pv">실제 승률이 25.6%를 초과해야 2.0 bps 비용 후 수익 가능</td></tr></tbody></table></div>
+<div class="spec-section"><div class="spec-section-title">유니버스 및 설정</div><table class="spec-table"><thead><tr><th>항목</th><th>값</th></tr></thead><tbody><tr><td class="pk">종목</td><td class="pv">BTCUSDT</td></tr><tr><td class="pk">기간</td><td class="pv">20250701 → 20251031  (123일)</td></tr><tr><td class="pk">자본금</td><td class="pv">10,000,000 KRW</td></tr><tr><td class="pk">수수료</td><td class="pv">수수료 2.0 bps + 매도세 0.0 bps → 왕복 2.0 bps</td></tr><tr><td class="pk">지연시간</td><td class="pv">제출 50.0 ms ± 10.0 ms 변동</td></tr></tbody></table></div>
+    <details>
+      <summary>spec.yaml (raw)</summary>
+      <pre>name: crypto_1h_btc_mean_rev_168h_iter1
+description: |
+  BTCUSDT 1시간봉 168시간(7일) 수익률이 -5.6226% 이하로 하락했을 때 평균회귀 매수 진입.
+  트레일링 스탑(활성화 600 bps, 거리 300 bps)과 profit_target 1312 bps, stop_loss 450 bps로 청산.
+  신호: roc_168h &lt;= -0.056226 (trailing 168 bar rate-of-change).
+  근거: 7일 급락 후 단기 평균회귀 경향, Binance spot 4 bps fee 환경에서 edge 확보 가능.
+strategy_kind: python
+target_symbol: BTCUSDT
+target_horizon: 1h
+capital: 10000000
+universe:
+  symbols: ["BTCUSDT"]
+  dates: [
+    "20250701", "20250702", "20250703", "20250704", "20250705",
+    "20250706", "20250707", "20250708", "20250709", "20250710",
+    "20250711", "20250712", "20250713", "20250714", "20250715",
+    "20250716", "20250717", "20250718", "20250719", "20250720",
+    "20250721", "20250722", "20250723", "20250724", "20250725",
+    "20250726", "20250727", "20250728", "20250729", "20250730",
+    "20250731", "20250801", "20250802", "20250803", "20250804",
+    "20250805", "20250806", "20250807", "20250808", "20250809",
+    "20250810", "20250811", "20250812", "20250813", "20250814",
+    "20250815", "20250816", "20250817", "20250818", "20250819",
+    "20250820", "20250821", "20250822", "20250823", "20250824",
+    "20250825", "20250826", "20250827", "20250828", "20250829",
+    "20250830", "20250831", "20250901", "20250902", "20250903",
+    "20250904", "20250905", "20250906", "20250907", "20250908",
+    "20250909", "20250910", "20250911", "20250912", "20250913",
+    "20250914", "20250915", "20250916", "20250917", "20250918",
+    "20250919", "20250920", "20250921", "20250922", "20250923",
+    "20250924", "20250925", "20250926", "20250927", "20250928",
+    "20250929", "20250930", "20251001", "20251002", "20251003",
+    "20251004", "20251005", "20251006", "20251007", "20251008",
+    "20251009", "20251010", "20251011", "20251012", "20251013",
+    "20251014", "20251015", "20251016", "20251017", "20251018",
+    "20251019", "20251020", "20251021", "20251022", "20251023",
+    "20251024", "20251025", "20251026", "20251027", "20251028",
+    "20251029", "20251030", "20251031"
+  ]
+fees:
+  commission_bps: 2.0
+  tax_bps: 0.0
+latency:
+  submit_ms: 50.0
+  jitter_ms: 10.0
+  seed: 42
+params:
+  # alpha params
+  roc_168h_threshold: -0.056226   # 168-bar rate-of-change 진입 임계값
+  entry_side: "low"               # 하락 시 매수 (mean-reversion long)
+  # execution params
+  entry_price_mode: "ask"         # 시장가 매수 (ask 체결)
+  entry_ttl_ticks: 0              # 0 = disabled (시장가므로 TTL 불필요)
+  cancel_on_bid_drop_ticks: 0     # 0 = disabled
+  profit_target_bps: 1312.07
+  stop_loss_bps: 450.79
+  trailing_stop: true
+  trailing_activation_bps: 600.0
+  trailing_distance_bps: 300.0
+  lot_size: 1
+  max_entries_per_session: 1
+signals: {}
+entry: {when: false, size: 1}
+exit: {when: false}
+risk:
+  max_position_per_symbol: 1
+</pre>
+    </details>
+  </div>
+</div>
+</body>
+</html>

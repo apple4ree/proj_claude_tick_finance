@@ -1,0 +1,24 @@
+{
+  "strategy": "ma_cross_20_50",
+  "symbol": "BTCUSDT",
+  "is": {
+    "total_return_pct": 64.09386431384765,
+    "sharpe_annualized": 0.8354117740172244,
+    "mdd_pct": -38.46623823524368,
+    "n_trades": 15,
+    "n_days_in_market": 435,
+    "avg_exposure": 0.5958904109589042,
+    "n_days": 730,
+    "final_equity": 1.6409386431384765
+  },
+  "oos": {
+    "total_return_pct": 16.678409787279215,
+    "sharpe_annualized": 0.8188229217472399,
+    "mdd_pct": -14.621429065349249,
+    "n_trades": 6,
+    "n_days_in_market": 140,
+    "avg_exposure": 0.38461538461538464,
+    "n_days": 364,
+    "final_equity": 1.1667840978727921
+  }
+}

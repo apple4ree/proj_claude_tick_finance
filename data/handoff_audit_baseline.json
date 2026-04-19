@@ -1,0 +1,212 @@
+{
+  "aggregate": {
+    "n_strategies": 2,
+    "iterate_context_exists": true,
+    "file_presence_rate": {
+      "spec.yaml": {
+        "present": 2,
+        "rate": 1.0
+      },
+      "strategy.py": {
+        "present": 2,
+        "rate": 1.0
+      },
+      "idea.json": {
+        "present": 2,
+        "rate": 1.0
+      },
+      "report.json": {
+        "present": 2,
+        "rate": 1.0
+      },
+      "report_strict.json": {
+        "present": 2,
+        "rate": 1.0
+      },
+      "alpha_design.md": {
+        "present": 1,
+        "rate": 0.5
+      },
+      "execution_design.md": {
+        "present": 1,
+        "rate": 0.5
+      },
+      "alpha_critique.md": {
+        "present": 1,
+        "rate": 0.5
+      },
+      "execution_critique.md": {
+        "present": 1,
+        "rate": 0.5
+      },
+      "feedback.json": {
+        "present": 1,
+        "rate": 0.5
+      },
+      "agent_trace.jsonl": {
+        "present": 1,
+        "rate": 0.5
+      }
+    },
+    "idea_field_presence_rate": {
+      "deviation_from_brief": {
+        "present": 1,
+        "rate": 0.5
+      },
+      "execution_specified": {
+        "present": 2,
+        "rate": 1.0
+      },
+      "alpha_specified": {
+        "present": 2,
+        "rate": 1.0
+      },
+      "signal_brief_rank": {
+        "present": 1,
+        "rate": 0.5
+      }
+    },
+    "model_version_logged_rate": {
+      "present": 1,
+      "rate": 0.5
+    },
+    "fully_instrumented_count": 1,
+    "fully_instrumented_rate": 0.5,
+    "clean_pct_of_total": {
+      "n": 2,
+      "mean": 79.96592117159634,
+      "min": 59.931842343192685,
+      "max": 100.0,
+      "median": 100.0
+    },
+    "invariant_violations": {
+      "total": 4,
+      "by_type": {
+        "max_position_exceeded": 3,
+        "sl_overshoot": 1
+      },
+      "strategies_with_any_violation": 2,
+      "strategies_with_any_violation_rate": 1.0
+    }
+  },
+  "strategies": [
+    {
+      "strategy_id": "strat_20260417_0001_trajectory_multi_3sym",
+      "path": "/home/dgu/tick/proj_claude_tick_finance/strategies/strat_20260417_0001_trajectory_multi_3sym",
+      "files_present": {
+        "spec.yaml": true,
+        "strategy.py": true,
+        "idea.json": true,
+        "report.json": true,
+        "report_strict.json": true,
+        "alpha_design.md": false,
+        "execution_design.md": false,
+        "alpha_critique.md": false,
+        "execution_critique.md": false,
+        "feedback.json": false,
+        "agent_trace.jsonl": false
+      },
+      "files_missing": [
+        "alpha_design.md",
+        "execution_design.md",
+        "alpha_critique.md",
+        "execution_critique.md",
+        "feedback.json",
+        "agent_trace.jsonl"
+      ],
+      "idea_fields_present": {
+        "signal_brief_rank": false,
+        "deviation_from_brief": false,
+        "alpha_specified": true,
+        "execution_specified": true
+      },
+      "idea_fields_missing": [
+        "signal_brief_rank",
+        "deviation_from_brief"
+      ],
+      "model_version_logged": false,
+      "attribution": {
+        "normal_pnl": -6290.5625,
+        "strict_pnl_clean": -3770.05,
+        "bug_pnl": -2520.5125,
+        "clean_pct_of_total": 59.931842343192685
+      },
+      "invariant_violation_count": 3,
+      "invariant_violation_by_type": {
+        "max_position_exceeded": 3
+      },
+      "agent_trace": null,
+      "referenced_in_iterate_context": true,
+      "summary": {
+        "critical_missing": [],
+        "fidelity_missing": [
+          "alpha_critique.md",
+          "execution_critique.md",
+          "feedback.json",
+          "agent_trace.jsonl"
+        ],
+        "idea_fields_missing_count": 2,
+        "fully_instrumented": false
+      }
+    },
+    {
+      "strategy_id": "strat_20260417_0002_smoke_042700_obi5",
+      "path": "/home/dgu/tick/proj_claude_tick_finance/strategies/strat_20260417_0002_smoke_042700_obi5",
+      "files_present": {
+        "spec.yaml": true,
+        "strategy.py": true,
+        "idea.json": true,
+        "report.json": true,
+        "report_strict.json": true,
+        "alpha_design.md": true,
+        "execution_design.md": true,
+        "alpha_critique.md": true,
+        "execution_critique.md": true,
+        "feedback.json": true,
+        "agent_trace.jsonl": true
+      },
+      "files_missing": [],
+      "idea_fields_present": {
+        "signal_brief_rank": true,
+        "deviation_from_brief": true,
+        "alpha_specified": true,
+        "execution_specified": true
+      },
+      "idea_fields_missing": [],
+      "model_version_logged": true,
+      "attribution": {
+        "normal_pnl": -3268.7,
+        "strict_pnl_clean": -3268.7,
+        "bug_pnl": 0.0,
+        "clean_pct_of_total": 100.0
+      },
+      "invariant_violation_count": 1,
+      "invariant_violation_by_type": {
+        "sl_overshoot": 1
+      },
+      "agent_trace": {
+        "n_entries": 8,
+        "agents_logged": [
+          "alpha-designer",
+          "execution-designer",
+          "spec-writer",
+          "strategy-coder",
+          "backtest-runner",
+          "alpha-critic",
+          "execution-critic",
+          "feedback-analyst"
+        ],
+        "models_used": [
+          "sonnet"
+        ]
+      },
+      "referenced_in_iterate_context": true,
+      "summary": {
+        "critical_missing": [],
+        "fidelity_missing": [],
+        "idea_fields_missing_count": 0,
+        "fully_instrumented": true
+      }
+    }
+  ]
+}

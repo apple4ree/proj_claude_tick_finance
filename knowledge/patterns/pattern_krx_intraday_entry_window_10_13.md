@@ -5,7 +5,6 @@ tags: [pattern, time-filter, krx, resting-limit, OBI, opening-auction, MOC, win-
 severity: critical
 lessons:
   - "[[lesson_20260415_009_krx_opening_hour_09_00_09_30_obi_signals_are_noise_block_entries_until_09_30]]"
-  - "[[lesson_20260415_010_time_filter_must_match_universe_with_opening_hour_noise]]"
   - "[[lesson_20260415_011_krx_late_session_13_00_obi_edge_collapses_0pct_wr_requires_end_of_day_entry_cutoff]]"
 ---
 

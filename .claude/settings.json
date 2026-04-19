@@ -1,5 +1,7 @@
 {
   "enabledPlugins": {
-    "ouroboros@ouroboros": true
+    "ouroboros@ouroboros": true,
+    "superpowers@claude-plugins-official": true,
+    "data-processing@ai-research-skills": true
   }
 }

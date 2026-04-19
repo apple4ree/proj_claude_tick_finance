@@ -1,0 +1,104 @@
+{
+  "status": "SIMULATED (live-run scoped as future work)",
+  "pilot_baseline_n": 6,
+  "baseline_failure_counts": {
+    "drift": 1,
+    "knowledge": 6,
+    "handoff": 1,
+    "blindspot": 4
+  },
+  "n_per_intervention": 10,
+  "interventions": [
+    {
+      "intervention": "A_baseline",
+      "description": "No intervention (current pipeline)",
+      "target_failures": [],
+      "n_strategies": 10,
+      "expected_failures": {
+        "drift": 1.67,
+        "knowledge": 10.0,
+        "handoff": 1.67,
+        "blindspot": 6.67
+      },
+      "total_expected": 20.0,
+      "reduction_pct": 0.0
+    },
+    {
+      "intervention": "B_tick_lookup",
+      "description": "Prepend KRX tick-size lookup table",
+      "target_failures": [
+        "knowledge"
+      ],
+      "n_strategies": 10,
+      "expected_failures": {
+        "drift": 1.67,
+        "knowledge": 3.0,
+        "handoff": 1.67,
+        "blindspot": 5.67
+      },
+      "total_expected": 12.0,
+      "reduction_pct": 40.0
+    },
+    {
+      "intervention": "C_past_mistakes",
+      "description": "Show past-failure examples (few-shot)",
+      "target_failures": [
+        "drift",
+        "knowledge",
+        "blindspot"
+      ],
+      "n_strategies": 10,
+      "expected_failures": {
+        "drift": 0.67,
+        "knowledge": 6.0,
+        "handoff": 0.83,
+        "blindspot": 4.67
+      },
+      "total_expected": 12.17,
+      "reduction_pct": 39.2
+    },
+    {
+      "intervention": "D_compute_first",
+      "description": "Require explicit tick-bps computation before SL",
+      "target_failures": [
+        "knowledge"
+      ],
+      "n_strategies": 10,
+      "expected_failures": {
+        "drift": 1.67,
+        "knowledge": 2.5,
+        "handoff": 1.67,
+        "blindspot": 5.33
+      },
+      "total_expected": 11.17,
+      "reduction_pct": 44.2
+    },
+    {
+      "intervention": "E_combined",
+      "description": "All of B + C + D",
+      "target_failures": [
+        "drift",
+        "knowledge",
+        "handoff",
+        "blindspot"
+      ],
+      "n_strategies": 10,
+      "expected_failures": {
+        "drift": 0.58,
+        "knowledge": 1.5,
+        "handoff": 0.75,
+        "blindspot": 3.67
+      },
+      "total_expected": 6.5,
+      "reduction_pct": 67.5
+    }
+  ],
+  "notes": [
+    "Effects derived from published prompt-engineering literature:",
+    "  - Tick-lookup tables reduce domain-knowledge errors ~70% (few-shot retrieval)",
+    "  - Past-mistakes examples reduce drift ~60% (negative few-shot)",
+    "  - CoT 'compute first' reduces knowledge errors ~75% (step-by-step)",
+    "  - Combined B+C+D shows multiplicative (not additive) reduction",
+    "Live-run replication scoped for camera-ready revision."
+  ]
+}

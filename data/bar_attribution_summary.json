@@ -1,0 +1,142 @@
+[
+  {
+    "strategy_id": "bar_s1_sol_vol_momentum",
+    "symbol": "SOLUSDT",
+    "is": {
+      "normal_return_pct": 29.168009509441184,
+      "strict_return_pct": 29.168009509441184,
+      "bug_return_pct": 0.0,
+      "clean_pct_of_total": 100.0,
+      "normal_sharpe": 0.8886118466828186,
+      "strict_sharpe": 0.8886118466828186,
+      "normal_mdd_pct": -15.19819776526139,
+      "strict_mdd_pct": -15.19819776526139,
+      "n_trades_normal": 22,
+      "n_trades_strict": 22
+    },
+    "oos": {
+      "normal_return_pct": -1.3949519377374875,
+      "strict_return_pct": -1.3949519377374875,
+      "bug_return_pct": 0.0,
+      "clean_pct_of_total": 100.0,
+      "normal_sharpe": -0.03993915750791651,
+      "strict_sharpe": -0.03993915750791651,
+      "normal_mdd_pct": -7.970199319397167,
+      "strict_mdd_pct": -7.970199319397167,
+      "n_trades_normal": 14,
+      "n_trades_strict": 14
+    }
+  },
+  {
+    "strategy_id": "bar_s2_btc_bb_reversion",
+    "symbol": "BTCUSDT",
+    "is": {
+      "normal_return_pct": 7.732399446029259,
+      "strict_return_pct": 7.732399446029259,
+      "bug_return_pct": 0.0,
+      "clean_pct_of_total": 100.0,
+      "normal_sharpe": 0.6162178022734396,
+      "strict_sharpe": 0.6162178022734396,
+      "normal_mdd_pct": -6.677348670095146,
+      "strict_mdd_pct": -6.677348670095146,
+      "n_trades_normal": 8,
+      "n_trades_strict": 8
+    },
+    "oos": {
+      "normal_return_pct": 8.604505583657263,
+      "strict_return_pct": 8.604505583657263,
+      "bug_return_pct": 0.0,
+      "clean_pct_of_total": 100.0,
+      "normal_sharpe": 1.1200710741243263,
+      "strict_sharpe": 1.1200710741243263,
+      "normal_mdd_pct": -3.7217867774629996,
+      "strict_mdd_pct": -3.7217867774629996,
+      "n_trades_normal": 6,
+      "n_trades_strict": 6
+    }
+  },
+  {
+    "strategy_id": "bar_s3_eth_vol_breakout",
+    "symbol": "ETHUSDT",
+    "is": {
+      "normal_return_pct": -4.201547682220108,
+      "strict_return_pct": -4.201547682220108,
+      "bug_return_pct": 0.0,
+      "clean_pct_of_total": 100.0,
+      "normal_sharpe": -0.12794994058531975,
+      "strict_sharpe": -0.12794994058531975,
+      "normal_mdd_pct": -20.350438827227887,
+      "strict_mdd_pct": -20.350438827227887,
+      "n_trades_normal": 8,
+      "n_trades_strict": 8
+    },
+    "oos": {
+      "normal_return_pct": 4.51688174386724,
+      "strict_return_pct": 4.51688174386724,
+      "bug_return_pct": 0.0,
+      "clean_pct_of_total": 100.0,
+      "normal_sharpe": 0.37939984975618735,
+      "strict_sharpe": 0.37939984975618735,
+      "normal_mdd_pct": -10.853105615286971,
+      "strict_mdd_pct": -10.853105615286971,
+      "n_trades_normal": 6,
+      "n_trades_strict": 6
+    }
+  },
+  {
+    "strategy_id": "bar_s4_sol_vol_compress",
+    "symbol": "SOLUSDT",
+    "is": {
+      "normal_return_pct": 15.163597012595353,
+      "strict_return_pct": 15.163597012595353,
+      "bug_return_pct": 0.0,
+      "clean_pct_of_total": 100.0,
+      "normal_sharpe": 0.38752157420571576,
+      "strict_sharpe": 0.38752157420571576,
+      "normal_mdd_pct": -52.337748240541856,
+      "strict_mdd_pct": -52.337748240541856,
+      "n_trades_normal": 38,
+      "n_trades_strict": 38
+    },
+    "oos": {
+      "normal_return_pct": -8.137194592015318,
+      "strict_return_pct": -8.137194592015318,
+      "bug_return_pct": 0.0,
+      "clean_pct_of_total": 100.0,
+      "normal_sharpe": -0.016523656175403034,
+      "strict_sharpe": -0.016523656175403034,
+      "normal_mdd_pct": -39.012873443533245,
+      "strict_mdd_pct": -39.012873443533245,
+      "n_trades_normal": 17,
+      "n_trades_strict": 17
+    }
+  },
+  {
+    "strategy_id": "bar_s5_btc_momentum_ls",
+    "symbol": "BTCUSDT",
+    "is": {
+      "normal_return_pct": 29.729678711858455,
+      "strict_return_pct": 29.729678711858455,
+      "bug_return_pct": 0.0,
+      "clean_pct_of_total": 100.0,
+      "normal_sharpe": 0.540919488042186,
+      "strict_sharpe": 0.540919488042186,
+      "normal_mdd_pct": -34.26293247574295,
+      "strict_mdd_pct": -34.26293247574295,
+      "n_trades_normal": 73,
+      "n_trades_strict": 73
+    },
+    "oos": {
+      "normal_return_pct": -21.47254324871427,
+      "strict_return_pct": -21.47254324871427,
+      "bug_return_pct": 0.0,
+      "clean_pct_of_total": 100.0,
+      "normal_sharpe": -0.6206654985931569,
+      "strict_sharpe": -0.6206654985931569,
+      "normal_mdd_pct": -33.2413434440709,
+      "strict_mdd_pct": -33.2413434440709,
+      "n_trades_normal": 43,
+      "n_trades_strict": 43
+    }
+  }
+]

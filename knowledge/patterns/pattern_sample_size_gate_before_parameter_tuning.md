@@ -4,7 +4,7 @@ tags: [pattern, methodology, sample-size, lot-sizing, krx, win-rate, adverse-sel
 severity: high
 created: 2026-04-15T00:00:00
 links:
-  - lesson_20260415_008_lot_size_scaling_amplifies_nominal_pnl_linearly_but_does_not_improve_edge_quality
+  - lesson_20260415_006_widening_target_degrades_wr_faster_than_it_improves_payoff_use_lot_size_to_amortize_fees_instead
   - lesson_20260414_012_two_stage_state_machine_over_qualifies_entry_near_zero_trade_count_makes_signal_unvalidatable
 ---
 

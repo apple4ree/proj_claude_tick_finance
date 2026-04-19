@@ -1,0 +1,16 @@
+name: dummy_alt_v0
+description: Phase 3 smoke test — alternating taker BUY/SELL every N ticks per symbol.
+strategy_kind: alternating
+interval: 5000
+qty: 1
+capital: 10000000
+universe:
+  symbols: ["005930", "000660"]
+  dates: ["20260313"]
+fees:
+  commission_bps: 1.5
+  tax_bps: 18.0
+latency:
+  submit_ms: 5.0
+  jitter_ms: 1.0
+  seed: 42

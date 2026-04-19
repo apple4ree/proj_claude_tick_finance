@@ -5,8 +5,6 @@ tags: [pattern, lob, signal-timing, absorption, anti-edge, obi]
 severity: high
 links:
   - "[[lesson_20260414_005_mean_reversion_entry_fires_after_reversal_exhausted_ret50_confirmation_too_late]]"
-  - "[[lesson_20260414_007_lob_imbalance_acceleration_fires_at_peak_not_onset]]"
-  - "[[lesson_20260414_009_surface_depth_obi_divergence_enters_after_absorption_not_before]]"
 ---
 
 # Pattern: LOB signal fires after absorption, not at onset
