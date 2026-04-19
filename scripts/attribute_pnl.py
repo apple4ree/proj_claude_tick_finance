@@ -4,7 +4,7 @@
 For each strategy:
   1. Run backtest in normal mode (if report.json missing)
   2. Run backtest in strict mode (if report_strict.json missing)
-  3. Compute clean_pnl = strict_pnl, bug_pnl = normal_pnl - strict_pnl
+  3. Compute strict_pnl_clean = strict_pnl, bug_pnl = normal_pnl - strict_pnl
   4. Per-invariant impact = sum of (normal - strict) PnL attributable to each type
 
 Usage:
@@ -88,7 +88,7 @@ def attribute(strategy_dir: Path) -> dict | None:
         "normal_violations_by_type": normal_viol_by_type,
         "strict_blocks_total": strict_blocks,
         "interpretation": (
-            "clean_pnl is the return if strategy obeyed spec exactly; "
+            "strict_pnl_clean is the return if strategy obeyed spec exactly; "
             "bug_pnl is the portion attributable to spec violations"
         ),
     }
