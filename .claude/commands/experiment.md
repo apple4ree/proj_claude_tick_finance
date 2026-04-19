@@ -293,3 +293,21 @@ Must still be 12/12.
 - `scripts/verify_outputs.py` catches mis-routed or malformed agent outputs.
 - `strategies/_iterate_context.md` is append-only; never rewrite prior iteration blocks.
 - `knowledge/lessons/` accumulates feedback-analyst output when agent-mode is used.
+
+## LOB Collector ownership (crypto_lob market only)
+
+When `--market crypto_lob`, data is populated by `scripts/binance_lob_collector.py` running as a long-lived background process (not spawned by `/experiment`). Orchestrator responsibilities:
+
+1. **Before Step 1**: verify the collector daemon is alive and data exists for the requested `[is-start, oos-end]` window:
+   ```bash
+   pgrep -f "binance_lob_collector" > /dev/null || \
+     echo "WARNING: LOB collector not running — start with: nohup python scripts/binance_lob_collector.py --symbols <syms> > /tmp/binance_lob.log 2>&1 &"
+   # verify partition coverage:
+   python -c "from engine.data_loader import iter_events_crypto_lob; import time; \
+              n=sum(1 for _ in iter_events_crypto_lob(<is_start_ns>, <oos_end_ns>, <syms>)); \
+              print(f'LOB snapshots in window: {n:,}')"
+   ```
+2. **During run**: do NOT kill the collector. The process must keep running to accumulate forward-going data for the next iteration.
+3. **After Step 4 post-flight audit**: log current parquet size and last `recv_count` from `/tmp/binance_lob.log` so the next session knows how much was accumulated.
+4. **If collector is not running** and `--market crypto_lob` was requested, abort with the message above — do NOT attempt to proceed with stale / empty data.
+5. This collector is **external infrastructure**; no agent is responsible for managing it. The orchestrator (the Claude instance running `/experiment`) is the sole owner.

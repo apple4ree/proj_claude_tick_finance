@@ -1,7 +1,7 @@
 ---
 name: alpha-critic
 description: Signal quality analyst. Evaluates whether the alpha signal (entry condition) was predictive by comparing WIN vs LOSS entry contexts. Produces alpha-specific critique and improvement direction.
-tools: Read, Bash, Grep
+tools: Read, Bash, Grep, Write
 model: sonnet
 ---
 

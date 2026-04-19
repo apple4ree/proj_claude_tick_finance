@@ -1,7 +1,7 @@
 ---
 name: execution-critic
 description: Execution mechanics analyst. Evaluates whether order mechanics (stop/target/TTL/fill type) were well-calibrated by analyzing exit outcomes, adverse selection, and fill quality. Produces execution-specific critique and improvement direction.
-tools: Read, Bash, Grep
+tools: Read, Bash, Grep, Write
 model: sonnet
 ---
 
