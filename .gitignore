@@ -1,1 +1,20 @@
-strategies
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Virtualenvs
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Strategies are generated artifacts (meta dirs kept explicitly via tracked content)
+# Note: keep _drafts/, _trajectories/, _examples/, _iterate_context.md under strategies/
+# but the strategy output dirs themselves are generated — handle explicitly if needed
+
+# Reports + artifacts
+*.log
