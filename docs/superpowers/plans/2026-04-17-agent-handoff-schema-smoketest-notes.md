@@ -17,14 +17,16 @@
 
 The `/experiment --design-mode=agent` invocation requires running LLM agents (alpha-designer, execution-designer, etc.) which cannot be fully automated by a subagent in this session. To validate the happy path end-to-end, you should run one iteration manually.
 
-**Recommended command:**
+**Recommended command (multi-symbol, per-symbol backtest mode — standard eval universe):**
 
 ```
-/experiment --market krx --symbols 042700 --is-start 20260316 --oos-start 20260323 \
+/experiment --market krx --symbols top10 --is-start 20260316 --oos-start 20260323 \
             --design-mode agent --feedback-mode programmatic --n-iterations 1
 ```
 
-Symbol `042700` chosen because the weakly-profitable baseline `pilot_s1_042700_obi10` exists on it — so the schema should accept a regenerated design (Success Criterion #3).
+`top10` expands to `005930, 000660, 005380, 034020, 010140, 006800, 272210, 042700, 015760, 035420` per `CLAUDE.md`. This exercises the validator across multiple signal briefs (not just one), including `042700` where the weakly-profitable baseline `pilot_s1_042700_obi10` exists — so Success Criterion #3 is checked as part of the multi-symbol sweep.
+
+Per-symbol backtest mode is the standard evaluation convention (memory: `project_standard_eval_universe.md`); the runner handles the per-symbol split automatically when multiple symbols are specified.
 
 ## What To Watch
 
