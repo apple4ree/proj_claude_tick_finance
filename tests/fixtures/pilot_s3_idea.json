@@ -1,0 +1,14 @@
+{
+  "name": "pilot_s3_034020_spread",
+  "entry_condition": "spread_bps >= 9.501 AND obi(depth=5) > 0.50 on 034020",
+  "signals_needed": ["spread_bps", "obi(depth=5)"],
+  "needs_python": true,
+  "paradigm": "mean_reversion",
+  "signal_brief_rank": 1,
+  "entry_execution": {"price": "ask", "ttl_ticks": null, "cancel_on_bid_drop_ticks": null},
+  "exit_execution": {"profit_target_bps": 79.0, "stop_loss_bps": 9.5, "trailing_stop": true, "trailing_activation_bps": 19.5, "trailing_distance_bps": 9.5},
+  "position": {"lot_size": 2, "max_entries_per_session": 3},
+  "deviation_from_brief": {"pt_pct": 0.0, "sl_pct": 216.7, "rationale": "034020 tick=100KRW=9.35bps/tick; brief sl_bps=3 unreachable"},
+  "alpha_draft_path": "strategies/_drafts/pilot_s3_034020_spread_alpha.md",
+  "execution_draft_path": "strategies/_drafts/pilot_s3_034020_spread_execution.md"
+}

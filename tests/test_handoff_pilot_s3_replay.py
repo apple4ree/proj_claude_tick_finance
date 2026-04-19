@@ -24,8 +24,7 @@ def test_pilot_s3_idea_json_without_realism_block_fails_validation():
     """If we submit the existing (schema-less) pilot_s3 idea.json as alpha-designer
     output, the new validator should reject it for missing brief_realism."""
     existing = json.loads(
-        (REPO_ROOT
-         / "strategies/strat_20260417_0005_pilot_s3_034020_spread/idea.json").read_text()
+        (REPO_ROOT / "tests/fixtures/pilot_s3_idea.json").read_text()
     )
     # Build a minimal alpha-designer-shaped wrapper around existing content
     wrapper = {
