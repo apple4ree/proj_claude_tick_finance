@@ -1,6 +1,8 @@
-# Tick Strategy Framework
+# Crypto Strategy Framework
 
-KRX 10-level order book (H0STASP0) tick data로 전략을 자율 생성 → 백테스트 → 학습하는 프레임워크.
+Binance OHLCV bar 데이터(1d / 1h / 15m / 5m) 기반으로 전략을 자율 생성 → 백테스트 → 학습하는 프레임워크.
+
+**Scope note (2026-04-19)**: 이 프로젝트는 2026-04-15 crypto pivot 이후 크립토 bar 데이터 전용으로 정리되었습니다. KRX tick(H0STASP0) 관련 legacy 자산은 `data/_archive/krx_legacy/` 및 `scripts/_legacy/`로 이동됐으며, unified `/experiment` 프레임워크는 KRX를 지원하지 않습니다. (이유: KRX 21 bps round-trip fee가 tick horizon edge를 잠식, lessons 반복 확인.)
 
 ## Architecture
 
@@ -81,13 +83,13 @@ python scripts/verify_outputs.py --agent alpha-designer --output '<json>'
 
 **Agent prompt 업데이트**: `.claude/agents/alpha-designer.md`, `execution-designer.md`, `feedback-analyst.md`의 `### Output` 섹션이 pydantic schema를 참조. 기존 분석 prose는 그대로 보존.
 
-## KRX Constraints
+## Market Constraints (Crypto)
 
-- **Fee**: commission 1.5 bps (양측) + sell tax 18.0 bps = **21.0 bps round-trip** (엔진 실제 계산 기준)
-- **Latency**: 5ms ± 1ms jitter (lookahead 없음)
+- **Fee (default)**: Binance taker ≈ 4 bps round-trip (`--fee-bps` 로 설정; maker/네트워크/대체 거래소별 조정 가능)
 - **Order types**: MARKET, LIMIT (resting, queue-ahead model), CANCEL
-- **Long-only**: naked short 불가
-- **EOD**: 매일 강제 청산
+- **Long-only**: 엔진은 현재 naked short 금지 (crypto spot 기준)
+- **Session**: 크립토는 24/7 연속 거래, 명시적 EOD 강제 청산 없음 (bar 프레임워크 특성상 bar 경계가 실질적 evaluation 포인트)
+- **Bar units**: `crypto_1d` (1일), `crypto_1h` (1시간), `crypto_15m` / `crypto_5m`
 
 ## Spec-Invariant Checker
 
@@ -198,11 +200,14 @@ python scripts/trajectory_pool.py summary
 python scripts/trajectory_pool.py top --axis alpha --n 5
 ```
 
-## Data Universe
+## Data Universe (Crypto)
 
-- **IS (In-Sample)**: 20260305 ~ 20260320 (12일) — 전략 개발용. 하락+상승 혼합 regime.
-- **OOS (Out-of-Sample)**: 20260323 ~ 20260330 (6일) — 최종 검증용. 개발 중 절대 사용 금지.
-- **Top-10 symbols**: 005930, 000660, 005380, 034020, 010140, 006800, 272210, 042700, 015760, 035420
+- **Standard universe**: `BTCUSDT, ETHUSDT, SOLUSDT` (Binance perpetual/spot, multi-symbol robustness check 기준)
+- **Data sources**:
+  - `data/binance_daily/<SYM>.csv` — daily bars
+  - `data/binance_multi/{1h,15m,5m}/<SYM>.csv` — intraday bars
+- **IS / OOS split**: 실험별로 `--is-start`, `--is-end`, `--oos-start`, `--oos-end`로 명시. 관례: crypto_1h에서 IS ≈ 4 months, OOS ≈ 1-2 months (예: IS 2025-07-01~2025-10-31, OOS 2025-11-01~2025-12-31)
+- **Archived (KRX legacy)**: `data/_archive/krx_legacy/` — 이전 KRX top-10 tick 데이터 + v1 briefs. unified flow에서 참조되지 않음.
 
 ## Backtest Mode (2026-04-19 변경)
 
@@ -222,7 +227,9 @@ Primary metric: 포트폴리오 `return_pct` (shared-pool realized). `--per-symb
 
 ```bash
 # 통합 진입점 (canonical) — 단일/다중 iteration + 디자인 모드 + 피드백 모드 통합
-/experiment --market krx --symbols top10 --is-start 20260316 --oos-start 20260323 \
+/experiment --market crypto_1h --symbols BTCUSDT,ETHUSDT,SOLUSDT \
+            --is-start 2025-07-01 --is-end 2025-10-31 \
+            --oos-start 2025-11-01 --oos-end 2025-12-31 \
             --design-mode agent --feedback-mode programmatic --n-iterations 1
 #   --design-mode: auto (rule template) | agent (LLM chain) | skip
 #   --feedback-mode: programmatic | agent | both
@@ -259,6 +266,7 @@ python3 -m pytest tests/test_handoff_*.py tests/test_verify_outputs_schema.py -v
 - **Agent prompt (`.claude/agents/*.md`) 수정 시** `### Output` 섹션은 Pydantic schema 참조 형태 유지, 기타 workflow/rationale prose는 보존 (narrative regression 방지).
 - **코드 리뷰 요청** 시 직접 리뷰하지 않고 `Skill` 도구로 `co-review` 호출.
 - **코드 생성/수정 후** 반드시 `Skill` 도구로 `co-review`를 호출하여 Codex 코드 리뷰를 받는다. 리뷰 결과의 지적 사항을 수정/보완한 뒤 다시 `co-review`를 호출하여 통과할 때까지 반복.
-- **OOS 날짜(20260326~30)는 전략 개발 중 절대 사용 금지.**
+- **OOS window는 전략 개발 중 절대 사용 금지.** 실험별로 `--oos-start`, `--oos-end`로 명시하고 `scripts/validate_strategy.py`에서만 평가.
 - **report.html 작성 시에는 반드시 한국어 위주로 작성할 것**
-- **평가는 multi-symbol (top10) portfolio mode 기본**. 단일 심볼 / per-symbol은 debugging/analysis opt-in.
+- **평가는 multi-symbol (크립토 standard universe BTC/ETH/SOL) portfolio mode 기본**. 단일 심볼 / per-symbol은 debugging/analysis opt-in.
+- **KRX 복원 금지 (2026-04-19 결정)**. KRX tick 자산은 `data/_archive/krx_legacy/`, `scripts/_legacy/`로 이동. 복원이 필요하면 별도 설계 task로 올릴 것.
