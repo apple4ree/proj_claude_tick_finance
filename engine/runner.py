@@ -34,6 +34,27 @@ from engine.simulator import (
 from engine.spec import StrategySpec, load_spec
 
 
+def _resolve_time_window(spec: StrategySpec) -> tuple[int, int] | None:
+    """Convert spec.universe.time_window ISO strings → (start_ns, end_ns).
+
+    Returns None unless both start and end are specified (LOB mode). Supports
+    any format pandas.Timestamp accepts ('2026-04-19T06:00:00', '2026-04-19 06:00').
+    Treats as UTC when no timezone is supplied.
+    """
+    s = spec.universe.time_window_start
+    e = spec.universe.time_window_end
+    if not s or not e:
+        return None
+    import pandas as pd
+    start_ns = int(pd.Timestamp(s, tz="UTC").value)
+    end_ns = int(pd.Timestamp(e, tz="UTC").value)
+    if start_ns >= end_ns:
+        raise ValueError(
+            f"universe.time_window invalid: start={s} >= end={e}"
+        )
+    return (start_ns, end_ns)
+
+
 def _build_config(spec: StrategySpec) -> BacktestConfig:
     raw = spec.raw
     cap = float(raw.get("capital", 10_000_000))
@@ -354,6 +375,7 @@ def run(
             spec_dict = _yaml.safe_load(_f) or {}
     except Exception:
         spec_dict = {}
+    time_window = _resolve_time_window(spec)
     bt = Backtester(
         dates=spec.universe.dates,
         symbols=spec.universe.symbols,
@@ -361,6 +383,8 @@ def run(
         config=cfg,
         spec_dict=spec_dict,
         strict_mode=strict,
+        market=spec.universe.market,
+        time_window=time_window,
     )
     report = bt.run()
     report.spec_name = spec.name
@@ -459,6 +483,8 @@ def run_per_symbol(
 
     symbols = spec.universe.symbols
     dates = spec.universe.dates
+    market = spec.universe.market
+    time_window = _resolve_time_window(spec)
 
     per_symbol: dict[str, dict] = {}
     per_symbol_traces: dict[str, dict] = {}
@@ -466,7 +492,11 @@ def run_per_symbol(
 
     for sym in symbols:
         strategy = _build_strategy(spec, spec_path)
-        bt = Backtester(dates=dates, symbols=[sym], strategy=strategy, config=cfg, spec_dict=spec_dict, strict_mode=strict)
+        bt = Backtester(
+            dates=dates, symbols=[sym], strategy=strategy,
+            config=cfg, spec_dict=spec_dict, strict_mode=strict,
+            market=market, time_window=time_window,
+        )
         report = bt.run()
         report.starting_cash = cfg.starting_cash
         report.total_fees = bt.portfolio.total_fees

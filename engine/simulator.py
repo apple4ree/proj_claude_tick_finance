@@ -31,7 +31,7 @@ from typing import Callable, Iterable, Protocol
 
 import numpy as np
 
-from engine.data_loader import OrderBookSnapshot, iter_events
+from engine.data_loader import OrderBookSnapshot, iter_events, iter_events_crypto_lob
 from datetime import datetime, timedelta, timezone
 
 from engine.invariants import InvariantRunner, infer_invariants
@@ -307,9 +307,17 @@ class Backtester:
         config: BacktestConfig | None = None,
         spec_dict: dict | None = None,
         strict_mode: bool = False,
+        market: str = "",
+        time_window: tuple[int, int] | None = None,
     ) -> None:
         self.dates = list(dates)
+        # For crypto symbols (BTCUSDT, etc.) zfill(6) is a no-op since names
+        # already exceed 6 chars; KRX 6-digit codes are padded. Preserves both.
         self.symbols = [str(s).zfill(6) for s in symbols]
+        # LOB mode: market == "crypto_lob" triggers tick-level event iteration
+        # with no date loop and no EOD close (crypto trades 24/7).
+        self.market = market or ""
+        self.time_window = time_window
         self.strategy = strategy
         self.config = config or BacktestConfig()
         self.portfolio = Portfolio(starting_cash=self.config.starting_cash)
@@ -634,77 +642,98 @@ class Backtester:
             self.portfolio.apply_fill(fill)
             self._record_fill_for_invariants(fill)
 
+    def _process_snap(self, snap: OrderBookSnapshot, trace_every: int) -> None:
+        """Per-snapshot body shared by bar and LOB event loops."""
+        self.total_events += 1
+        self.last_mids[snap.symbol] = snap.mid
+        bid0 = float(snap.bid_px[0]) if snap.bid_px[0] > 0 else snap.mid
+        self.last_bids[snap.symbol] = bid0
+
+        sr = self.per_symbol[snap.symbol]
+        if sr.n_events == 0:
+            sr.first_mid = snap.mid
+            sr.first_ts_ns = snap.ts_ns
+        sr.last_mid = snap.mid
+        sr.last_ts_ns = snap.ts_ns
+        sr.n_events += 1
+        self._event_count_per_symbol[snap.symbol] = sr.n_events
+
+        # Strict-mode: force exits when spec thresholds cross (bid-based SL, time_stop)
+        if self._strict_mode and self._invariants:
+            self._strict_force_sell_check(snap)
+
+        # 1) settle any orders whose latency window has elapsed
+        self._match_pending(snap)
+        # 1b) check resting limit orders for price-crossing fills
+        self._check_resting_limits(snap)
+
+        # 2) let strategy observe tick
+        ctx = Context(
+            portfolio=self.portfolio,
+            last_mids=self.last_mids,
+            current_ts_ns=snap.ts_ns,
+        )
+        new_orders = self.strategy.on_tick(snap, ctx)
+        for order in new_orders or []:
+            if order.order_type == CANCEL:
+                # Immediate cancel: remove all resting LIMIT orders for this
+                # symbol. Pending (in-flight, latency-queued) orders are NOT
+                # cleared — a CANCEL targets the resting maker book only.
+                before = len(self.resting_limits)
+                self.resting_limits = [
+                    ro for ro in self.resting_limits
+                    if ro.order.symbol != order.symbol
+                ]
+                cancelled = before - len(self.resting_limits)
+                self.n_resting_cancelled += cancelled
+                continue
+            target = snap.ts_ns + self.config.latency_model.sample_ns()
+            self.pending.append(_PendingOrder(target_ts_ns=target, order=order))
+
+        # 3) trace sample
+        if self.total_events % trace_every == 0:
+            self.equity_samples.append(
+                (snap.ts_ns, self.portfolio.total_equity(self.last_mids))
+            )
+            self.mid_samples.setdefault(snap.symbol, []).append(
+                (snap.ts_ns, float(snap.mid))
+            )
+
+    def _run_bar_loop(self, trace_every: int) -> None:
+        """Date-partitioned bar market loop (KRX-style iter_events)."""
+        for date in self.dates:
+            last_ts_ns: int = 0
+            for snap in iter_events(date, self.symbols, regular_only=self.config.regular_only):
+                last_ts_ns = snap.ts_ns
+                self._process_snap(snap, trace_every)
+            # End-of-day: force-close all open positions before next date.
+            if last_ts_ns:
+                self._eod_close(last_ts_ns)
+
+    def _run_lob_loop(self, trace_every: int) -> None:
+        """Continuous LOB market loop — no date partitioning, no EOD close.
+
+        Crypto LOB streams interleaved across symbols; snapshots arrive in
+        ts_ns order from iter_events_crypto_lob(). At end-of-window we leave
+        any in-flight pending orders as they are (reported in pending_at_end).
+        """
+        if self.time_window is None:
+            raise ValueError(
+                "market='crypto_lob' requires time_window=(start_ns, end_ns); "
+                "check spec.universe.time_window.{start,end}"
+            )
+        start_ns, end_ns = self.time_window
+        for snap in iter_events_crypto_lob(start_ns, end_ns, self.symbols):
+            self._process_snap(snap, trace_every)
+
     def run(self) -> BacktestReport:
         import time
         t0 = time.time()
         trace_every = max(1, int(self.config.trace_every))
-        for date in self.dates:
-            last_ts_ns: int = 0
-            for snap in iter_events(date, self.symbols, regular_only=self.config.regular_only):
-                self.total_events += 1
-                self.last_mids[snap.symbol] = snap.mid
-                bid0 = float(snap.bid_px[0]) if snap.bid_px[0] > 0 else snap.mid
-                self.last_bids[snap.symbol] = bid0
-                last_ts_ns = snap.ts_ns
-
-                sr = self.per_symbol[snap.symbol]
-                if sr.n_events == 0:
-                    sr.first_mid = snap.mid
-                    sr.first_ts_ns = snap.ts_ns
-                sr.last_mid = snap.mid
-                sr.last_ts_ns = snap.ts_ns
-                sr.n_events += 1
-                # Per-symbol event counter for invariant time_stop checks
-                self._event_count_per_symbol[snap.symbol] = sr.n_events
-
-                # Strict-mode: force exits when spec thresholds cross (bid-based SL, time_stop)
-                if self._strict_mode and self._invariants:
-                    self._strict_force_sell_check(snap)
-
-                # 1) settle any orders whose latency window has elapsed
-                self._match_pending(snap)
-                # 1b) check resting limit orders for price-crossing fills
-                self._check_resting_limits(snap)
-
-                # 2) let strategy observe tick
-                ctx = Context(
-                    portfolio=self.portfolio,
-                    last_mids=self.last_mids,
-                    current_ts_ns=snap.ts_ns,
-                )
-                new_orders = self.strategy.on_tick(snap, ctx)
-                for order in new_orders or []:
-                    if order.order_type == CANCEL:
-                        # Immediate cancel: remove all resting LIMIT orders for this
-                        # symbol.  Pending (in-flight, latency-queued) orders are NOT
-                        # cleared — a CANCEL targets the resting maker book only.
-                        # This preserves co-submitted MARKET orders (e.g., stop-loss
-                        # MARKET SELL + CANCEL for orphaned resting LIMIT) from being
-                        # accidentally wiped.  No latency applied — cancels in KRX
-                        # equity market are near-instant (sub-ms ACK).
-                        before = len(self.resting_limits)
-                        self.resting_limits = [
-                            ro for ro in self.resting_limits
-                            if ro.order.symbol != order.symbol
-                        ]
-                        cancelled = before - len(self.resting_limits)
-                        self.n_resting_cancelled += cancelled
-                        continue
-                    target = snap.ts_ns + self.config.latency_model.sample_ns()
-                    self.pending.append(_PendingOrder(target_ts_ns=target, order=order))
-
-                # 3) trace sample
-                if self.total_events % trace_every == 0:
-                    self.equity_samples.append(
-                        (snap.ts_ns, self.portfolio.total_equity(self.last_mids))
-                    )
-                    self.mid_samples.setdefault(snap.symbol, []).append(
-                        (snap.ts_ns, float(snap.mid))
-                    )
-
-            # End-of-day: force-close all open positions before next date.
-            if last_ts_ns:
-                self._eod_close(last_ts_ns)
+        if self.market == "crypto_lob":
+            self._run_lob_loop(trace_every)
+        else:
+            self._run_bar_loop(trace_every)
 
         # Realize per-symbol results
         for sym, sr in self.per_symbol.items():

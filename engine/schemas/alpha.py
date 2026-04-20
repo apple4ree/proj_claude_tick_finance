@@ -95,7 +95,13 @@ class AlphaHandoff(HandoffBase):
     multi_date: bool
     parent_lesson: Optional[str]
 
-    signal_brief_rank: int = Field(ge=1, le=10)
+    signal_brief_rank: int = Field(
+        ge=1, le=10,
+        description="1-indexed position within the signal brief's top_robust[]. "
+                    "Value 1 = top_robust[0] (highest-ranked signal), "
+                    "value 10 = top_robust[9]. Execution-designer must "
+                    "index the brief as `top_robust[signal_brief_rank - 1]`.",
+    )
     universe_rationale: str
     escape_route: Optional[str]
 

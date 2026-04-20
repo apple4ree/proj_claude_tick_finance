@@ -83,6 +83,14 @@ def _expand_symbols(symbols: list[str], dates: list[str]) -> list[str]:
 class Universe:
     symbols: list[str] = field(default_factory=list)
     dates: list[str] = field(default_factory=list)
+    # 2026-04-20 crypto_lob extension:
+    #   market="crypto_lob" activates tick-level LOB mode (no date loop).
+    #   Otherwise empty/bar-market preserves historical behavior.
+    market: str = ""
+    # For LOB mode: ISO datetime window (UTC). Consumed by Backtester to
+    # compute ns bounds for iter_events_crypto_lob().
+    time_window_start: str = ""
+    time_window_end: str = ""
 
 
 @dataclass
@@ -108,10 +116,19 @@ def load_spec(path: Path | str) -> StrategySpec:
         [s if s in _WILDCARDS else s.zfill(6) for s in raw_symbols],
         dates,
     )
+    market = str(uni.get("market", "") or "")
+    tw = uni.get("time_window") or {}
+    tw_start = str(tw.get("start", "") or "")
+    tw_end = str(tw.get("end", "") or "")
     return StrategySpec(
         name=raw.get("name", Path(path).stem),
         description=raw.get("description", ""),
-        universe=Universe(symbols=symbols, dates=dates),
+        universe=Universe(
+            symbols=symbols, dates=dates,
+            market=market,
+            time_window_start=tw_start,
+            time_window_end=tw_end,
+        ),
         signals=raw.get("signals", {}) or {},
         entry=raw.get("entry", {}) or {},
         exit=raw.get("exit", {}) or {},

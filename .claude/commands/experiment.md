@@ -13,8 +13,8 @@ Runs the full alpha-discovery-to-feedback loop as a single sequence. Supersedes 
 |---|---|---|
 | `--market` | **required** | `crypto_1d` `crypto_1h` `crypto_15m` `crypto_5m` `crypto_lob` |
 | `--symbols` | **required** | `BTCUSDT,ETHUSDT,SOLUSDT` |
-| `--is-start --is-end` | **required** | `2025-07-01 2025-10-31` |
-| `--oos-start --oos-end` | **required** | `2025-11-01 2025-12-31` |
+| `--is-start --is-end` | **required** | Bar: `2025-07-01 2025-10-31` · LOB: `2026-04-19T06:00:00 2026-04-19T22:00:00` (ISO UTC) |
+| `--oos-start --oos-end` | **required** | Bar: `2025-11-01 2025-12-31` · LOB: `2026-04-19T22:00:00 2026-04-20T00:00:00` |
 | `--design-mode` | `auto` | `auto` (rule templates) · `agent` (alpha-designer Agent chain) · `skip` (strategies already exist) |
 | `--feedback-mode` | `both` | `programmatic` · `agent` · `both` |
 | `--ranks` | `0,1,2` | top_robust ranks to promote to strategies |
@@ -72,12 +72,26 @@ If not 12/12 PASS, invoke `code-generator` agent with mode=`bugfix` and `audit_p
 
 ## Step 1 — Phase 1: alpha discovery (once per run)
 
+**Bar markets** (`crypto_1d | crypto_1h | crypto_15m | crypto_5m`):
 ```bash
 python scripts/discover_alpha.py \
   --market <market> --symbols <symbols> \
   --is-start <is-start> --is-end <is-end> \
   --output data/signal_briefs_v2/<market>.json
 ```
+
+**LOB market** (`crypto_lob`): tick-level IC on Binance L2 snapshots (100ms cadence).
+```bash
+python scripts/discover_alpha_lob.py \
+  --symbols <symbols> \
+  --is-start '<YYYY-MM-DDTHH:MM:SS>' \
+  --is-end   '<YYYY-MM-DDTHH:MM:SS>' \
+  --horizons-ticks 10,100,1000,10000 \
+  --fee-bps 0 \
+  --threshold-percentile 90 \
+  --output data/signal_briefs_v2/crypto_lob.json
+```
+Note: LOB `--is-start/--is-end` accept ISO datetimes (UTC) rather than the date-only form used for bar markets. `--fee-bps 0` reflects the maker assumption for MM / spread_capture paradigms.
 
 Read the resulting `signal_briefs_v2/<market>.json`. The discovery is run **once per experiment run** — subsequent iterations re-use it unless the outer loop decides a rediscovery is warranted (e.g., after a pivot).
 
@@ -152,12 +166,19 @@ Output signal_brief_rank and deviation_from_brief fields in idea.json.
 
 ### 2b. Backtest
 
-For each new/selected strategy id `<sid>`:
+For each new/selected strategy id `<sid>`, choose the artifact script by market:
 ```bash
-python scripts/intraday_full_artifacts.py --id <sid>    # for 1h/15m/5m
-# or
-python scripts/bar_full_artifacts.py --id <sid>         # for daily
+# Daily bars (crypto_1d)
+python scripts/bar_full_artifacts.py --id <sid>
+
+# Intraday bars (crypto_1h / crypto_15m / crypto_5m)
+python scripts/intraday_full_artifacts.py --id <sid>
+
+# LOB (crypto_lob) — wraps engine.runner + MFE/MAE enrichment
+python scripts/lob_full_artifacts.py --id <sid>
 ```
+
+All three produce the same canonical artifact set (`report.json`, `trace.json`, `analysis_trace.{json,md}`, `report.html`) so downstream validation / BH / feedback treat them identically.
 
 If the backtest reports `anomaly_flag != null` or an invariant violation of type `high`, route to code-generator (`mode=bugfix`) with the anomaly before proceeding.
 

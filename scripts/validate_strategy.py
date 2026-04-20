@@ -34,7 +34,7 @@ import yaml
 
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
-from scripts.benchmark_vs_bh import bh_matched, HORIZON_PATH  # noqa: E402
+from scripts.benchmark_vs_bh import bh_matched, bh_matched_lob, HORIZON_PATH  # noqa: E402
 
 
 def load_strategy_module(strat_dir: Path):
@@ -93,8 +93,55 @@ def bars_per_year_for(horizon: str) -> float:
             "1m": 60 * 24 * 365.0}.get(horizon, 365.0)
 
 
+def run_oos_lob(strat_dir: Path, oos_start: str, oos_end: str) -> dict | None:
+    """LOB-market OOS: clone spec.yaml with OOS time_window, run engine.runner.
+
+    Returns same schema as run_oos (n_rt, sharpe, total_ret_pct, bh_ret_pct,
+    information_ratio, window). IR here is a *simplified* excess-return
+    normalization: (strat_ret - bh_ret) / max(|bh_ret|, 1e-4). Full
+    periodic Information Ratio would require iterating the equity curve
+    tick-by-tick against a BH series, deferred until more data is available.
+    """
+    spec_path = strat_dir / "spec.yaml"
+    spec = yaml.safe_load(spec_path.read_text())
+    spec_oos = dict(spec)
+    spec_oos["universe"] = dict(spec.get("universe", {}))
+    spec_oos["universe"]["time_window"] = {"start": oos_start, "end": oos_end}
+    tmp_path = strat_dir / "_spec_oos.yaml"
+    tmp_path.write_text(yaml.safe_dump(spec_oos, sort_keys=False))
+    try:
+        from engine.runner import run as run_engine
+        payload = run_engine(
+            tmp_path, write_trace=False, write_html=False,
+            report_out=strat_dir / "report_oos.json",
+        )
+    finally:
+        try:
+            tmp_path.unlink()
+        except FileNotFoundError:
+            pass
+    bh_ret = bh_matched_lob(payload)
+    ret = float(payload.get("return_pct") or 0.0)
+    if bh_ret is not None:
+        denom = max(abs(bh_ret), 1e-4)
+        ir = (ret - bh_ret) / denom
+    else:
+        ir = 0.0
+    return {
+        "n_rt": int(payload.get("n_roundtrips", 0)),
+        "sharpe": float(payload.get("sharpe_annualized", 0.0)),
+        "total_ret_pct": ret,
+        "bh_ret_pct": bh_ret,
+        "information_ratio": float(ir),
+        "window": [oos_start, oos_end],
+    }
+
+
 def run_oos(strat_dir: Path, oos_start: str, oos_end: str) -> dict | None:
     spec = yaml.safe_load((strat_dir / "spec.yaml").read_text())
+    market = str(((spec.get("universe") or {}).get("market")) or "")
+    if market == "crypto_lob":
+        return run_oos_lob(strat_dir, oos_start, oos_end)
     module = load_strategy_module(strat_dir)
     if module is None or not hasattr(module, "generate_signal"):
         return None

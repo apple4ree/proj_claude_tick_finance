@@ -19,11 +19,11 @@ Before proposing PT/SL/time_stop values, read the market-level signal brief prod
 data/signal_briefs_v2/<market>.json
 ```
 
-Find the entry at index `signal_brief_rank` within `top_robust[]` (alpha-designer's `signal_brief_rank` is the 0-indexed position there). That entry's `optimal_exit` field contains a terminal-return-approximation PT/SL derived from the pooled forward-return distribution over all symbols' triggered bars.
+Find the entry at `top_robust[signal_brief_rank - 1]` (alpha-designer's `signal_brief_rank` is **1-indexed**: value `1` means `top_robust[0]`, i.e. the highest-ranked signal). That entry's `optimal_exit` field contains a terminal-return-approximation PT/SL derived from the pooled forward-return distribution over all symbols' triggered bars.
 
 ### Your protocol
 
-1. **Read the alpha-designer's `signal_brief_rank`.** Locate the corresponding entry in `top_robust[signal_brief_rank]`.
+1. **Read the alpha-designer's `signal_brief_rank`.** Locate the corresponding entry at `top_robust[signal_brief_rank - 1]` (subtract 1 because the field is 1-indexed; `rank=1` → `top_robust[0]`).
 
 2. **Use `optimal_exit` as baseline.** Start with:
    - `profit_target_bps = optimal_exit.pt_bps`  (= p75 of positive entry-bar fwd returns in bps)

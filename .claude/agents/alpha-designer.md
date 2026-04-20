@@ -44,15 +44,15 @@ The brief is **cross-symbol robustness-filtered** — only signals where IC has 
    }
    ```
 
-3. **Pick from top_robust.** Do NOT invent a new signal. Pick a robust-filtered entry with `viable == true`. Prefer rank 0 unless you have a cited diversification reason.
+3. **Pick from top_robust.** Do NOT invent a new signal. Pick a robust-filtered entry with `viable == true`. Prefer rank 1 (the top entry) unless you have a cited diversification reason.
 
 4. **Use the brief's thresholds and horizon as-is.** `threshold_per_symbol` provides the data-optimal entry threshold per symbol; `horizon` is the measurement horizon. You may deviate by ≤10% if you cite a reason (e.g., "raised threshold 5% to increase selectivity for first iteration").
 
-5. **State the rank you chose and justify.** In `hypothesis`, include the phrase `"rank-N from top_robust"` where N is the 0-indexed position.
+5. **State the rank you chose and justify.** In `hypothesis`, include the phrase `"rank-N from top_robust"` where N is the **1-indexed** rank (1 = top).
 
 ### Output changes
 
-Add `signal_brief_rank: int` to your returned JSON indicating which `top_robust[]` position (0-indexed) you chose. This is audited downstream.
+Add `signal_brief_rank: int` to your returned JSON indicating which `top_robust[]` entry you chose (**1-indexed**: `1` = `top_robust[0]` = the highest-ranked signal, … `10` = `top_robust[9]`). Validator enforces `1 ≤ rank ≤ 10`.
 
 ### What NOT to do
 
@@ -104,7 +104,7 @@ Mandatory fields (hard-fail if missing or malformed):
 
 - All fields from `HandoffBase`: `strategy_id` (nullable at this stage — field must be present, value may be `null`), `timestamp`, `agent_name="alpha-designer"`, `model_version`, `draft_md_path`
 - Alpha core: `name`, `hypothesis`, `entry_condition`, `market_context`, `signals_needed`, `missing_primitive`, `needs_python`, `paradigm`, `multi_date`, `parent_lesson`
-- Brief-grounded: `signal_brief_rank` (int 1–10), `universe_rationale`, `escape_route` (nullable)
+- Brief-grounded: `signal_brief_rank` (int 1–10; **1 = top_robust[0] = highest-ranked**), `universe_rationale`, `escape_route` (nullable)
 - **`brief_realism: BriefRealismCheck`** — you MUST compute and report:
   - `brief_ev_bps_raw` — copy from signal brief
   - `entry_order_type` — one of `MARKET | LIMIT_AT_BID | LIMIT_AT_ASK | LIMIT_MID`
@@ -277,6 +277,8 @@ created: <YYYY-MM-DD>
   }
 }
 ```
+
+> **Note on `signal_brief_rank`** — The value is **1-indexed**: `1` means `top_robust[0]` (highest-ranked entry), `2` means `top_robust[1]`, …, `10` means `top_robust[9]`. Validator enforces `1 ≤ value ≤ 10`. Do not use `0`.
 
 ---
 

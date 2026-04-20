@@ -59,6 +59,28 @@ def bh_matched(symbol: str, horizon: str,
     return float(ret)
 
 
+def bh_matched_lob(report: dict, fee_side_bps: float = 0.5) -> float | None:
+    """Buy-and-hold benchmark for crypto_lob strategies.
+
+    Uses the first/last mid per symbol recorded by the engine during the
+    time_window run (report.per_symbol[sym].{first_mid,last_mid}). Equal-
+    weight average across symbols, minus a single-entry maker fee proxy.
+    fee_side_bps defaults to 0.5 (maker ≈ 0 on Binance VIP; kept >0 to
+    avoid the illusion of zero-cost BH).
+    """
+    per_sym = report.get("per_symbol") or {}
+    rets: list[float] = []
+    for _, d in per_sym.items():
+        f, l = d.get("first_mid"), d.get("last_mid")
+        if f and l and float(f) > 0:
+            rets.append((float(l) / float(f) - 1.0) * 100.0)
+    if not rets:
+        return None
+    avg_ret = sum(rets) / len(rets)
+    avg_ret -= fee_side_bps / 1e4 * 100.0  # single-entry fee
+    return float(avg_ret)
+
+
 def benchmark_one(strat_dir: Path) -> dict | None:
     rp = strat_dir / "report.json"
     sp = strat_dir / "spec.yaml"
@@ -66,20 +88,33 @@ def benchmark_one(strat_dir: Path) -> dict | None:
         return None
     r = json.loads(rp.read_text())
     spec = yaml.safe_load(sp.read_text())
+    universe = spec.get("universe", {}) or {}
+    market = str(universe.get("market", "") or "")
     symbol = spec.get("target_symbol") or (
         r.get("symbols", ["?"])[0] if r.get("symbols") else "?"
     )
     horizon = spec.get("target_horizon", "tick")
     dates = r.get("dates", [])
-    bh = None
-    if len(dates) == 2 and horizon in HORIZON_PATH:
+    bh: float | None = None
+
+    if market == "crypto_lob":
+        # LOB: no date range; use ISO time_window + engine's first/last mid per symbol
+        bh = bh_matched_lob(r)
+        horizon = "lob"
+        syms = r.get("symbols") or []
+        symbol = ",".join(syms) if syms else symbol
+        tw = (universe.get("time_window") or {})
+        dates = [str(tw.get("start", "")), str(tw.get("end", ""))]
+    elif len(dates) == 2 and horizon in HORIZON_PATH:
         bh = bh_matched(symbol, horizon, dates[0], dates[1])
+
     diff = None if bh is None else r.get("return_pct", 0.0) - bh
     return {
         "id": strat_dir.name,
         "symbol": symbol,
         "horizon": horizon,
         "dates": dates,
+        "market": market or None,
         "strategy_return_pct": r.get("return_pct"),
         "strategy_sharpe": r.get("sharpe_annualized"),
         "strategy_mdd_pct": r.get("mdd_pct"),
