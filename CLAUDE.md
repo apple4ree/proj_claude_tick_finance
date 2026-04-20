@@ -333,3 +333,5 @@ python3 -m pytest tests/test_handoff_*.py tests/test_verify_outputs_schema.py -v
 - **LOB spec 필수 필드**: `universe.market: crypto_lob` + `universe.time_window.{start,end}` (ISO UTC) + `universe.dates: []`. `target_symbol`/`target_horizon`는 LOB spec에 **절대 포함 금지**. 상세: `references/spec_schema_guide.md §1, §3`.
 - **LOB capital**: 인간 단위 USD로 기입 (예: `capital: 1000000` = $1M). runner가 `CRYPTO_PRICE_SCALE=1e8` 자동 적용. 사전 스케일된 값(`1e14`)도 허용하지만 가독성 저하.
 - **References 인용 의무**: designer/critic agents는 `references/*.md` §번호 형태로 인용. 미인용 설계는 critic이 flag. `references/README.md`에 각 agent의 injection path 명시.
+- **`/experiment` 중간 선택지 제시 금지** (2026-04-20). orchestrator가 "몇 iter로 할까요?", "어떤 rank만?", "foreground vs background?", "scope 좁힐까요?" 등의 질문으로 실행을 차단해선 안 됨. launch 시 CLI 인자가 최종 contract. 변경 필요 시 사용자가 `Ctrl+C` abort 후 재실행. 상세 규칙은 `.claude/commands/experiment.md` "Execution discipline" 섹션.
+- **`/experiment` 1 iter = 1 portfolio strategy** (2026-04-20). `universe.symbols`에 target 심볼을 모두 unified해 **하나의 spec.yaml**을 만든다. `--ranks 1,2,3`은 iter 단위로 cycle (iter 1 → rank 1, iter 2 → rank 2 …) — 한 iter 내에서 다중 rank/심볼 spawn 금지. n_iterations=10 → 정확히 10 strategies.

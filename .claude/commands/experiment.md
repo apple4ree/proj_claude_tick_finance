@@ -17,12 +17,30 @@ Runs the full alpha-discovery-to-feedback loop as a single sequence. Supersedes 
 | `--oos-start --oos-end` | **required** | Bar: `2025-11-01 2025-12-31` · LOB: `2026-04-19T22:00:00 2026-04-20T00:00:00` |
 | `--design-mode` | `auto` | `auto` (rule templates) · `agent` (alpha-designer Agent chain) · `skip` (strategies already exist) |
 | `--feedback-mode` | `both` | `programmatic` · `agent` · `both` |
-| `--ranks` | `0,1,2` | top_robust ranks to promote to strategies |
+| `--ranks` | `1` | top_robust ranks to cycle across iterations (1-indexed; `1` = top_robust[0]). Comma-separated list, e.g. `1,2,3`. Ranks **cycle across iterations** (iter 1 uses ranks[0], iter 2 uses ranks[1 % len], …) — they do NOT spawn multiple strategies within a single iteration. |
 | `--strategies-pattern` | derived | Glob pattern for an existing set |
 | `--n-iterations` | **10** (**minimum enforced**) | Number of design→validate→feedback cycles; **must be ≥ 10** per 2026-04-19 policy |
 | `--meta-review-every` | `5` | Invoke meta-reviewer every K iterations |
 | `--output-dir` | `experiments/run_<date>` | — |
 | `--smoke-test` | off | Bypass the n-iterations ≥ 10 enforcement. Only use for infrastructure verification, NOT for strategy evaluation. |
+
+## Execution discipline (MANDATORY — 2026-04-20)
+
+Once `/experiment` starts, the orchestrator **MUST run through all N iterations without asking the user for confirmation at any intermediate point**. Specifically:
+
+1. **No scope-reduction questions mid-run.** Do NOT present "options" to the user (e.g., "should I run rank 0 only?", "full sprint vs narrowed?", "foreground vs /loop?"). The CLI arguments at launch are the final contract; the orchestrator follows them verbatim. Changing scope requires the user to abort (`Ctrl+C`) and re-invoke with different flags.
+
+2. **No "context/time budget" early stops.** Orchestrator context usage is not a stop condition. Each iteration's agent chain runs in **fresh subagent contexts** (isolated from the orchestrator); only structured summaries return to the orchestrator, so N=10 iterations fits in one session. Do not pre-emptively suggest background/`/loop` pacing unless `--n-iterations >= 50`.
+
+3. **Stop conditions are ONLY those listed in §2g.** Nothing else — not scope concerns, not wall-clock estimates, not "this might take too long", not "the smoke run already showed the answer". The loop proceeds deterministically through all N iterations or a §2g condition.
+
+4. **ONE strategy per iteration (portfolio mode is the default).** Each iteration produces exactly ONE multi-symbol portfolio strategy under `strategies/<id>/`, with `universe.symbols` containing all targets unified (example: `[BTCUSDT, ETHUSDT, SOLUSDT]` is ONE strategy, not three). Do NOT interpret `--ranks 0,1,2` × 3 symbols as "9 strategies per iter". The correct reading: for each iteration, alpha-designer picks ONE rank from `top_robust[]` (1-indexed per CLAUDE.md §Rules), and spec-writer creates ONE spec.yaml unifying all target symbols.
+
+5. **`--ranks` cycles across iterations, not within one iteration.** If `--ranks 1,2,3` is passed with `--n-iterations 10`, iter 1 uses rank 1, iter 2 uses rank 2, iter 3 uses rank 3, iter 4 wraps to rank 1, and so on. Never spawn multiple strategies within a single iteration — each iteration is one agent-chain + one backtest + one critique.
+
+6. **Budget assumption**: 10-iter full run takes ~60-120 min wall-clock. Do not offer to narrow scope for perceived runtime risk — that decision already lives in the user's `--n-iterations` choice.
+
+7. **Prior smoke runs do NOT short-circuit the current run.** Even if a recent `--smoke-test` run captured a lesson (e.g., "SOL spread-gate fix"), the current non-smoke run must still execute its full N iterations — the loop's purpose is *lesson propagation and reinforcement*, not first-time discovery.
 
 ## Iteration budget policy (2026-04-19)
 
@@ -155,12 +173,18 @@ If verify_outputs returns `ok=false`: re-dispatch the agent with the failure not
 **Design prompt template for alpha-designer (agent mode):**
 ```
 The signal brief v2 is at data/signal_briefs_v2/<market>.json.
-Pick the rank-<rank> entry (robust signal with cross-symbol IC).
-Target: <market> <symbol>.
+Pick the rank-<rank> entry (1-indexed; rank=1 means top_robust[0], the highest-ranked robust signal).
+Target market: <market>. Target symbols (portfolio, unified): <symbols>.
 Read strategies/_iterate_context.md for lessons from prior iterations in this run.
 Your strategy MUST use the rank-<rank> feature × horizon as its primary signal.
-Output signal_brief_rank and deviation_from_brief fields in idea.json.
+
+Produce EXACTLY ONE AlphaHandoff for this iteration. The spec that follows
+will unify all target symbols in a single `universe.symbols` list (portfolio
+mode) — do NOT create per-symbol strategies. Output `signal_brief_rank` (1-indexed)
+in the AlphaHandoff JSON.
 ```
+
+**Rank-cycling rule**: The `--ranks` CLI flag (default `1`) is a list. For iteration `i` (1-based), use `ranks[(i - 1) % len(ranks)]`. Example: `--ranks 1,2,3 --n-iterations 10` → ranks [1, 2, 3, 1, 2, 3, 1, 2, 3, 1]. Each iteration still creates **one portfolio strategy**, not one-per-rank.
 
 **skip**: resolve strategy set via `--strategies-pattern`.
 
