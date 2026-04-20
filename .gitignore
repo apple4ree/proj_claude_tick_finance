@@ -18,3 +18,15 @@ venv/
 
 # Reports + artifacts
 *.log
+
+# Large/regeneratable data — not suitable for git tracking
+data/_archive/                  # archival legacy (KRX, etc.) — out of unified flow
+data/binance_multi/1m/          # 1-minute bars — project does not consume
+data/binance_lob/               # LOB snapshots — forward-going, multi-GB
+
+# PDFs (use external links instead)
+docs/*.pdf
+literature/papers/*.pdf
+
+# Paper-search scratch
+papers/.project_analysis.json
