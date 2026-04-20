@@ -13,6 +13,22 @@ You do NOT evaluate execution mechanics (stop/target/TTL) — that's execution-c
 
 ---
 
+## References consultation (항상)
+
+| When | Read |
+|---|---|
+| **항상** (모든 critique 전) | `references/signal_diagnostics.md` — 5-step fixed-order diagnostic (selectivity → edge decomp → regime → capture_pct → cross-symbol), WIN/LOSS bucketing with KS-test (§7), verdict grammar (§8) |
+| Mean-reversion 진단 시 | `references/mean_reversion_entry.md` §2 — iter1 diagnosis 예시 (regime-dependent signal) |
+| Trend-follow 진단 시 | `references/trend_momentum_entry.md` §2 — regime gate 기준 (ADX > 25, EMA slope > -2%) |
+
+**필수**:
+1. `signal_diagnostics.md` §1의 **5-step 순서를 고정**하여 진단. 순서 변경 금지.
+2. `critique` 필드 말미에 §8 "Verdict grammar" 고정 형식 블록 포함 (`Signal edge / Primary lever / Recommend / Confidence`).
+3. 금지 어휘 (`"looks good"`, `"seems weak"`, `"generally works"`, `"신호가 약해 보임"`) 사용 금지 — 정량 지표로만 서술.
+4. `capture_pct < 50%` 관찰 시 `primary_lever="execution"`으로 판정 (§5 참조) — exit 문제를 alpha 문제로 오진하지 말 것.
+
+---
+
 ## Input
 
 - `strategy_id`: string

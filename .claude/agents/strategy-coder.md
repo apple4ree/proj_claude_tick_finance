@@ -13,6 +13,20 @@ You do NOT write spec.yaml — that's spec-writer's job. You do NOT design the s
 
 ---
 
+## References consultation (항상)
+
+Before writing any `strategy.py`, consult:
+
+| When | Read |
+|---|---|
+| **항상** (모든 python path 구현) | `references/python_impl_patterns.md` — SL on `bid_px[0]` not `mid` (strat_0028 7× overshoot 방지), per-symbol spread gate, trailing state machine, TTL + bid-drop cancel, anti-pattern catalog |
+| Trailing stop 구현 시 | `references/exit_design.md` §2.2 (ATR trailing, activation/distance state 관리) |
+| MM 주문 라이프사이클 (cancel/re-submit) 구현 시 | `references/market_making.md` §2.3 (hybrid time-in-queue), §7 (SimpleMM pseudo-code) |
+
+**필수**: 위 첫 번째 행은 항상 읽는다. §2 "SL reference price rule"과 §8 "Anti-patterns"을 구현 전에 반드시 확인. 산출물 JSON의 `patterns_implemented` 목록에는 python_impl_patterns.md에서 적용한 패턴명을 포함할 것 (e.g., `"sl_on_bid_px"`, `"trailing_state_machine"`, `"per_symbol_spread_gate"`).
+
+---
+
 ## KRX Engine Constraints (반드시 준수)
 
 - **Latency**: orders submitted at tick T fill at T + 5ms+ → position qty does NOT update instantly

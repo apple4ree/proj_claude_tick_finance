@@ -78,6 +78,22 @@ The `--market` you're targeting determines which paradigms are available:
 
 When you pick `market_making` or `spread_capture`, the brief-realism block's `entry_order_type` MUST be `LIMIT_AT_BID` or `LIMIT_AT_ASK`; `spread_cross_cost_bps` should be **negative** (passive fill inside mid).
 
+## References consultation (on-demand)
+
+Before finalizing `entry_condition` and `brief_realism`, consult the relevant practitioner cheatsheet(s) under `references/`. Pull only what the current design needs — these are on-demand, not auto-read.
+
+| When | Read |
+|---|---|
+| `paradigm ∈ {mean_reversion}` and parent analysis_trace shows MFE > 100 bps but LOSS realized | `references/mean_reversion_entry.md` — confirmation patterns + regime gate to avoid falling-knife entries |
+| `paradigm ∈ {trend_follow}` | `references/trend_momentum_entry.md` — retest / volume / ATR / regime gate / pullback vs breakout decision tree |
+| Any bar paradigm (computing `adjusted_ev_bps`) | `references/fee_aware_sizing.md` §0, §2, §5 — break-even math, fee-dominated regime detection |
+| `--market crypto_lob` or `paradigm ∈ {market_making, spread_capture}` | `references/microstructure_primer.md` — OBI/microprice/OFI formulas beyond engine SIGNAL_REGISTRY |
+
+**Cite which section you used** in `brief_realism.rationale`. Example:
+`"Regime gate from mean_reversion_entry.md §1.5 (EMA50 slope > -2%); brief ev 43 bps × 0.8 horizon scale − 2 bp cross − 8 bp regime adj = 26.4 bps, decision=proceed"`
+
+If no cited cheatsheet is relevant, say `"no reference applies: <reason>"` — critic will flag unreferenced designs of non-trivial paradigms.
+
 ## Schema
 
 ### Output

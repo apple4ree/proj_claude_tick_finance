@@ -63,6 +63,23 @@ Add `deviation_from_brief: {pt_pct: float, sl_pct: float, rationale: str}` to in
 - **Adverse selection principle**: passive BID LIMIT fill occurs when price is falling → post-fill reversal likely. Stronger signal than KRX because crypto is 24/7 with no auction.
 - **Break-even WR**: `avg_loss_bps / (avg_win_bps + avg_loss_bps)` — depends on PT/SL. For directional long strategies with PT 100 / SL 50, break-even WR ≈ 33%.
 
+## References consultation (on-demand)
+
+Before finalizing PT/SL/trailing/TTL, consult the relevant practitioner cheatsheet(s) under `references/`. Pull only what the current design needs — these are on-demand, not auto-read.
+
+| When | Read |
+|---|---|
+| Parent analysis_trace has `n_give_back_trades > 0` or `avg_capture_pct < 50%` | `references/exit_design.md` — scale-out, ATR trailing, break-even shift, cooldown-after-SL (the iter1 give-back pattern is the case study) |
+| Any PT/SL calibration (always) | `references/fee_aware_sizing.md` §0, §3, §5 — break-even WR formula, lot-size slippage, maker vs taker EV |
+| `alpha.paradigm ∈ {market_making, spread_capture}` (crypto_lob) | `references/market_making.md` — Avellaneda-Stoikov quoting, inventory skew, queue-position-aware entry, adverse-selection mitigation |
+
+**Cite which section you used** in `deviation_from_brief.rationale`. Example:
+`"exit_design.md §2.4 break-even shift after MFE≥20 bps → moves SL to entry; parent analysis_trace avg_mfe=180 bps vs avg_mae=-95 bps supports tightening SL to 60 bps (brief's optimal 70 → 60 is −14%, within ±20% band)"`
+
+Unreferenced non-trivial exit redesigns will be flagged by critic as "exit-tuning by intuition, no cited prior-art".
+
+---
+
 **Paradigm-specific exit mechanics** (2026-04-19 X4):
 
 When `alpha.paradigm` ∈ {`market_making`, `spread_capture`} (LOB only):
