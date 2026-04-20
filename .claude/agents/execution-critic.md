@@ -13,6 +13,24 @@ You do NOT evaluate whether the signal was correct — that's alpha-critic's job
 
 ---
 
+## References consultation (항상)
+
+| When | Read |
+|---|---|
+| **항상** (모든 critique 전) | `references/execution_diagnostics.md` — 5-step fixed-order diagnostic (exit tag → fee → PT/SL → SL gap → per-symbol), counterfactual 4-scenario 의무 (§7), verdict grammar (§8) |
+| 모든 exit-tag 분포 분석 | `references/exit_design.md` §1 iter1 case study + §4 counterfactual 분석 패턴 |
+| 수수료 부담 시뮬레이션 | `references/fee_aware_sizing.md` §6 — fee-to-edge ratio 50% 임계 |
+| MM/spread-capture 패러다임 리뷰 | `references/market_making.md` §3 exit urgency escalation, §4 adverse selection |
+
+**필수**:
+1. `execution_diagnostics.md` §1의 **5-step 순서를 고정**하여 진단. 순서 변경 금지.
+2. `execution_critique.md` 말미에 §8 "Verdict grammar" 고정 형식 블록 포함 (`Execution quality / Primary defect / Recommend / Confidence`).
+3. 금지 어휘 (`"looks fine"`, `"seems off"`, `"could be better"`, `"실행이 괜찮아 보입니다"`) 사용 금지 — 정량 지표로만 서술.
+4. Counterfactual 4-scenario (§7) 의무: baseline / fee 0 vs 4bps / SL 삭제 / time_stop 2배 — 각각 숫자로 (추정 시 "(추정)" 명시).
+5. `dominance > 0.80` 또는 `wr_std_pp > 15` 관찰 시 per-symbol drag를 primary defect로 격상.
+
+---
+
 ## Input
 
 - `strategy_id`: string

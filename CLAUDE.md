@@ -5,23 +5,36 @@ Binance crypto 데이터 기반 전략 자율 생성 → 백테스트 → 학습
 - **Bar OHLCV** (1d / 1h / 15m / 5m): directional strategies (mean-reversion, momentum, breakout)
 - **L2 Order Book (LOB)** (10-level, 100ms snapshot): LOB-aware strategies (market-making / ping-pong / spread capture)
 
-**Scope note (2026-04-19 전면 재구조화)**: KRX tick legacy + Qlib CSI500/SP500 경로 **완전 제거됨**. 크립토 전용으로 집중. LOB 데이터는 `scripts/binance_lob_collector.py`가 forward-going으로 수집 (과거 데이터 없음 → 수주간 축적 필요). 초기에는 OHLCV만, LOB 축적 후 market-making paradigm 활성화.
+**Scope note (2026-04-19 ~ 2026-04-20)**: KRX tick legacy + Qlib CSI500/SP500 경로 **완전 제거됨**. 크립토 전용. LOB 데이터는 `scripts/binance_lob_collector.py`가 WebSocket으로 forward-going 수집 (2026-04-19 시작, 상시 가동). **LOB end-to-end 파이프라인은 2026-04-20 활성화 완료** (α-1~α-6): engine LOB dispatch + discover_alpha_lob + lob_full_artifacts + BH/validate LOB 분기 + `/experiment --market crypto_lob` 통합 smoke 통과 (iter2 BTC+ETH +0.226 bps @ fee=0).
 
 ## Architecture
 
 ```
 engine/              순수 Python 백테스트 엔진 (토큰 비용 = 0)
   schemas/           Pydantic handoff contracts (AlphaHandoff, ExecutionHandoff, FeedbackOutput)
-scripts/             CLI 도구 (verify_outputs, audit, optuna, analyze, validate 등)
-strategies/          전략 산출물 루트 (현재 meta only: _drafts/, _trajectories/, _examples/, _iterate_context.md)
-                     — 2026-04-19 archival 이후 모든 구체 전략은 re-generate 필요
-knowledge/           Obsidian 호환 vault (49 lessons + patterns + seeds, README.md 포함)
-.claude/agents/      16 전문 agent 정의 (alpha/execution designer, critics, writer, coder, 기타)
-.claude/commands/    /experiment (canonical), /iterate & /new-strategy (deprecated)
+  data_loader.py     CRYPTO_PRICE_SCALE=1e8 LOB int64 scaling + iter_events_crypto_lob
+  simulator.py       Backtester (bar loop / LOB loop dispatch by universe.market)
+  runner.py          capital auto-scale for crypto_lob + _resolve_time_window
+scripts/             CLI 도구 (discover_alpha / discover_alpha_lob / *_full_artifacts / validate_strategy / benchmark_vs_bh / run_feedback / verify_outputs / audit / optuna 등)
+  binance_lob_collector.py  상시 가동 (WebSocket depth20@100ms → hourly parquet)
+references/          9 practitioner cheatsheets (agent consultation source of truth)
+  exit_design.md / mean_reversion_entry.md / fee_aware_sizing.md
+  microstructure_primer.md / market_making.md / trend_momentum_entry.md
+  python_impl_patterns.md / portfolio_allocation.md
+  signal_diagnostics.md / execution_diagnostics.md / spec_schema_guide.md
+strategies/          전략 산출물 루트 (meta files: _drafts/, _trajectories/, _iterate_context.md)
+knowledge/           Obsidian 호환 vault (lessons + patterns + seeds)
+.claude/agents/      11 active agents (설계 7 + 비평 2 + support 2)
+.claude/commands/    /experiment (canonical); /iterate & /new-strategy (deprecated)
 docs/                overview.html + superpowers/specs + superpowers/plans + progress/
 tests/               pytest suite + fixtures/ (pilot_s3 idea.json 등 regression 데이터)
 literature/papers/   참조 논문
-experiments/         _research_session + 개별 실험 아티팩트
+experiments/         _research_session + 개별 실험 아티팩트 + run_<date>/experiment_summary.md
+data/
+  binance_daily/     crypto_1d bars
+  binance_multi/{1h,15m,5m}/  intraday bars
+  binance_lob/<SYM>/<YYYY-MM-DD>/<HH>.parquet  LOB snapshots (forward-going)
+  signal_briefs_v2/<market>.json  Phase 1 산출물
 ```
 
 ## Unified Framework (end-to-end)
@@ -29,14 +42,18 @@ experiments/         _research_session + 개별 실험 아티팩트
 데이터 기반 α 발견 + agent 기반 설계 + 자동 검증이 하나의 flow로 묶임.
 
 ```
-[Phase 1] scripts/discover_alpha.py        → signal_brief_v2.json  (IC ranking across symbols)
-[Phase 2] ── design-mode=auto   ──→ scripts/gen_strategy_from_brief.py (rule-template)
+[Phase 1] discover_alpha.py (bar) OR discover_alpha_lob.py (LOB)
+             → data/signal_briefs_v2/<market>.json  (cross-symbol IC + robustness + per-signal calibration)
+[Phase 2] ── design-mode=auto   ──→ scripts/gen_strategy_from_brief.py (rule-template, bar only)
           └─ design-mode=agent ──→ alpha-designer → execution-designer → spec-writer → strategy-coder
-[Phase 2.5] scripts/intraday_full_artifacts.py / bar_full_artifacts.py  → report/trace/HTML
-[Phase 3]   scripts/validate_strategy.py   → 4 gates (invariants / OOS / IR vs BH / cross-symbol)
-[Phase 3.5] scripts/benchmark_vs_bh.py     → bh_benchmark.json
-[Phase 4] ── feedback-mode=programmatic ──→ scripts/run_feedback.py → feedback_auto.*, _iterate_context.md
-          └─ feedback-mode=agent         ──→ alpha-critic + execution-critic + feedback-analyst → knowledge/lessons/
+                                   (각 단계 Pydantic verify_outputs 검증 강제)
+[Phase 2.5] bar_full_artifacts.py (daily) OR intraday_full_artifacts.py (1h/15m/5m) OR lob_full_artifacts.py (LOB)
+             → report.json / trace.json / analysis_trace.{json,md} / report.html
+[Phase 3]   validate_strategy.py           → 4 gates (invariants / OOS / IR vs BH / cross-symbol)
+[Phase 3.5] benchmark_vs_bh.py              → bh_benchmark.json (bar vs LOB 분기)
+[Phase 4] ── feedback-mode=programmatic ──→ run_feedback.py → feedback_auto.*, _iterate_context.md
+          └─ feedback-mode=agent         ──→ alpha-critic + execution-critic + feedback-analyst
+                                             → knowledge/lessons/<YYYYMMDD>_<id>_<slug>.md
 ```
 
 **진입점**: `/experiment --market crypto_1h --symbols BTCUSDT,ETHUSDT,SOLUSDT --is-start ... --oos-start ... --design-mode (auto|agent) --feedback-mode (both|programmatic|agent)`
@@ -60,9 +77,25 @@ alpha-designer → execution-designer → spec-writer → [strategy-coder] → b
 | execution-critic | 체결 메커닉 분석 (exit 분포, fee 부담, stop/target 교정) | execution critique JSON |
 | feedback-analyst | 두 critique 합의 → 최종 lesson + seeds | `knowledge/lessons/`, feedback.json |
 
-Support: `code-generator` (engine 확장), `meta-reviewer` (프레임워크 감사, 매 K회), `portfolio-designer` (capital allocation), `strategy-ideator` (legacy)
+Support: `code-generator` (engine 확장), `meta-reviewer` (프레임워크 감사, 매 K회), `portfolio-designer` (capital allocation — dormant, LOB multi-symbol scale-up 시 활성화), `backtest-runner` (wrapper).
 
-**Iteration context 전파**: 매 iteration 후 `strategies/_iterate_context.md`에 결과 누적. Critics 분석은 `strategies/<id>/alpha_critique.md`, `execution_critique.md`로 저장. 다음 iteration의 agent가 이 파일들을 읽어 이전 교훈을 직접 참조.
+Active agent count: **11**. 2026-04-20 clean-up: 미사용 agents (`strategy-ideator` legacy + `context-quality-reviewer` / `project-automation-auditor` / `session-pattern-analyzer` / `skill-portfolio-analyzer` — check-harness plugin 전용) 삭제.
+
+### Agent → References mapping
+
+각 설계/비평 agent는 `references/` 실천 치트시트를 on-demand consult. 인용 필수 (critic이 미인용 설계는 flag).
+
+| Agent | Consulted references |
+|---|---|
+| alpha-designer | `mean_reversion_entry.md` / `trend_momentum_entry.md` (paradigm별), `fee_aware_sizing.md`, `microstructure_primer.md` (LOB) |
+| execution-designer | `exit_design.md`, `fee_aware_sizing.md`, `market_making.md` (MM 패러다임) |
+| spec-writer | `spec_schema_guide.md` (항상) — market별 required-field matrix |
+| strategy-coder | `python_impl_patterns.md` (항상), `exit_design.md` §2.2 / `market_making.md` §2.3,§7 |
+| portfolio-designer | `portfolio_allocation.md` (항상), `fee_aware_sizing.md` §3 |
+| alpha-critic | `signal_diagnostics.md` (항상 5-step 고정 진단), `mean_reversion_entry.md` / `trend_momentum_entry.md` §2 |
+| execution-critic | `execution_diagnostics.md` (항상 5-step + counterfactual 의무), `exit_design.md` §1,§4, `fee_aware_sizing.md` §6, `market_making.md` §3,§4 |
+
+**Iteration context 전파**: 매 iteration 후 `strategies/_iterate_context.md`에 결과 누적. Critics 분석은 `strategies/<id>/alpha_critique.md`, `execution_critique.md`로 저장. 다음 iteration의 agent가 이 파일들 + 부모 `analysis_trace.md` (per-RT MFE/MAE/capture_pct)를 읽어 이전 교훈을 직접 참조.
 
 ## Agent Handoff Schema (Pydantic)
 
@@ -89,11 +122,12 @@ python scripts/verify_outputs.py --agent alpha-designer --output '<json>'
 ## Market Constraints (Crypto)
 
 - **Fee (default)**: Binance taker ≈ 4 bps round-trip (`--fee-bps`로 설정). Market-making paradigm에서는 maker fee 0 bps 또는 negative (rebate) 가정 가능.
-- **Order types**: MARKET, LIMIT (resting, queue-ahead model), CANCEL
+- **Order types**: MARKET, LIMIT (resting, queue-ahead model), CANCEL (per-symbol 일괄, per-order 지원 안 함)
 - **Long-only**: 엔진은 현재 naked short 금지 (crypto spot 기준; perpetual futures는 별도 모드로 추가 가능)
-- **Session**: 크립토는 24/7 연속 거래, 명시적 EOD 강제 청산 없음
-- **Bar markets**: `crypto_1d` (1일), `crypto_1h` (1시간), `crypto_15m` / `crypto_5m`
-- **LOB market (forward-going)**: `crypto_lob` — 10-level order book snapshot @ 100ms. `data/binance_lob/<sym>/<date>/<hour>.parquet`. `scripts/binance_lob_collector.py`가 WebSocket 으로 수집. **과거 데이터 없음 — 수주간 축적 후 사용**.
+- **Session**: 크립토는 24/7 연속 거래, 명시적 EOD 강제 청산 없음 (bar path만 EOD close 적용)
+- **Bar markets**: `crypto_1d` (1일), `crypto_1h` (1시간), `crypto_15m` / `crypto_5m` — date-partitioned iterator
+- **LOB market**: `crypto_lob` — 10-level order book @ 100ms cadence. `data/binance_lob/<SYM>/<YYYY-MM-DD>/<HH>.parquet`. 전용 iterator `iter_events_crypto_lob(start_ns, end_ns, symbols)`. LOB spec은 `universe.market: crypto_lob` + `universe.time_window.{start,end}` 필수, `dates: []` 필수, `target_symbol/target_horizon` 금지.
+- **LOB capital 자동 스케일링**: `CRYPTO_PRICE_SCALE = 1e8` (satoshi-equivalent int64). `engine/runner._build_config`가 `market=crypto_lob` AND `capital ≤ 1e9` 이면 자동으로 ×1e8 스케일. spec에 인간 단위 USD (예: `capital: 1000000` = $1M) 권장.
 
 ## Spec-Invariant Checker
 
@@ -205,11 +239,14 @@ python scripts/trajectory_pool.py top --axis alpha --n 5
 
 ## Data Universe (Crypto)
 
-- **Standard universe**: `BTCUSDT, ETHUSDT, SOLUSDT` (Binance perpetual/spot, multi-symbol robustness check 기준)
+- **Standard universe**: `BTCUSDT, ETHUSDT, SOLUSDT` (Binance spot, multi-symbol robustness check 기준)
 - **Data sources**:
   - `data/binance_daily/<SYM>.csv` — daily bars
   - `data/binance_multi/{1h,15m,5m}/<SYM>.csv` — intraday bars
-- **IS / OOS split**: 실험별로 `--is-start`, `--is-end`, `--oos-start`, `--oos-end`로 명시. 관례: crypto_1h에서 IS ≈ 4 months, OOS ≈ 1-2 months (예: IS 2025-07-01~2025-10-31, OOS 2025-11-01~2025-12-31)
+  - `data/binance_lob/<SYM>/<YYYY-MM-DD>/<HH>.parquet` — LOB 20-level snapshots @ 100ms (top-10 level을 engine이 소비). `scripts/binance_lob_collector.py` 상시 가동.
+- **IS / OOS split**:
+  - Bar: `--is-start`/`--is-end`를 `YYYY-MM-DD`로. 관례 crypto_1h IS ≈ 4 months, OOS ≈ 1-2 months (예: IS 2025-07-01~2025-10-31, OOS 2025-11-01~2025-12-31)
+  - LOB: ISO datetime (UTC), 예: IS `2026-04-19T06:00:00 ~ 2026-04-19T22:00:00` (16h), OOS `2026-04-19T22:00:00 ~ 2026-04-20T00:00:00` (2h). 장기 실험은 LOB 축적 분량 성장에 따라 창 확장.
 - **Archived (KRX legacy)**: `data/_archive/krx_legacy/` — 이전 KRX top-10 tick 데이터 + v1 briefs. unified flow에서 참조되지 않음.
 
 ## Backtest Mode (2026-04-19 변경)
@@ -229,22 +266,39 @@ Primary metric: 포트폴리오 `return_pct` (shared-pool realized). `--per-symb
 ## Key Commands
 
 ```bash
-# 통합 진입점 (canonical) — 단일/다중 iteration + 디자인 모드 + 피드백 모드 통합
+# 통합 진입점 (canonical) — bar
 /experiment --market crypto_1h --symbols BTCUSDT,ETHUSDT,SOLUSDT \
             --is-start 2025-07-01 --is-end 2025-10-31 \
             --oos-start 2025-11-01 --oos-end 2025-12-31 \
-            --design-mode agent --feedback-mode programmatic --n-iterations 1
-#   --design-mode: auto (rule template) | agent (LLM chain) | skip
+            --design-mode agent --feedback-mode both --n-iterations 10
+
+# 통합 진입점 — LOB (datetime UTC, 보통 smoke-test에만)
+/experiment --market crypto_lob --symbols BTCUSDT,ETHUSDT,SOLUSDT \
+            --is-start '2026-04-19T06:00:00' --is-end '2026-04-19T22:00:00' \
+            --oos-start '2026-04-19T22:00:00' --oos-end '2026-04-20T00:00:00' \
+            --design-mode agent --feedback-mode both --n-iterations 2 --smoke-test
+#   --design-mode: auto (rule template, bar only) | agent (LLM chain) | skip
 #   --feedback-mode: programmatic | agent | both
 
-# 백테스트 (default: portfolio mode)
-python -m engine.runner --spec strategies/<id>/spec.yaml --summary
+# Phase 1 standalone
+python scripts/discover_alpha.py      --market crypto_1h --symbols ... --is-start ... --output ...   # bar
+python scripts/discover_alpha_lob.py  --symbols ... --is-start '...' --is-end '...' --output ...    # LOB
 
-# Agent 산출물 스키마 검증 (subprocess)
+# 백테스트
+python -m engine.runner --spec strategies/<id>/spec.yaml --summary          # portfolio mode
+python -m engine.runner --spec strategies/<id>/spec.yaml --per-symbol       # 분석 opt-in
+
+# Phase 2.5 post-processor (artifact 생성 + MFE/MAE 계산)
+python scripts/lob_full_artifacts.py     --id <id>   # LOB
+python scripts/intraday_full_artifacts.py --id <id>  # 1h/15m/5m
+python scripts/bar_full_artifacts.py      --id <id>  # daily
+
+# Agent 산출물 스키마 검증
 python scripts/verify_outputs.py --agent alpha-designer --output '<json>'
 
-# 파라미터 최적화
-python scripts/optuna_sweep.py --spec strategies/<id>/spec.yaml --n-trials 50
+# LOB 수집기 상태 확인
+pgrep -af binance_lob_collector
+ls -la data/binance_lob/BTCUSDT/ | tail
 
 # 감사
 python scripts/audit_principles.py    # 12/12 must pass
@@ -252,8 +306,9 @@ python scripts/audit_principles.py    # 12/12 must pass
 # 지식 검색
 python scripts/search_knowledge.py --query "keyword" --top 5
 
-# 테스트 (handoff schema 포함)
-python3 -m pytest tests/test_handoff_*.py tests/test_verify_outputs_schema.py -v
+# 테스트
+python3 -m pytest tests/ -q                                               # 전체 (~45s)
+python3 -m pytest tests/test_handoff_*.py tests/test_verify_outputs_schema.py -v  # schema만
 
 # Legacy (deprecated — /experiment로 대체)
 /iterate 10 "seed description"
@@ -272,5 +327,9 @@ python3 -m pytest tests/test_handoff_*.py tests/test_verify_outputs_schema.py -v
 - **OOS window는 전략 개발 중 절대 사용 금지.** 실험별로 `--oos-start`, `--oos-end`로 명시하고 `scripts/validate_strategy.py`에서만 평가.
 - **report.html 작성 시에는 반드시 한국어 위주로 작성할 것**
 - **평가는 multi-symbol (크립토 standard universe BTC/ETH/SOL) portfolio mode 기본**. 단일 심볼 / per-symbol은 debugging/analysis opt-in.
-- **Iteration budget**: `/experiment --n-iterations`는 **반드시 ≥ 10** (2026-04-19 policy). 1-shot 실행 금지. 이유: 자율 루프가 실제로 lesson을 축적하려면 최소 10 iterations 이상 필요 (한 번 실행은 noise). `--smoke-test` 플래그가 있는 경우에만 예외.
-- **KRX / 非-crypto 시장 복원 금지 (2026-04-19 결정)**. 크립토 전용 프레임워크로 확정. 다른 시장이 필요하면 별도 fork 프로젝트로.
+- **Iteration budget**: `/experiment --n-iterations`는 **반드시 ≥ 10** (2026-04-19 policy). 1-shot 실행 금지. `--smoke-test` 플래그는 예외 (인프라 검증 전용, 성과 평가 금지).
+- **KRX / 非-crypto 시장 복원 금지** (2026-04-19 결정). 크립토 전용 프레임워크로 확정.
+- **`signal_brief_rank`는 1-indexed** (2026-04-20). `1 = top_robust[0]` (최상위). execution-designer는 `top_robust[signal_brief_rank - 1]`로 인덱싱. Pydantic `ge=1, le=10` 강제.
+- **LOB spec 필수 필드**: `universe.market: crypto_lob` + `universe.time_window.{start,end}` (ISO UTC) + `universe.dates: []`. `target_symbol`/`target_horizon`는 LOB spec에 **절대 포함 금지**. 상세: `references/spec_schema_guide.md §1, §3`.
+- **LOB capital**: 인간 단위 USD로 기입 (예: `capital: 1000000` = $1M). runner가 `CRYPTO_PRICE_SCALE=1e8` 자동 적용. 사전 스케일된 값(`1e14`)도 허용하지만 가독성 저하.
+- **References 인용 의무**: designer/critic agents는 `references/*.md` §번호 형태로 인용. 미인용 설계는 critic이 flag. `references/README.md`에 각 agent의 injection path 명시.

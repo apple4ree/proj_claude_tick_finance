@@ -75,11 +75,25 @@ def main() -> None:
 
     if not spec.universe.symbols:
         errors.append("universe.symbols is empty")
-    if not spec.universe.dates:
+    # crypto_lob uses time_window instead of date-partitioned loops;
+    # empty dates list is valid for that market.
+    is_lob = str(spec.universe.market or "").lower() == "crypto_lob"
+    if not spec.universe.dates and not is_lob:
         errors.append("universe.dates is empty")
 
     if kind == "python":
-        errors.extend(_validate_python_strategy(path))
+        # strategy.py is written by strategy-coder *after* spec-writer;
+        # skip the import check when the file does not yet exist so that
+        # validate_spec can be called immediately after spec creation.
+        strat_py = path.parent / "strategy.py"
+        if strat_py.exists():
+            errors.extend(_validate_python_strategy(path))
+        else:
+            print(
+                f"[warn] strategy.py not yet written for {path.parent.name}"
+                " — skipping Python import check",
+                file=sys.stderr,
+            )
     else:
         # DSL / built-in paths check signals and expressions
         for name, defn in (spec.signals or {}).items():

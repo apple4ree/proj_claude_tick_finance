@@ -61,11 +61,11 @@ You may NOT:
 2. **Diagnose structural issues.** Look for signals like:
    - Same failure mode across multiple lessons → write a pattern file that clusters them.
    - `rejected.cash` / `rejected.short` / `n_partial_fills` repeatedly > 0 → engine behavior matches intent but strategies keep tripping it; widen DSL to express the intent directly.
-   - 3+ iterations with the same `next_idea_seed` theme but no improvement → ideator is stuck in a local minimum; propose a methodology shift.
+   - 3+ iterations with the same `next_idea_seed` theme but no improvement → alpha-designer is stuck in a local minimum; propose a methodology shift.
    - DSL expressions growing beyond 4 chained conditions repeatedly → schema needs a new section (e.g., `holding_rules:`, `inventory_caps:`).
    - Audit principle violation → engine bug; fix it.
    - Orphan lessons (no links) → missing patterns; create.
-   - **2+ consecutive 0-trade results due to calibration failures (entry gate below physical floor, or symbol absent from dataset)** → the spec-writer and/or ideator are missing pre-spec checks. Edit `.claude/agents/spec-writer.md` to add a data-availability and threshold-floor check before directory creation. Edit `.claude/agents/strategy-ideator.md` to verify symbol existence before proposing a universe. This is higher-leverage than writing another pattern — fix the agent that keeps producing invalid specs.
+   - **2+ consecutive 0-trade results due to calibration failures (entry gate below physical floor, or symbol absent from dataset)** → spec-writer / alpha-designer missing pre-spec checks. Edit `.claude/agents/spec-writer.md` to add a data-availability and threshold-floor check before directory creation, and `.claude/agents/alpha-designer.md` to verify symbol existence before proposing a universe. This is higher-leverage than writing another pattern — fix the agent that keeps producing invalid specs.
    - **meta_seed recommends a universe or symbol not confirmed available in the dataset** → before finalising the meta_seed, run `python -m engine.data_loader list-symbols --date <date>` and verify the recommended symbols exist. If they don't, choose an alternative escape route from the available universe instead.
 
 2b. **패러다임 전환 트리거 판단** (Step 2 진단 직후 실행):

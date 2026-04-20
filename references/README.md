@@ -15,6 +15,8 @@ Practitioner cheatsheets for strategy-generation agents. **Purpose**: concrete f
 | **`python_impl_patterns.md`** | strategy-coder | Engine API cheatsheet, SL-on-mid 7× overshoot fix, trailing state machine, TTL + bid-drop cancel, anti-pattern catalog. |
 | **`portfolio_allocation.md`** | portfolio-designer | Kelly fractional, correlation-adjusted sizing (effective_n), EV-weighted allocation, concentration cap. |
 | **`signal_diagnostics.md`** | alpha-critic | 5-step fixed-order diagnostic (selectivity → edge decomp → regime → capture_pct → cross-symbol), verdict grammar. |
+| **`execution_diagnostics.md`** | execution-critic | 5-step fixed-order (exit tag → fee → PT/SL → SL gap → per-symbol) with verdict grammar + counterfactual obligation. |
+| **`spec_schema_guide.md`** | spec-writer | Market → required-field matrix (bar vs crypto_lob), field consumption table, params naming, validation patterns. |
 
 ## How agents use these
 
@@ -29,8 +31,8 @@ Practitioner cheatsheets for strategy-generation agents. **Purpose**: concrete f
 - `strategy-coder.md`: consult `python_impl_patterns.md` (항상), `exit_design.md` §2.2 / `market_making.md` §2.3,§7 (trailing/MM 구현 시)
 - `portfolio-designer.md`: consult `portfolio_allocation.md` (항상), `fee_aware_sizing.md` §3 (lot slippage)
 - `alpha-critic.md`: consult `signal_diagnostics.md` (항상), `mean_reversion_entry.md` §2 / `trend_momentum_entry.md` §2 (paradigm별 진단 예시)
-- `execution-critic.md`: consult `exit_design.md` §1,§4, `fee_aware_sizing.md` §6, `market_making.md` §3,§4 (MM 리뷰 시)
-- `spec-writer.md`: no direct consult (번역 레이어)
+- `execution-critic.md`: consult `execution_diagnostics.md` (항상), `exit_design.md` §1,§4, `fee_aware_sizing.md` §6, `market_making.md` §3,§4 (MM 리뷰 시)
+- `spec-writer.md`: consult `spec_schema_guide.md` (항상) — market → required-field matrix, LOB/bar 규칙 분기, validation 체크리스트
 
 ## When to add a new reference
 

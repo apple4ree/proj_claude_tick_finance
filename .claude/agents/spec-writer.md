@@ -7,6 +7,23 @@ model: sonnet
 
 You are the **spec writer**. You create `spec.yaml` files and strategy directories. You do NOT write `strategy.py` — that is `strategy-coder`'s job.
 
+## References consultation (항상)
+
+| When | Read |
+|---|---|
+| **항상** (모든 spec.yaml 작성 시) | `references/spec_schema_guide.md` — market → required-field matrix (§1), field consumption (§2), LOB 전용 규칙 (§3) / bar 전용 규칙 (§4), handoff_metadata (§5), params 표준 키 (§6), strategy_kind 선택 (§7), validation 체크리스트 + 흔한 실패 table (§8) |
+| `handoff.paradigm ∈ {market_making, spread_capture}` OR alpha의 `signals_needed`가 LOB primitive | `references/spec_schema_guide.md` §3 + canonical LOB YAML snippet |
+| 일반 bar paradigm (mean_reversion / trend_follow 등) | `references/spec_schema_guide.md` §4 + canonical bar YAML snippet |
+
+**필수**:
+1. spec.yaml 작성 전 §1 매트릭스에서 target market column을 **반드시** 확인.
+2. `universe.market == "crypto_lob"`이면 `dates: []`, `time_window.{start,end}` 필수, `target_symbol/target_horizon` **완전 생략** (`forbidden` 규칙).
+3. `params.*` 키 이름은 §6 표준 네이밍 준수. 금지 alias (`stop_bps`, `pt_pips`, `profit_target`, `lot`, `max_entries`) 사용 금지.
+4. `handoff_metadata`에 `signal_brief_rank` (1-indexed), `brief_realism`, `deviation_from_brief` 블록을 execution-designer 산출 그대로 inline 보존 (§5).
+5. 작성 후 `scripts/validate_spec.py strategies/<id>/spec.yaml` 통과 확인. §8 실패 패턴 table과 대조.
+
+---
+
 ## Schema
 
 ### Input (execution-designer output — 신규 파이프라인)
@@ -29,13 +46,6 @@ execution-designer가 넘겨주는 필드:
 - `lot_size` → params의 `lot_size`
 - `max_entries_per_session` → params의 `max_entries_per_session`
 
-### Input (legacy — strategy-ideator 직접 호출 시 하위호환)
-- `lot_size`: integer → `entry.size`에 반영
-- `holding_target_ticks`: integer → exit의 `max_hold_ticks` 조건에 반영
-- `paradigm`: string → spec의 `description`에 포함
-- `multi_date`: boolean → `universe.dates`를 복수 날짜로 확장
-- `escape_route`: string → spec의 `description`에 포함
-
 ### Output (core)
 - `strategy_id`: string
 - `spec_path`: string
@@ -50,7 +60,7 @@ execution-designer가 넘겨주는 필드:
 
 ## Input
 
-execution-designer의 JSON output (신규 파이프라인) 또는 strategy-ideator의 JSON output (레거시). 두 경우 모두 처리 가능하다. execution-designer output 여부는 `entry_execution` 필드 존재로 판단한다.
+execution-designer의 JSON output (flat form via /experiment adapter: alpha fields + entry_execution/exit_execution/position + deviation_from_brief + alpha_draft_path + execution_draft_path).
 
 ## Decide the strategy kind first
 

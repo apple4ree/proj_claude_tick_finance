@@ -29,50 +29,75 @@ import yaml
 REPO = Path(__file__).resolve().parent.parent
 
 
+def _f(v, default: float = 0.0) -> float:
+    """Safe float coercion for report fields (None → default) to survive format strings."""
+    try:
+        return float(v) if v is not None else default
+    except (TypeError, ValueError):
+        return default
+
+
 def summarize(strat_dir: Path) -> dict:
     r = json.loads((strat_dir / "report.json").read_text())
     spec = yaml.safe_load((strat_dir / "spec.yaml").read_text())
     vp = strat_dir / "validation.json"
     v = json.loads(vp.read_text()) if vp.exists() else None
 
-    rt = r.get("n_roundtrips", 0)
-    wins = int(round((r.get("win_rate_pct", 0) / 100.0) * rt)) if rt else 0
+    rt = int(r.get("n_roundtrips", 0) or 0)
+    wr_pct = _f(r.get("win_rate_pct"), 0.0)
+    wins = int(round((wr_pct / 100.0) * rt)) if rt else 0
     losses = rt - wins
-    exit_mix = r.get("invariant_violation_by_type", {})
+    exit_mix = r.get("invariant_violation_by_type", {}) or {}
 
-    # Alpha / execution diagnosis
-    notes = []
-    if rt > 0 and r.get("avg_exposure", 0) < 0.1:
+    # Alpha / execution diagnosis (safe fallbacks for LOB reports that
+    # omit bar-market fields like avg_exposure / ic_pearson / icir).
+    notes: list[str] = []
+    avg_exp = _f(r.get("avg_exposure"), None)
+    if rt > 0 and avg_exp is not None and avg_exp < 0.1:
         notes.append("low exposure (<10%) — signal rarely fires; intentional sparse entry")
     if rt == 0:
         notes.append("zero roundtrips — signal never triggered in this period")
-    if r.get("information_ratio", 0) > 0.5:
+    ir = _f(r.get("information_ratio"), 0.0)
+    if ir > 0.5:
         notes.append("strong positive IR vs buy-and-hold")
-    elif r.get("information_ratio", 0) < -0.5:
+    elif ir < -0.5:
         notes.append("strongly negative IR — strategy materially underperforms BH")
-    if r.get("invariant_violation_count", 0) > 0:
-        notes.append(f"invariant violations: {r['invariant_violation_count']} ({list(exit_mix.keys())})")
+    n_inv = int(r.get("invariant_violation_count", 0) or 0)
+    if n_inv > 0:
+        notes.append(f"invariant violations: {n_inv} ({list(exit_mix.keys())})")
+
+    # LOB market has no target_symbol/target_horizon; derive from universe.
+    uni = spec.get("universe") or {}
+    market = str(uni.get("market", "") or "")
+    symbols = uni.get("symbols") or []
+    paradigm = spec.get("paradigm") or (
+        (spec.get("handoff_metadata") or {}).get("alpha", {}).get("paradigm")
+        if isinstance(spec.get("handoff_metadata"), dict) else None
+    )
+    symbol_display = spec.get("target_symbol") or (",".join(symbols) if symbols else "—")
+    horizon_display = spec.get("target_horizon") or (market or "—")
 
     return {
         "strategy_id": strat_dir.name,
         "timestamp": datetime.utcnow().isoformat() + "Z",
         "spec": {
-            "paradigm": spec.get("paradigm"),
-            "symbol": spec.get("target_symbol"),
-            "horizon": spec.get("target_horizon"),
+            "paradigm": paradigm or "—",
+            "symbol": symbol_display,
+            "horizon": horizon_display,
+            "market": market or None,
             "params": spec.get("params", {}),
         },
         "backtest": {
-            "return_pct": r.get("return_pct"),
-            "sharpe": r.get("sharpe_annualized"),
-            "mdd_pct": r.get("mdd_pct"),
-            "ic_pearson": r.get("ic_pearson"),
-            "ic_spearman": r.get("ic_spearman"),
-            "icir": r.get("icir"),
-            "information_ratio": r.get("information_ratio"),
+            "return_pct": _f(r.get("return_pct"), 0.0),
+            "sharpe": _f(r.get("sharpe_annualized"), 0.0),
+            "mdd_pct": _f(r.get("mdd_pct"), 0.0),
+            "ic_pearson": _f(r.get("ic_pearson"), 0.0),
+            "ic_spearman": _f(r.get("ic_spearman"), 0.0),
+            "icir": _f(r.get("icir"), 0.0),
+            "information_ratio": _f(r.get("information_ratio"), 0.0),
             "n_roundtrips": rt,
-            "win_rate_pct": r.get("win_rate_pct"),
-            "avg_exposure": r.get("avg_exposure"),
+            "win_rate_pct": wr_pct,
+            "avg_exposure": _f(r.get("avg_exposure"), 0.0),
         },
         "validation": v["gates"] if v else None,
         "oos": v["oos_result"] if v else None,

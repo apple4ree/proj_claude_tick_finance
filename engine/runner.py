@@ -56,8 +56,34 @@ def _resolve_time_window(spec: StrategySpec) -> tuple[int, int] | None:
 
 
 def _build_config(spec: StrategySpec) -> BacktestConfig:
+    """Build a BacktestConfig from the raw spec dict.
+
+    Capital auto-scaling for ``market: crypto_lob``: snapshots carry int64
+    prices scaled by ``CRYPTO_PRICE_SCALE = 1e8`` (see engine/data_loader.py).
+    `starting_cash` and per-order notional share that unit, so a spec that
+    declares a human-unit figure (e.g. ``capital: 100000`` meaning $100k USD)
+    must be multiplied by the same scale factor before the backtester sees
+    it — otherwise every MARKET BUY is instantly rejected for lack of cash.
+
+    Detection heuristic: if ``market == "crypto_lob"`` and ``capital`` is in
+    the human range (≤ 1e9), treat it as real USD and multiply. Authors who
+    already pass a pre-scaled value (> 1e9) are respected unchanged. Emits
+    a one-line stderr note so the adjustment is visible in the pipeline log.
+    """
+    from engine.data_loader import CRYPTO_PRICE_SCALE
+
     raw = spec.raw
-    cap = float(raw.get("capital", 10_000_000))
+    cap_raw = float(raw.get("capital", 10_000_000))
+    market = (raw.get("universe") or {}).get("market", "") or spec.universe.market
+
+    cap = cap_raw
+    if market == "crypto_lob" and cap_raw <= 1e9:
+        cap = cap_raw * float(CRYPTO_PRICE_SCALE)
+        print(
+            f"[runner] crypto_lob: auto-scaled capital {cap_raw:.4g} × "
+            f"CRYPTO_PRICE_SCALE ({CRYPTO_PRICE_SCALE}) = {cap:.4g}"
+        )
+
     fees_cfg = raw.get("fees", {}) or {}
     lat_cfg = raw.get("latency", {}) or {}
     return BacktestConfig(
