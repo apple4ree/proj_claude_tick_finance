@@ -1,0 +1,17 @@
+[
+  {"id": "bar_s16", "symbol": "BTCUSDT", "paradigm": "mean_reversion",       "hint": "RSI-14 oversold < 30 with volume spike filter"},
+  {"id": "bar_s17", "symbol": "BTCUSDT", "paradigm": "trend_follow",         "hint": "Moving Average ribbon (5/10/20/50 alignment)"},
+  {"id": "bar_s18", "symbol": "BTCUSDT", "paradigm": "volatility_regime",    "hint": "ATR contraction + price near 52w high"},
+  {"id": "bar_s19", "symbol": "BTCUSDT", "paradigm": "breakout",             "hint": "Multi-day high breakout with no volume gate"},
+  {"id": "bar_s20", "symbol": "ETHUSDT", "paradigm": "trend_follow",         "hint": "DualSMA 20/60 + ADX trend strength filter"},
+  {"id": "bar_s21", "symbol": "ETHUSDT", "paradigm": "mean_reversion",       "hint": "Z-score of close vs 30d mean, buy when z<-1.5"},
+  {"id": "bar_s22", "symbol": "ETHUSDT", "paradigm": "volatility_regime",    "hint": "Low-vol days (rvol < 30th pct) + trend intact"},
+  {"id": "bar_s23", "symbol": "ETHUSDT", "paradigm": "breakout",             "hint": "20d high with 10d pullback confirmation"},
+  {"id": "bar_s24", "symbol": "SOLUSDT", "paradigm": "trend_follow",         "hint": "Supertrend indicator with ATR stop"},
+  {"id": "bar_s25", "symbol": "SOLUSDT", "paradigm": "mean_reversion",       "hint": "Bollinger mean reversion with RSI divergence"},
+  {"id": "bar_s26", "symbol": "SOLUSDT", "paradigm": "breakout",             "hint": "Narrow Range 7 days breakout (NR7 pattern)"},
+  {"id": "bar_s27", "symbol": "BTCUSDT", "paradigm": "trend_follow",         "hint": "Linear regression slope 30d > 0 with pullback"},
+  {"id": "bar_s28", "symbol": "ETHUSDT", "paradigm": "trend_follow",         "hint": "Price > 200 MA + weekly close > weekly open"},
+  {"id": "bar_s29", "symbol": "SOLUSDT", "paradigm": "volatility_regime",    "hint": "Chaikin volatility + price momentum combined"},
+  {"id": "bar_s30", "symbol": "BTCUSDT", "paradigm": "mean_reversion",       "hint": "CCI < -100 with rising on-balance volume"}
+]

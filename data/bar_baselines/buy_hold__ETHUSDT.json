@@ -1,0 +1,24 @@
+{
+  "strategy": "buy_hold",
+  "symbol": "ETHUSDT",
+  "is": {
+    "total_return_pct": 177.9320766157305,
+    "sharpe_annualized": 1.1836439392194007,
+    "mdd_pct": -45.25610116118868,
+    "n_trades": 1,
+    "n_days_in_market": 730,
+    "avg_exposure": 1.0,
+    "n_days": 730,
+    "final_equity": 2.779320766157305
+  },
+  "oos": {
+    "total_return_pct": -11.611331116022761,
+    "sharpe_annualized": 0.20582439830497523,
+    "mdd_pct": -60.04257684849964,
+    "n_trades": 1,
+    "n_days_in_market": 364,
+    "avg_exposure": 1.0,
+    "n_days": 364,
+    "final_equity": 0.8838866888397724
+  }
+}

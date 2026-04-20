@@ -1,0 +1,60 @@
+{
+  "strategy_id": null,
+  "timestamp": "2026-04-20T06:30:00",
+  "agent_name": "execution-designer",
+  "model_version": "claude-sonnet-4-6",
+  "draft_md_path": "strategies/_drafts/lob_iter2_obi1_spread_gate_execution.md",
+  "name": "lob_iter2_obi1_spread_gate",
+  "hypothesis": "When obi_1 >= per-symbol p90 threshold AND spread_bps < profit_target_bps, a 10-tick directional edge exists in BTC/ETH (rank-1 from top_robust); SOL is structurally gated out by its wider spread.",
+  "entry_condition": "Enter LONG when: (1) obi_1 >= threshold_per_symbol[symbol] (BTC=0.91469, ETH=0.942049, SOL=0.749589); (2) spread_bps < profit_target_bps [spread gate - new in iter-2]; (3) no existing position in this symbol.",
+  "market_context": "24/7 crypto LOB (Binance 100ms snapshots); direction-agnostic at 10-tick horizon; SOL expected excluded by spread gate in most ticks; active universe effectively BTC+ETH until SOL spread normalizes.",
+  "signals_needed": [
+    "obi(depth=1)",
+    "spread_bps"
+  ],
+  "missing_primitive": null,
+  "needs_python": true,
+  "paradigm": "spread_capture",
+  "multi_date": true,
+  "parent_lesson": "lesson_20260420_001_lob_spread_gt_pt_blocks_symbol_before_obi_signal_can_work_implementation_bypass_invalidates_cross_symbol_alpha_assessment",
+  "signal_brief_rank": 1,
+  "universe_rationale": "BTC/ETH/SOL full standard universe; SOL self-excludes via spread gate at runtime, preserving diagnostic visibility into SOL spread regime; BTC+ETH confirmed positive edge from iter-1 (+0.267/+0.184 bps at fee=0).",
+  "escape_route": "If spread gate excludes >90% of SOL ticks and BTC+ETH combined n_trade falls below statistical floor, pivot iter-3 to passive LIMIT_AT_BID maker entry to restore full 3-symbol universe viability.",
+  "brief_realism": {
+    "brief_ev_bps_raw": 0.38,
+    "entry_order_type": "MARKET",
+    "spread_cross_cost_bps": 0.05,
+    "brief_horizon_ticks": 10,
+    "planned_holding_ticks_estimate": 10,
+    "horizon_scale_factor": 1.0,
+    "symbol_trend_pct_during_target_window": null,
+    "regime_compatibility": "unknown",
+    "regime_adjustment_bps": 0.0,
+    "adjusted_ev_bps": 0.33,
+    "decision": "proceed_with_caveat",
+    "rationale": "Per microstructure_primer.md \u00a71.1, BTC/ETH spread at top-of-book averages ~0.05 bps half-spread cost for MARKET entry; SOL is excluded by the spread gate so its 1.17 bps spread does not enter the EV calculation. Per fee_aware_sizing.md \u00a72, fee_to_edge_ratio at real 4-bps taker = 94.7% \u2014 this iteration runs at fee=0 (smoke construct) confirming the gate fix; maker-only execution must be adopted before live deployment. Regime direction for 2026-04-19 LOB sample is unknown (single-day, no macro context), so regime_adjustment=0 and proceed_with_caveat is the appropriate decision pending multi-day OOS confirmation."
+  },
+  "entry_execution": {
+    "price": "ask",
+    "ttl_ticks": null,
+    "cancel_on_bid_drop_ticks": null
+  },
+  "exit_execution": {
+    "profit_target_bps": 1.09,
+    "stop_loss_bps": 1.78,
+    "trailing_stop": false,
+    "trailing_activation_bps": null,
+    "trailing_distance_bps": null
+  },
+  "position": {
+    "lot_size": 1,
+    "max_entries_per_session": 500
+  },
+  "deviation_from_brief": {
+    "pt_pct": -0.099,
+    "sl_pct": 0.041,
+    "rationale": "Baseline is top_robust[1] (obi_5/fwd_10t): pt_bps=1.21, sl_bps=1.71. PT held at iter-1 value 1.09 bps (-9.9% from brief): intra-horizon path concern \u2014 brief note states terminal-return approximation with no path simulation; tighter PT is more likely to trigger on real intra-horizon path than the nominal 1.21 bps terminal value, consistent with the time_stop-primary exit architecture where most exits are timed rather than limit-triggered. SL held at iter-1 value 1.78 bps (+4.1% from brief): gap-risk compensation \u2014 iter-1 observed 10/11 SL exits overshot spec by avg 3.5 bps due to 100ms cadence gap; a slightly wider formal SL accepts the known gap risk at a calibrated level without masking it. Both deviations are within the \u00b120% band."
+  },
+  "alpha_draft_path": "strategies/_drafts/lob_iter2_obi1_spread_gate_alpha.md",
+  "execution_draft_path": "strategies/_drafts/lob_iter2_obi1_spread_gate_execution.md"
+}

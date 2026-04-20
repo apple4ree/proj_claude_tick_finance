@@ -1,0 +1,24 @@
+{
+  "strategy": "ma_cross_20_50",
+  "symbol": "ETHUSDT",
+  "is": {
+    "total_return_pct": 27.87979770561495,
+    "sharpe_annualized": 0.5033245072699349,
+    "mdd_pct": -38.1673013619682,
+    "n_trades": 17,
+    "n_days_in_market": 381,
+    "avg_exposure": 0.5219178082191781,
+    "n_days": 730,
+    "final_equity": 1.2787979770561495
+  },
+  "oos": {
+    "total_return_pct": 43.78881664648795,
+    "sharpe_annualized": 1.1003894463144415,
+    "mdd_pct": -20.902570657577062,
+    "n_trades": 4,
+    "n_days_in_market": 124,
+    "avg_exposure": 0.34065934065934067,
+    "n_days": 364,
+    "final_equity": 1.4378881664648795
+  }
+}

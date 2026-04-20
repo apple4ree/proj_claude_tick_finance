@@ -1,0 +1,67 @@
+[
+  {
+    "strategy_id": "bar_s11_sol_mom_loosest",
+    "symbol": "SOLUSDT",
+    "full_return_pct": 107.29060386947462,
+    "full_sharpe": 0.8168569857855366,
+    "full_mdd_pct": -46.10646089747204,
+    "is_return_pct": 78.49302467668082,
+    "is_sharpe": 0.8900028898585164,
+    "is_mdd_pct": -44.79087851286076,
+    "oos_return_pct": 22.36837966711045,
+    "oos_sharpe": 0.853393604874194,
+    "oos_mdd_pct": -19.444463768484447
+  },
+  {
+    "strategy_id": "bar_s12_btc_bb_wide",
+    "symbol": "BTCUSDT",
+    "full_return_pct": 23.821150320623865,
+    "full_sharpe": 0.8542942228127534,
+    "full_mdd_pct": -6.677348670095129,
+    "is_return_pct": 23.538997062114507,
+    "is_sharpe": 1.0776336101875699,
+    "is_mdd_pct": -6.677348670095129,
+    "oos_return_pct": 3.580158364271191,
+    "oos_sharpe": 1.1842299512627492,
+    "oos_mdd_pct": -0.8042064740672412
+  },
+  {
+    "strategy_id": "bar_s13_eth_breakout_short",
+    "symbol": "ETHUSDT",
+    "full_return_pct": 4.644037453389371,
+    "full_sharpe": 0.18123201812722364,
+    "full_mdd_pct": -39.317058740316554,
+    "is_return_pct": -31.294805738823673,
+    "is_sharpe": -0.7897414331867569,
+    "is_mdd_pct": -39.317058740316554,
+    "oos_return_pct": 52.308771671025255,
+    "oos_sharpe": 1.4925888049057512,
+    "oos_mdd_pct": -19.0061829742951
+  },
+  {
+    "strategy_id": "bar_s14_sol_mom_nostop",
+    "symbol": "SOLUSDT",
+    "full_return_pct": 93.44826264621213,
+    "full_sharpe": 0.8498555638280951,
+    "full_mdd_pct": -23.11226432119439,
+    "is_return_pct": 84.12715690881723,
+    "is_sharpe": 1.0402267430348315,
+    "is_mdd_pct": -23.11226432119439,
+    "oos_return_pct": 12.296156273227442,
+    "oos_sharpe": 0.6357184172464498,
+    "oos_mdd_pct": -14.504291452460198
+  },
+  {
+    "strategy_id": "bar_s15_btc_mom_ls_wide",
+    "symbol": "BTCUSDT",
+    "full_return_pct": -9.964911879001958,
+    "full_sharpe": 0.13465000597840152,
+    "full_mdd_pct": -53.6239437466277,
+    "is_return_pct": 17.85314673418661,
+    "is_sharpe": 0.4071530488194966,
+    "is_mdd_pct": -53.6239437466277,
+    "oos_return_pct": -14.609781890824902,
+    "oos_sharpe": -0.2445502980721129,
+    "oos_mdd_pct": -38.16579643779702
+  }
+]

@@ -1,0 +1,36 @@
+{
+  "id": "crypto_1h_btc_mean_rev_168h_iter1",
+  "passed": true,
+  "gates": {
+    "1_invariants": {
+      "pass": true,
+      "detail": "violations=0 (allow=0)"
+    },
+    "2_oos_sharpe": {
+      "pass": true,
+      "detail": "OOS roundtrips=14 (min=1), Sharpe=-1.31, ret=-8.41%"
+    },
+    "3_ir_vs_bh": {
+      "pass": true,
+      "detail": "OOS IR=+2.35 (min=+0.00), BH=-19.620844206156203"
+    },
+    "4_cross_symbol": {
+      "pass": true,
+      "detail": "standalone (no siblings), soft-pass"
+    }
+  },
+  "oos_result": {
+    "total_ret_pct": -8.41489300247893,
+    "sharpe": -1.307749292213218,
+    "mdd_pct": -18.24454327765748,
+    "n_rt": 14,
+    "exposure": 0.48541666666666666,
+    "bh_ret_pct": -19.620844206156203,
+    "information_ratio": 2.3538765705694984,
+    "window": [
+      "2025-11-01",
+      "2025-12-31"
+    ]
+  },
+  "oos_error": null
+}

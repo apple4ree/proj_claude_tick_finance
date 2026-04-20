@@ -1,6 +1,27 @@
 ---
-description: Open-ended autonomous meta-loop. Runs N iterations advancing an initial seed, with freedom to evolve the framework (engine fixes, DSL extensions, pattern synthesis, methodology shifts) — not just tune strategy parameters. Invokes meta-reviewer every K iterations.
+description: "[DEPRECATED] Use /experiment instead. Open-ended autonomous meta-loop; superseded by the unified /experiment framework."
 argument-hint: <N> [<initial seed — optional>]
+---
+
+> ⚠ **DEPRECATED — `/experiment` is the canonical entry point.**
+>
+> Replace `/iterate <N> "<seed>"` with:
+>
+> ```
+> /experiment --market <m> --symbols <s> \
+>             --is-start <...> --is-end <...> \
+>             --oos-start <...> --oos-end <...> \
+>             --design-mode agent --feedback-mode agent \
+>             --n-iterations <N> --meta-review-every 5
+> ```
+>
+> `/experiment` adds raw-EDA Phase 1, 4-gate validation (invariants / OOS / IR vs
+> buy-and-hold / cross-symbol), BH benchmark, IC/ICIR/IR metrics, and programmatic
+> feedback alongside the legacy agent chain. The agent chain still runs when
+> `--design-mode agent` and `--feedback-mode agent` are set.
+>
+> The body below is retained for archival reference only.
+
 ---
 
 You are orchestrating an **open-ended autonomous meta-loop** for the tick strategy framework.
@@ -28,11 +49,54 @@ This loop is NOT a fixed "ideate → spec → backtest → feedback" pipeline. T
 
 At each iteration boundary, decide which of these applies. Pick exactly one. (If more than one is needed, do them over consecutive iterations.)
 
-1. **New strategy** (standard path) — alpha-designer → execution-designer → spec-writer → [code-generator if missing primitive] → [strategy-coder if needs_strategy_coder=true] → backtest-runner → [alpha-critic + execution-critic in parallel] → feedback-analyst (reconciler). After backtest-runner, invoke alpha-critic and execution-critic **in parallel** (both receive the same metrics JSON). Then pass both critiques to feedback-analyst for reconciliation into the final lesson and seeds.
+1. **New strategy** (standard path) — alpha-designer → execution-designer → spec-writer → [code-generator if missing primitive] → [strategy-coder if needs_strategy_coder=true] → backtest-runner → **attribute_pnl (strict-mode counterfactual)** → [alpha-critic + execution-critic in parallel] → feedback-analyst (reconciler) → **iterate_finalize**. After backtest-runner, run `python scripts/attribute_pnl.py --strategy <id>` to produce `report_strict.json` and update `data/attribution_summary.json` — metrics passed to critics must include `strict_pnl_clean`, `bug_pnl`, `clean_pct_of_total` (schema exactly as emitted by `attribute_pnl.py`). After backtest, invoke alpha-critic and execution-critic **in parallel**. Then pass both critiques to feedback-analyst. Finally invoke `scripts/iterate_finalize.py` (see "Fidelity measurement plumbing" below).
 2. **Engine fix** — when backtest-runner's `anomaly_flag` or an audit check flags a principle violation that blocks progress. Route: code-generator (mode=bugfix) → re-run audit → return to the strategy that triggered it.
 3. **DSL extension** — when spec-writer reports the current grammar cannot express an idea pattern you're seeing repeatedly. Route: spec-writer (meta-authority) or code-generator (mode=dsl_ext), followed by example update.
 4. **Pattern consolidation** — when ≥3 lessons share a root cause. Route: feedback-analyst or strategy-ideator writes `knowledge/patterns/<id>.md` and rebuilds the graph.
 5. **Meta-review** — on K boundary or when stuck. Route: meta-reviewer, then use its `meta_seed` as input to action #1 on the next iteration.
+
+## Iteration context persistence
+
+Each iteration MUST persist its learnings for future iterations to read:
+
+### Per-strategy critique files (after critics complete)
+Write two markdown files to the strategy directory:
+- `strategies/<id>/alpha_critique.md` — alpha-critic's full analysis in readable markdown
+- `strategies/<id>/execution_critique.md` — execution-critic's full analysis in readable markdown
+
+Format:
+```markdown
+# Alpha Critique: <strategy_id>
+
+**Signal edge**: <strong | weak | none | inconclusive>
+
+## WIN vs LOSS Separation
+| Metric | WIN avg | LOSS avg | Delta |
+|---|---|---|---|
+| OBI | <val> | <val> | <val> |
+| spread_bps | <val> | <val> | <val> |
+
+## Selectivity
+<entry_pct>%, assessment: <selective | too_restrictive | broad>
+
+## Regime Dependency
+<assessment>
+
+## Critique
+<2-3 sentences>
+
+## Improvement Direction
+<1 sentence>
+```
+
+### Running iterate context log
+`strategies/_iterate_context.md` is the **primary context source** for all agents in subsequent iterations. **Do NOT append to it manually** — `scripts/iterate_finalize.py` (invoked at each iteration's end; see "Fidelity measurement plumbing" below) is the sole writer. The finalize script is idempotent per (iteration, strategy_id). The block it writes contains `Result / Attribution / Alpha / Execution / Priority / Seed → next`.
+
+When invoking alpha-designer or execution-designer, include in the prompt:
+```
+Read strategies/_iterate_context.md for context from prior iterations in this run.
+```
+This context deliberately excludes handoff-fidelity measurement data (which lives in `strategies/<id>/handoff_audit.json`) so that downstream agent behavior is not affected by paper-pipeline metadata.
 
 ## Loop structure
 
@@ -128,6 +192,58 @@ for i in 1..N:
         current_seed = feedback.local_seed or feedback.next_idea_seed
         seed_type = "local"
 ```
+
+## Fidelity measurement plumbing (MANDATORY per iteration)
+
+After each iteration's chain completes (strategy ran, critics done, feedback produced) and BEFORE moving to the next iteration, run the finalize step. This is pure measurement — it does not change agent behavior, it records what happened so the paper has per-iteration data.
+
+### 1. Log each agent call
+After each subagent in the chain returns, append one line to `strategies/<id>/agent_trace.jsonl` via:
+```bash
+python scripts/log_agent_call.py \
+    --strategy <strategy_id> \
+    --iteration <i> \
+    --agent <alpha-designer|execution-designer|spec-writer|strategy-coder|backtest-runner|alpha-critic|execution-critic|feedback-analyst|meta-reviewer|code-generator|portfolio-designer> \
+    --model <sonnet|opus|haiku> \
+    --status <ok|error|skipped> \
+    [--timestamp <UTC-ISO8601>] [--note "optional short note"]
+```
+Use the `model` field from the agent's frontmatter (`.claude/agents/<name>.md`). `status=skipped` is valid (e.g., when strategy-coder is skipped because `needs_strategy_coder=false`).
+
+**Pre-spec-writer timing rule** — the strategy directory does not exist until spec-writer returns `strategy_id`. So for action-type 1 (new strategy):
+- Buffer `alpha-designer` and `execution-designer` call records in memory (agent name, model, status, and call time).
+- After spec-writer returns `strategy_id`, flush the buffered records using `--timestamp <original-call-time>` so retroactive logs preserve the actual call order.
+- Log spec-writer itself and all subsequent agents immediately after each returns.
+The logger rejects calls pointing at a nonexistent strategy dir — use this buffering sequence to avoid phantom state. The logger is not idempotent (no run-id / call-id in schema), so call it exactly once per agent invocation.
+
+### 2. Run attribute_pnl if not yet run
+If `strategies/<id>/report_strict.json` does not exist, run:
+```bash
+python scripts/attribute_pnl.py --strategy <strategy_id>
+```
+This produces the counterfactual strict-mode report and updates `data/attribution_summary.json`. The resulting `strict_pnl_clean`, `bug_pnl`, `clean_pct_of_total` must be included in the metrics passed to critics (field names match `attribute_pnl.py` output exactly).
+
+### 3. Run iterate_finalize
+At the very end of each iteration:
+```bash
+python scripts/iterate_finalize.py \
+    --strategy <strategy_id> \
+    --iter <i> \
+    --seed-type <local|escape|paradigm|meta> \
+    --return-pct <metrics.return_pct> \
+    --n-roundtrips <metrics.n_roundtrips> \
+    --win-rate <metrics.win_rate_pct> \
+    --alpha-finding "<one line from alpha_critique>" \
+    --execution-finding "<one line from execution_critique>" \
+    --priority <feedback.priority_action> \
+    --next-seed "<feedback.next_idea_seed>"
+```
+This:
+- Runs `attribute_pnl.py` if still missing (idempotent).
+- Writes `strategies/<id>/handoff_audit.json` (per-strategy handoff-fidelity snapshot).
+- Appends an iteration block to `strategies/_iterate_context.md` — which subsequent iterations' agents should read.
+
+Do NOT skip any of steps 1–3. They are what makes the iteration data usable for the fidelity paper.
 
 ## Stopping conditions (STRICT)
 

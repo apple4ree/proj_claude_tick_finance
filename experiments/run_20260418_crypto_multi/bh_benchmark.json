@@ -1,0 +1,154 @@
+{
+  "strategies": [
+    {
+      "id": "crypto_1h_btc_rsi_atr",
+      "symbol": "BTCUSDT",
+      "horizon": "1h",
+      "dates": [
+        "2025-07-01",
+        "2025-12-31"
+      ],
+      "strategy_return_pct": 4.3024220304829885,
+      "strategy_sharpe": 1.3239170943811487,
+      "strategy_mdd_pct": -3.242937031452283,
+      "information_ratio": 1.0394734716187644,
+      "bh_return_pct": -17.857795373721505,
+      "diff_pct": 22.160217404204495,
+      "beats_bh_absolute": true
+    },
+    {
+      "id": "crypto_1h_eth_rsi_atr",
+      "symbol": "ETHUSDT",
+      "horizon": "1h",
+      "dates": [
+        "2025-07-01",
+        "2025-12-31"
+      ],
+      "strategy_return_pct": 5.589491951590664,
+      "strategy_sharpe": 2.022398354693639,
+      "strategy_mdd_pct": -1.232537970745368,
+      "information_ratio": -0.6908032757280869,
+      "bh_return_pct": 18.922466761585813,
+      "diff_pct": -13.33297480999515,
+      "beats_bh_absolute": false
+    },
+    {
+      "id": "crypto_1h_sol_rsi_atr",
+      "symbol": "SOLUSDT",
+      "horizon": "1h",
+      "dates": [
+        "2025-07-01",
+        "2025-12-31"
+      ],
+      "strategy_return_pct": -2.7280400099476076,
+      "strategy_sharpe": -1.009065938798777,
+      "strategy_mdd_pct": -4.194361134913868,
+      "information_ratio": 0.1248929149001896,
+      "bh_return_pct": -19.312083225639693,
+      "diff_pct": 16.584043215692084,
+      "beats_bh_absolute": true
+    },
+    {
+      "id": "crypto_1h_weekly_meanrev_btc",
+      "symbol": "BTCUSDT",
+      "horizon": "1h",
+      "dates": [
+        "2025-07-01",
+        "2025-12-31"
+      ],
+      "strategy_return_pct": -6.464192807789293,
+      "strategy_sharpe": -0.9005693009042429,
+      "strategy_mdd_pct": -14.5834355559084,
+      "information_ratio": 0.5211689296063012,
+      "bh_return_pct": -17.857795373721505,
+      "diff_pct": 11.393602565932213,
+      "beats_bh_absolute": true
+    },
+    {
+      "id": "crypto_1h_weekly_meanrev_eth",
+      "symbol": "ETHUSDT",
+      "horizon": "1h",
+      "dates": [
+        "2025-07-01",
+        "2025-12-31"
+      ],
+      "strategy_return_pct": 8.192781961126405,
+      "strategy_sharpe": 0.5932892396611505,
+      "strategy_mdd_pct": -28.33457072511133,
+      "information_ratio": -0.6243257072098869,
+      "bh_return_pct": 18.922466761585813,
+      "diff_pct": -10.729684800459408,
+      "beats_bh_absolute": false
+    },
+    {
+      "id": "crypto_1h_weekly_meanrev_sol",
+      "symbol": "SOLUSDT",
+      "horizon": "1h",
+      "dates": [
+        "2025-07-01",
+        "2025-12-31"
+      ],
+      "strategy_return_pct": -5.83056112943564,
+      "strategy_sharpe": -0.014164681852062249,
+      "strategy_mdd_pct": -30.76648273120287,
+      "information_ratio": 0.24281103666697282,
+      "bh_return_pct": -19.312083225639693,
+      "diff_pct": 13.481522096204053,
+      "beats_bh_absolute": true
+    },
+    {
+      "id": "crypto_1h_zscore_trend_btc",
+      "symbol": "BTCUSDT",
+      "horizon": "1h",
+      "dates": [
+        "2025-07-01",
+        "2025-12-31"
+      ],
+      "strategy_return_pct": -13.136047311987099,
+      "strategy_sharpe": -1.5219193787880605,
+      "strategy_mdd_pct": -22.00823908672263,
+      "information_ratio": 0.14001012620598627,
+      "bh_return_pct": -17.857795373721505,
+      "diff_pct": 4.721748061734406,
+      "beats_bh_absolute": true
+    },
+    {
+      "id": "crypto_1h_zscore_trend_eth",
+      "symbol": "ETHUSDT",
+      "horizon": "1h",
+      "dates": [
+        "2025-07-01",
+        "2025-12-31"
+      ],
+      "strategy_return_pct": 35.982346089605535,
+      "strategy_sharpe": 2.1123043396754086,
+      "strategy_mdd_pct": -18.1853843242734,
+      "information_ratio": 0.1765919875790845,
+      "bh_return_pct": 18.922466761585813,
+      "diff_pct": 17.059879328019722,
+      "beats_bh_absolute": true
+    },
+    {
+      "id": "crypto_1h_zscore_trend_sol",
+      "symbol": "SOLUSDT",
+      "horizon": "1h",
+      "dates": [
+        "2025-07-01",
+        "2025-12-31"
+      ],
+      "strategy_return_pct": 0.24615419238405156,
+      "strategy_sharpe": 0.190420848112522,
+      "strategy_mdd_pct": -25.263858197243994,
+      "information_ratio": 0.3246968945749938,
+      "bh_return_pct": -19.312083225639693,
+      "diff_pct": 19.558237418023744,
+      "beats_bh_absolute": true
+    }
+  ],
+  "summary": {
+    "total": 9,
+    "comparable": 9,
+    "beat_bh_absolute": 7,
+    "positive_ir_vs_bh": 7
+  }
+}

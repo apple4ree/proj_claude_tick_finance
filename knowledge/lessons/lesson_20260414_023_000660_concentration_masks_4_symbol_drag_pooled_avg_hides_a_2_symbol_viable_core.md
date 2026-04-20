@@ -4,6 +4,8 @@ created: 2026-04-14T12:36:49
 tags: [lesson, universe-filter, symbol-concentration, 000660, 005930, resting-limit, krx, win-rate, iteration-stagnation]
 source: strat_20260414_0025_krx_resting_limit_5sym_spread18
 metric: "return_pct=0.0065 trades=30 win_rate_pct=43.33 n_symbols=5"
+links:
+  - "[[pattern_universe_filter_per_symbol_win_rate_screen]]"
 ---
 
 # 000660 concentration masks 4-symbol drag: pooled avg hides a 2-symbol viable core

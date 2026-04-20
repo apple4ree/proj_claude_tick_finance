@@ -4,7 +4,6 @@ created: 2026-04-14T00:00:00
 tags: [pattern, fees, tax, korea, turnover, tick-scale, lot-size]
 lessons:
   - "[[lesson_20260414_001_absolute_spread_filter_breaks_cross_symbol]]"
-  - "[[lesson_20260414_002_obi_momentum_has_no_edge_over_spread_cost_at_tick_horizon]]"
   - "[[lesson_20260414_003_tax_heavy_korean_market_tight_spread_entry_filter_increases_turnover_fees_dominate_pnl]]"
 ---
 

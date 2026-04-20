@@ -5,10 +5,7 @@ severity: high
 created: 2026-04-14
 links:
   - "[[lesson_20260414_005_mean_reversion_entry_fires_after_reversal_exhausted_ret50_confirmation_too_late]]"
-  - "[[lesson_20260414_007_lob_imbalance_acceleration_fires_at_peak_not_onset]]"
-  - "[[lesson_20260414_009_surface_depth_obi_divergence_enters_after_absorption_not_before]]"
   - "[[lesson_20260414_011_ideator_win_rate_optimism_lob_resilience_recovery_signal_was_anti_edge]]"
-  - "[[lesson_20260414_016_rolling_high_breakout_enters_at_local_top_structural_exhaustion_signal]]"
   - "[[lesson_20260414_017_all_transition_based_entry_signals_fire_at_informationally_neutral_points]]"
 ---
 

@@ -1,0 +1,24 @@
+{
+  "strategy": "momentum_20",
+  "symbol": "BTCUSDT",
+  "is": {
+    "total_return_pct": 146.0227394169933,
+    "sharpe_annualized": 1.3948521087980332,
+    "mdd_pct": -33.708270475127165,
+    "n_trades": 68,
+    "n_days_in_market": 442,
+    "avg_exposure": 0.6054794520547945,
+    "n_days": 730,
+    "final_equity": 2.460227394169933
+  },
+  "oos": {
+    "total_return_pct": -15.643224915425913,
+    "sharpe_annualized": -0.6070330102680479,
+    "mdd_pct": -21.918025618810933,
+    "n_trades": 48,
+    "n_days_in_market": 150,
+    "avg_exposure": 0.41208791208791207,
+    "n_days": 364,
+    "final_equity": 0.8435677508457409
+  }
+}

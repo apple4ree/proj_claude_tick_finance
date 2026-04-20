@@ -1,0 +1,24 @@
+{
+  "strategy": "buy_hold",
+  "symbol": "BTCUSDT",
+  "is": {
+    "total_return_pct": 462.86198857139726,
+    "sharpe_annualized": 2.0151261574788655,
+    "mdd_pct": -26.15137505386774,
+    "n_trades": 1,
+    "n_days_in_market": 730,
+    "avg_exposure": 1.0,
+    "n_days": 730,
+    "final_equity": 5.628619885713973
+  },
+  "oos": {
+    "total_return_pct": -7.385749646067263,
+    "sharpe_annualized": 0.023576965112464602,
+    "mdd_pct": -32.022515264497706,
+    "n_trades": 1,
+    "n_days_in_market": 364,
+    "avg_exposure": 1.0,
+    "n_days": 364,
+    "final_equity": 0.9261425035393274
+  }
+}

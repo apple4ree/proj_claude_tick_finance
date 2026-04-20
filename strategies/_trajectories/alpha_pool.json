@@ -1,0 +1,393 @@
+[
+  {
+    "traj_id": "alpha_001",
+    "symbol": "000660",
+    "signal": "spread_bps",
+    "threshold": 12.128563,
+    "horizon": 3000,
+    "signal_brief_rank": 1,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 20.469,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_002",
+    "symbol": "010140",
+    "signal": "spread_bps",
+    "threshold": 17.497813,
+    "horizon": 3000,
+    "signal_brief_rank": 1,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 33.096,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_003",
+    "symbol": "010140",
+    "signal": "spread_bps",
+    "threshold": 17.467249,
+    "horizon": 3000,
+    "signal_brief_rank": 2,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 32.658,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_004",
+    "symbol": "010140",
+    "signal": "obi_5",
+    "threshold": 0.730319,
+    "horizon": 3000,
+    "signal_brief_rank": 3,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 18.086,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_005",
+    "symbol": "010140",
+    "signal": "obi_10",
+    "threshold": 0.706558,
+    "horizon": 3000,
+    "signal_brief_rank": 4,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 18.547,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_006",
+    "symbol": "010140",
+    "signal": "total_imbalance",
+    "threshold": 0.706558,
+    "horizon": 3000,
+    "signal_brief_rank": 5,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 18.547,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_007",
+    "symbol": "010140",
+    "signal": "obi_1",
+    "threshold": 0.757326,
+    "horizon": 3000,
+    "signal_brief_rank": 6,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 13.084,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_008",
+    "symbol": "010140",
+    "signal": "tob_ratio",
+    "threshold": 7.241514,
+    "horizon": 3000,
+    "signal_brief_rank": 7,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 13.084,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_009",
+    "symbol": "034020",
+    "signal": "spread_bps",
+    "threshold": 9.501188,
+    "horizon": 3000,
+    "signal_brief_rank": 1,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 17.104,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_010",
+    "symbol": "034020",
+    "signal": "mid_ret_100",
+    "threshold": 9.474183,
+    "horizon": 3000,
+    "signal_brief_rank": 2,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 11.793,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_011",
+    "symbol": "035420",
+    "signal": "obi_5",
+    "threshold": 0.643894,
+    "horizon": 3000,
+    "signal_brief_rank": 1,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 24.532,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_012",
+    "symbol": "035420",
+    "signal": "spread_bps",
+    "threshold": 23.01496,
+    "horizon": 3000,
+    "signal_brief_rank": 2,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 19.49,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_013",
+    "symbol": "035420",
+    "signal": "obi_3",
+    "threshold": 0.630062,
+    "horizon": 3000,
+    "signal_brief_rank": 3,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 20.556,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_014",
+    "symbol": "042700",
+    "signal": "slope_diff",
+    "threshold": 6.6215,
+    "horizon": 3000,
+    "signal_brief_rank": 1,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 34.695,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_015",
+    "symbol": "042700",
+    "signal": "obi_5",
+    "threshold": 0.581266,
+    "horizon": 3000,
+    "signal_brief_rank": 2,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 28.6,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_016",
+    "symbol": "042700",
+    "signal": "obi_10",
+    "threshold": 0.469463,
+    "horizon": 3000,
+    "signal_brief_rank": 3,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 27.542,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_017",
+    "symbol": "042700",
+    "signal": "total_imbalance",
+    "threshold": 0.469463,
+    "horizon": 3000,
+    "signal_brief_rank": 4,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 27.542,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_018",
+    "symbol": "042700",
+    "signal": "obi_5",
+    "threshold": 0.491804,
+    "horizon": 3000,
+    "signal_brief_rank": 5,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 22.396,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_019",
+    "symbol": "042700",
+    "signal": "obi_10",
+    "threshold": 0.519599,
+    "horizon": 3000,
+    "signal_brief_rank": 6,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 18.476,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_020",
+    "symbol": "042700",
+    "signal": "total_imbalance",
+    "threshold": 0.519599,
+    "horizon": 3000,
+    "signal_brief_rank": 7,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 18.476,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_021",
+    "symbol": "042700",
+    "signal": "spread_bps",
+    "threshold": 16.934801,
+    "horizon": 3000,
+    "signal_brief_rank": 8,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 21.749,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_022",
+    "symbol": "042700",
+    "signal": "obi_3",
+    "threshold": 0.478394,
+    "horizon": 3000,
+    "signal_brief_rank": 9,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 18.042,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "alpha_023",
+    "symbol": "042700",
+    "signal": "slope_diff",
+    "threshold": 5.0085,
+    "horizon": 3000,
+    "signal_brief_rank": 10,
+    "entry_condition": "",
+    "time_window": [
+      36000,
+      46800
+    ],
+    "ic": 0.0,
+    "q5_bps": 21.789,
+    "score": 0.0,
+    "n_backtests": 0
+  }
+]

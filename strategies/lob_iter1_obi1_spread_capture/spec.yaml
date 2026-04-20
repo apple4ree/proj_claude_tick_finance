@@ -1,0 +1,106 @@
+name: lob_iter1_obi1_spread_capture
+description: |
+  [crypto_lob / spread_capture] LOB iter-1 전략: 최우선호가 수준 OBI(depth=1)가 심볼별 90번째 백분위수 임계값을 돌파할 때 시장가 매수 진입.
+  시그널 근거: obi_1 x fwd_10t 신호가 BTC/ETH/SOL 전 심볼에서 avg_ic=0.2505, min_abs_ic=0.2352로 robust — signal_brief top_robust rank-1.
+  체결 방식: MARKET BUY (ask 가격), maker fee 0 bps (Binance 지정가 리베이트 가정).
+  청산 우선순위: (1) time_stop 10 틱(~1초) — 주 청산 경로; (2) profit_target 1.09 bps / stop_loss 1.78 bps — 극단 경로 캡.
+  시간 제한 청산이 핵심: PT/SL만으로는 손익분기 WR 62%가 필요하나 실현 WR ~40% → time_stop이 없으면 기대값 음수.
+  PT는 brief p75(1.21 bps) 대비 -9.9% 축소(=p50): 100ms 틱 단위 intra-path 모니터링에서 path noise로 인해 p75 도달률이 terminal 분포보다 낮음.
+  SL은 brief(1.62 bps) 대비 +9.9% 확대: entry_stats 기준 path std 0.68-1.06 bps → 정상 경로에서 조기 강제청산 방지.
+  심볼별 obi_threshold: BTCUSDT 0.91469, ETHUSDT 0.942049, SOLUSDT 0.749589 (signal brief threshold_per_symbol).
+  참조 lesson: market_making.md §0 adverse selection / §3 exit urgency escalation.
+  IS 창: 2026-04-19 06:00-22:00 UTC (단일 일자, 단일 LOB 수집 세션).
+
+capital: 1000000.0  # $1M USD — runner auto-scales × CRYPTO_PRICE_SCALE=1e8 for crypto_lob
+
+universe:
+  market: crypto_lob
+  symbols: [BTCUSDT, ETHUSDT, SOLUSDT]
+  time_window:
+    start: "2026-04-19T06:00:00"
+    end:   "2026-04-19T22:00:00"
+  dates: []  # LOB 모드: date-partitioned 루프 없음 — time_window로 대체
+
+fees:
+  commission_bps: 0.0   # Binance maker fee 0 (지정가 리베이트 가정)
+  tax_bps: 0.0          # 크립토: 매도세 없음
+
+latency:
+  submit_ms: 5.0
+  jitter_ms: 1.0
+  seed: 42
+
+strategy_kind: python
+
+params:
+  # --- alpha params ---
+  obi_thresholds:
+    BTCUSDT: 0.91469
+    ETHUSDT: 0.942049
+    SOLUSDT: 0.749589
+  # --- execution params ---
+  entry_price_mode: ask       # MARKET BUY at ask — taker fill certainty
+  entry_ttl_ticks: 0          # 0 = disabled (market order; no resting TTL)
+  cancel_on_bid_drop_ticks: 0 # 0 = disabled
+  profit_target_bps: 1.09
+  stop_loss_bps: 1.78
+  trailing_stop: false
+  trailing_activation_bps: 0.0
+  trailing_distance_bps: 0.0
+  time_stop_ticks: 10         # PRIMARY exit — ~1 second at 100ms cadence
+  lot_size: 1
+  max_entries_per_session: 500
+  max_position_per_symbol: 1
+
+# DSL placeholders — strategy_kind=python; logic is in strategy.py (to be written by strategy-coder)
+signals: {}
+entry:
+  when: false
+  size: 1
+exit:
+  when: false
+
+risk:
+  max_position_per_symbol: 1
+
+# ---------------------------------------------------------------------------
+# Handoff metadata — preserved for audit traceability
+# ---------------------------------------------------------------------------
+handoff_metadata:
+  signal_brief_rank: 1
+  universe_rationale: >
+    BTCUSDT/ETHUSDT/SOLUSDT pass cross-symbol robustness filter with same-sign IC
+    (BTC=0.253, ETH=0.263, SOL=0.235) and min_abs_ic=0.2352 >> 0.04 floor —
+    strongest robustness of all LOB signals in brief.
+  brief_realism:
+    brief_ev_bps_raw: 0.38
+    entry_order_type: MARKET
+    spread_cross_cost_bps: 0.065
+    brief_horizon_ticks: 10
+    planned_holding_ticks_estimate: 10
+    horizon_scale_factor: 1.0
+    symbol_trend_pct_during_target_window: 0.5
+    regime_compatibility: partial
+    regime_adjustment_bps: 0.2
+    adjusted_ev_bps: 0.115
+    decision: proceed_with_caveat
+    rationale: >
+      MARKET entry at half-spread cost (0.065 bps) preserves fill certainty at
+      ephemeral 1-second OBI signal horizon; regime marked partial due to
+      single-day IS window; adjusted EV 0.115 bps is positive but thin —
+      any taker fee above 0 bps eliminates the edge entirely.
+  deviation_from_brief:
+    pt_pct: -0.099
+    sl_pct: 0.099
+    rationale: >
+      PT reduced 9.9% from brief 1.21 bps to 1.09 bps (p75→p50): intra-path
+      100ms monitoring reaches p75 less often than terminal distribution implies
+      due to path noise. SL raised 9.9% from brief 1.62 bps to 1.78 bps:
+      path std 0.68-1.06 bps → 1.62 bps reachable on normal winning paths.
+      Primary exit remains time_stop at 10 ticks; PT/SL cap extreme paths only.
+  draft_notes:
+    alpha_draft_path: strategies/_drafts/lob_iter1_obi1_spread_capture_alpha.md
+    execution_draft_path: strategies/_drafts/lob_iter1_obi1_spread_capture_execution.md
+  agent_name: execution-designer
+  model_version: claude-sonnet-4-6
+  timestamp: "2026-04-20T00:00:00"

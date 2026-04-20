@@ -13,6 +13,20 @@ You do NOT write spec.yaml — that's spec-writer's job. You do NOT design the s
 
 ---
 
+## References consultation (항상)
+
+Before writing any `strategy.py`, consult:
+
+| When | Read |
+|---|---|
+| **항상** (모든 python path 구현) | `references/python_impl_patterns.md` — SL on `bid_px[0]` not `mid` (strat_0028 7× overshoot 방지), per-symbol spread gate, trailing state machine, TTL + bid-drop cancel, anti-pattern catalog |
+| Trailing stop 구현 시 | `references/exit_design.md` §2.2 (ATR trailing, activation/distance state 관리) |
+| MM 주문 라이프사이클 (cancel/re-submit) 구현 시 | `references/market_making.md` §2.3 (hybrid time-in-queue), §7 (SimpleMM pseudo-code) |
+
+**필수**: 위 첫 번째 행은 항상 읽는다. §2 "SL reference price rule"과 §8 "Anti-patterns"을 구현 전에 반드시 확인. 산출물 JSON의 `patterns_implemented` 목록에는 python_impl_patterns.md에서 적용한 패턴명을 포함할 것 (e.g., `"sl_on_bid_px"`, `"trailing_state_machine"`, `"per_symbol_spread_gate"`).
+
+---
+
 ## KRX Engine Constraints (반드시 준수)
 
 - **Latency**: orders submitted at tick T fill at T + 5ms+ → position qty does NOT update instantly
@@ -222,6 +236,49 @@ def _tick_size(self, sym: str) -> int:
         return min(nonzero) if nonzero else 100
     return 100
 ```
+
+---
+
+## Invariant Checklist (MANDATORY)
+
+The engine auto-checks 7 invariants from spec.yaml. Your generated strategy.py MUST honor each:
+
+1. **sl_overshoot** (stop_loss_bps): SL monitoring MUST use bid_px[0], NOT mid.
+   ```python
+   current_bid = float(snap.bid_px[0])
+   loss_bps = (entry_price - current_bid) / entry_price * 1e4
+   if loss_bps >= self.stop_loss_bps:  # correct
+       submit MARKET SELL
+   ```
+   Add a 5-tick guard to avoid false triggers from the fill-spread gap:
+   `if ticks_held >= 5:` before the SL check.
+
+2. **entry_gate_end_bypass** (entry_end_time_seconds): Cancel resting BUY when `kst_sec >= entry_end_sec`.
+   ```python
+   if sym in self._pending_buy and kst_sec >= self.entry_end_sec:
+       del self._pending_buy[sym]
+       return [Order(sym, None, 0, order_type=CANCEL, tag="cancel_past_entry_end")]
+   ```
+
+3. **entry_gate_start_bypass** (entry_start_time_seconds): Do not submit BUY before `entry_start_sec`.
+
+4. **max_entries_exceeded** (max_entries_per_session): Track `self._entries_today[sym]`, increment on submit, compare before submitting.
+
+5. **max_position_exceeded** (max_position_per_symbol): BEFORE submitting a new BUY, check:
+   ```python
+   pos = ctx.portfolio.positions.get(sym)
+   if pos and pos.qty > 0:   # already holding — do not submit second BUY
+       return []
+   if sym in self._pending_buy:   # pending order in flight — wait for confirmation
+       return []
+   ```
+   This prevents the double-fill bug where two BUYs fill on the same tick.
+
+6. **time_stop_overshoot** (time_stop_ticks): Track `self._ticks_in_position[sym]` and increment each tick while in position. Submit MARKET SELL when it reaches the threshold. Reset to 0 on every new fill.
+
+7. **pt_overshoot** (profit_target_bps): LIMIT SELL at exactly `entry_price * (1 + pt_bps/1e4)` — do not overshoot.
+
+**Verification**: After running the backtest, check `report.json.invariant_violations`. A well-written strategy has an empty list.
 
 ---
 

@@ -1,0 +1,664 @@
+{
+  "market": "crypto_lob",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT"
+  ],
+  "is_period": {
+    "start": "2026-04-19T06:00:00",
+    "end": "2026-04-19T22:00:00",
+    "start_ns": 1776578400000000000,
+    "end_ns": 1776636000000000000
+  },
+  "fee_bps": 0.0,
+  "threshold_percentile": 90,
+  "robustness": {
+    "min_abs_ic": 0.02,
+    "criterion": "same sign across all symbols AND min |IC| >= threshold"
+  },
+  "top_robust": [
+    {
+      "feature": "obi_1",
+      "horizon": "fwd_10t",
+      "avg_ic": 0.2505,
+      "min_abs_ic": 0.2352,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.253,
+        "ETHUSDT": 0.2633,
+        "SOLUSDT": 0.2352
+      },
+      "direction": "long",
+      "entry_side": "high",
+      "threshold_percentile": 90,
+      "threshold_per_symbol": {
+        "BTCUSDT": 0.91469,
+        "ETHUSDT": 0.942049,
+        "SOLUSDT": 0.749589
+      },
+      "entry_stats_per_symbol": {
+        "BTCUSDT": {
+          "n_entry": 57273,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.3,
+          "std_fwd_bps": 0.68,
+          "win_rate_pct": 36.36
+        },
+        "ETHUSDT": {
+          "n_entry": 57229,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.42,
+          "std_fwd_bps": 0.9,
+          "win_rate_pct": 50.61
+        },
+        "SOLUSDT": {
+          "n_entry": 44116,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.46,
+          "std_fwd_bps": 1.06,
+          "win_rate_pct": 30.96
+        }
+      },
+      "optimal_exit": {
+        "pt_bps": 1.21,
+        "sl_bps": 1.62,
+        "horizon_ticks": 10,
+        "win_rate_pct": 40.0,
+        "mean_fwd_bps": 0.38,
+        "note": "terminal-return approximation over tick horizon; no intra-horizon path simulation. Units: ticks (100ms cadence for BTC/ETH/SOL)."
+      },
+      "ev_bps_after_fee": 0.38,
+      "viable": true,
+      "fee_bps_used": 0.0
+    },
+    {
+      "feature": "obi_5",
+      "horizon": "fwd_10t",
+      "avg_ic": 0.2183,
+      "min_abs_ic": 0.1375,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2529,
+        "ETHUSDT": 0.2645,
+        "SOLUSDT": 0.1375
+      },
+      "direction": "long",
+      "entry_side": "high",
+      "threshold_percentile": 90,
+      "threshold_per_symbol": {
+        "BTCUSDT": 0.919318,
+        "ETHUSDT": 0.926172,
+        "SOLUSDT": 0.337962
+      },
+      "entry_stats_per_symbol": {
+        "BTCUSDT": {
+          "n_entry": 57271,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.3,
+          "std_fwd_bps": 0.68,
+          "win_rate_pct": 36.44
+        },
+        "ETHUSDT": {
+          "n_entry": 57236,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.42,
+          "std_fwd_bps": 0.91,
+          "win_rate_pct": 49.54
+        },
+        "SOLUSDT": {
+          "n_entry": 44114,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.24,
+          "std_fwd_bps": 1.0,
+          "win_rate_pct": 20.15
+        }
+      },
+      "optimal_exit": {
+        "pt_bps": 1.21,
+        "sl_bps": 1.71,
+        "horizon_ticks": 10,
+        "win_rate_pct": 36.64,
+        "mean_fwd_bps": 0.33,
+        "note": "terminal-return approximation over tick horizon; no intra-horizon path simulation. Units: ticks (100ms cadence for BTC/ETH/SOL)."
+      },
+      "ev_bps_after_fee": 0.33,
+      "viable": true,
+      "fee_bps_used": 0.0
+    },
+    {
+      "feature": "obi_10",
+      "horizon": "fwd_10t",
+      "avg_ic": 0.2039,
+      "min_abs_ic": 0.0978,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2532,
+        "ETHUSDT": 0.2607,
+        "SOLUSDT": 0.0978
+      },
+      "direction": "long",
+      "entry_side": "high",
+      "threshold_percentile": 90,
+      "threshold_per_symbol": {
+        "BTCUSDT": 0.921407,
+        "ETHUSDT": 0.912953,
+        "SOLUSDT": 0.231817
+      },
+      "entry_stats_per_symbol": {
+        "BTCUSDT": {
+          "n_entry": 57271,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.3,
+          "std_fwd_bps": 0.68,
+          "win_rate_pct": 36.57
+        },
+        "ETHUSDT": {
+          "n_entry": 57228,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.4,
+          "std_fwd_bps": 0.91,
+          "win_rate_pct": 47.77
+        },
+        "SOLUSDT": {
+          "n_entry": 44114,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.17,
+          "std_fwd_bps": 0.98,
+          "win_rate_pct": 16.91
+        }
+      },
+      "optimal_exit": {
+        "pt_bps": 1.21,
+        "sl_bps": 1.67,
+        "horizon_ticks": 10,
+        "win_rate_pct": 35.14,
+        "mean_fwd_bps": 0.3,
+        "note": "terminal-return approximation over tick horizon; no intra-horizon path simulation. Units: ticks (100ms cadence for BTC/ETH/SOL)."
+      },
+      "ev_bps_after_fee": 0.3,
+      "viable": true,
+      "fee_bps_used": 0.0
+    },
+    {
+      "feature": "total_imbalance",
+      "horizon": "fwd_10t",
+      "avg_ic": 0.2039,
+      "min_abs_ic": 0.0978,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2532,
+        "ETHUSDT": 0.2607,
+        "SOLUSDT": 0.0978
+      },
+      "direction": "long",
+      "entry_side": "high",
+      "threshold_percentile": 90,
+      "threshold_per_symbol": {
+        "BTCUSDT": 0.921407,
+        "ETHUSDT": 0.912953,
+        "SOLUSDT": 0.231817
+      },
+      "entry_stats_per_symbol": {
+        "BTCUSDT": {
+          "n_entry": 57271,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.3,
+          "std_fwd_bps": 0.68,
+          "win_rate_pct": 36.57
+        },
+        "ETHUSDT": {
+          "n_entry": 57228,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.4,
+          "std_fwd_bps": 0.91,
+          "win_rate_pct": 47.77
+        },
+        "SOLUSDT": {
+          "n_entry": 44114,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.17,
+          "std_fwd_bps": 0.98,
+          "win_rate_pct": 16.91
+        }
+      },
+      "optimal_exit": {
+        "pt_bps": 1.21,
+        "sl_bps": 1.67,
+        "horizon_ticks": 10,
+        "win_rate_pct": 35.14,
+        "mean_fwd_bps": 0.3,
+        "note": "terminal-return approximation over tick horizon; no intra-horizon path simulation. Units: ticks (100ms cadence for BTC/ETH/SOL)."
+      },
+      "ev_bps_after_fee": 0.3,
+      "viable": true,
+      "fee_bps_used": 0.0
+    },
+    {
+      "feature": "obi_1",
+      "horizon": "fwd_100t",
+      "avg_ic": 0.1988,
+      "min_abs_ic": 0.1513,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2335,
+        "ETHUSDT": 0.2117,
+        "SOLUSDT": 0.1513
+      },
+      "direction": "long",
+      "entry_side": "high",
+      "threshold_percentile": 90,
+      "threshold_per_symbol": {
+        "BTCUSDT": 0.914715,
+        "ETHUSDT": 0.942065,
+        "SOLUSDT": 0.749606
+      },
+      "entry_stats_per_symbol": {
+        "BTCUSDT": {
+          "n_entry": 57262,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.77,
+          "std_fwd_bps": 2.14,
+          "win_rate_pct": 66.21
+        },
+        "ETHUSDT": {
+          "n_entry": 57220,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 1.0,
+          "std_fwd_bps": 3.14,
+          "win_rate_pct": 68.61
+        },
+        "SOLUSDT": {
+          "n_entry": 44107,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.91,
+          "std_fwd_bps": 3.45,
+          "win_rate_pct": 56.25
+        }
+      },
+      "optimal_exit": {
+        "pt_bps": 2.95,
+        "sl_bps": 2.98,
+        "horizon_ticks": 100,
+        "win_rate_pct": 64.3,
+        "mean_fwd_bps": 0.89,
+        "note": "terminal-return approximation over tick horizon; no intra-horizon path simulation. Units: ticks (100ms cadence for BTC/ETH/SOL)."
+      },
+      "ev_bps_after_fee": 0.89,
+      "viable": true,
+      "fee_bps_used": 0.0
+    },
+    {
+      "feature": "obi_5",
+      "horizon": "fwd_100t",
+      "avg_ic": 0.1797,
+      "min_abs_ic": 0.0945,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2335,
+        "ETHUSDT": 0.211,
+        "SOLUSDT": 0.0945
+      },
+      "direction": "long",
+      "entry_side": "high",
+      "threshold_percentile": 90,
+      "threshold_per_symbol": {
+        "BTCUSDT": 0.919333,
+        "ETHUSDT": 0.926172,
+        "SOLUSDT": 0.338004
+      },
+      "entry_stats_per_symbol": {
+        "BTCUSDT": {
+          "n_entry": 57262,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.8,
+          "std_fwd_bps": 2.13,
+          "win_rate_pct": 66.36
+        },
+        "ETHUSDT": {
+          "n_entry": 57236,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 1.02,
+          "std_fwd_bps": 3.09,
+          "win_rate_pct": 68.64
+        },
+        "SOLUSDT": {
+          "n_entry": 44105,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.46,
+          "std_fwd_bps": 3.3,
+          "win_rate_pct": 48.24
+        }
+      },
+      "optimal_exit": {
+        "pt_bps": 2.89,
+        "sl_bps": 3.19,
+        "horizon_ticks": 100,
+        "win_rate_pct": 62.14,
+        "mean_fwd_bps": 0.78,
+        "note": "terminal-return approximation over tick horizon; no intra-horizon path simulation. Units: ticks (100ms cadence for BTC/ETH/SOL)."
+      },
+      "ev_bps_after_fee": 0.78,
+      "viable": true,
+      "fee_bps_used": 0.0
+    },
+    {
+      "feature": "obi_5_ewm_10",
+      "horizon": "fwd_10t",
+      "avg_ic": 0.1792,
+      "min_abs_ic": 0.102,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2128,
+        "ETHUSDT": 0.2226,
+        "SOLUSDT": 0.102
+      },
+      "direction": "long",
+      "entry_side": "high",
+      "threshold_percentile": 90,
+      "threshold_per_symbol": {
+        "BTCUSDT": 0.884303,
+        "ETHUSDT": 0.865889,
+        "SOLUSDT": 0.323471
+      },
+      "entry_stats_per_symbol": {
+        "BTCUSDT": {
+          "n_entry": 57271,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.21,
+          "std_fwd_bps": 0.58,
+          "win_rate_pct": 28.66
+        },
+        "ETHUSDT": {
+          "n_entry": 57228,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.29,
+          "std_fwd_bps": 0.78,
+          "win_rate_pct": 38.74
+        },
+        "SOLUSDT": {
+          "n_entry": 44114,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.16,
+          "std_fwd_bps": 0.94,
+          "win_rate_pct": 16.65
+        }
+      },
+      "optimal_exit": {
+        "pt_bps": 1.18,
+        "sl_bps": 1.76,
+        "horizon_ticks": 10,
+        "win_rate_pct": 28.96,
+        "mean_fwd_bps": 0.23,
+        "note": "terminal-return approximation over tick horizon; no intra-horizon path simulation. Units: ticks (100ms cadence for BTC/ETH/SOL)."
+      },
+      "ev_bps_after_fee": 0.23,
+      "viable": true,
+      "fee_bps_used": 0.0
+    },
+    {
+      "feature": "microprice_diff_bps",
+      "horizon": "fwd_10t",
+      "avg_ic": 0.1723,
+      "min_abs_ic": 0.0534,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.0534,
+        "ETHUSDT": 0.2287,
+        "SOLUSDT": 0.235
+      },
+      "direction": "long",
+      "entry_side": "high",
+      "threshold_percentile": 90,
+      "threshold_per_symbol": {
+        "BTCUSDT": 0.000608,
+        "ETHUSDT": 0.020363,
+        "SOLUSDT": 0.438294
+      },
+      "entry_stats_per_symbol": {
+        "BTCUSDT": {
+          "n_entry": 57271,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.3,
+          "std_fwd_bps": 0.69,
+          "win_rate_pct": 36.44
+        },
+        "ETHUSDT": {
+          "n_entry": 57229,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.41,
+          "std_fwd_bps": 0.91,
+          "win_rate_pct": 50.61
+        },
+        "SOLUSDT": {
+          "n_entry": 44116,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.45,
+          "std_fwd_bps": 1.05,
+          "win_rate_pct": 30.8
+        }
+      },
+      "optimal_exit": {
+        "pt_bps": 1.21,
+        "sl_bps": 1.73,
+        "horizon_ticks": 10,
+        "win_rate_pct": 39.98,
+        "mean_fwd_bps": 0.38,
+        "note": "terminal-return approximation over tick horizon; no intra-horizon path simulation. Units: ticks (100ms cadence for BTC/ETH/SOL)."
+      },
+      "ev_bps_after_fee": 0.38,
+      "viable": true,
+      "fee_bps_used": 0.0
+    },
+    {
+      "feature": "obi_10",
+      "horizon": "fwd_100t",
+      "avg_ic": 0.1714,
+      "min_abs_ic": 0.0719,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2346,
+        "ETHUSDT": 0.2076,
+        "SOLUSDT": 0.0719
+      },
+      "direction": "long",
+      "entry_side": "high",
+      "threshold_percentile": 90,
+      "threshold_per_symbol": {
+        "BTCUSDT": 0.921417,
+        "ETHUSDT": 0.912954,
+        "SOLUSDT": 0.231845
+      },
+      "entry_stats_per_symbol": {
+        "BTCUSDT": {
+          "n_entry": 57268,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.81,
+          "std_fwd_bps": 2.13,
+          "win_rate_pct": 66.47
+        },
+        "ETHUSDT": {
+          "n_entry": 57227,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.97,
+          "std_fwd_bps": 3.11,
+          "win_rate_pct": 68.01
+        },
+        "SOLUSDT": {
+          "n_entry": 44105,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.28,
+          "std_fwd_bps": 3.21,
+          "win_rate_pct": 45.36
+        }
+      },
+      "optimal_exit": {
+        "pt_bps": 2.8,
+        "sl_bps": 3.06,
+        "horizon_ticks": 100,
+        "win_rate_pct": 61.15,
+        "mean_fwd_bps": 0.72,
+        "note": "terminal-return approximation over tick horizon; no intra-horizon path simulation. Units: ticks (100ms cadence for BTC/ETH/SOL)."
+      },
+      "ev_bps_after_fee": 0.72,
+      "viable": true,
+      "fee_bps_used": 0.0
+    },
+    {
+      "feature": "total_imbalance",
+      "horizon": "fwd_100t",
+      "avg_ic": 0.1714,
+      "min_abs_ic": 0.0719,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2346,
+        "ETHUSDT": 0.2076,
+        "SOLUSDT": 0.0719
+      },
+      "direction": "long",
+      "entry_side": "high",
+      "threshold_percentile": 90,
+      "threshold_per_symbol": {
+        "BTCUSDT": 0.921417,
+        "ETHUSDT": 0.912954,
+        "SOLUSDT": 0.231845
+      },
+      "entry_stats_per_symbol": {
+        "BTCUSDT": {
+          "n_entry": 57268,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.81,
+          "std_fwd_bps": 2.13,
+          "win_rate_pct": 66.47
+        },
+        "ETHUSDT": {
+          "n_entry": 57227,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.97,
+          "std_fwd_bps": 3.11,
+          "win_rate_pct": 68.01
+        },
+        "SOLUSDT": {
+          "n_entry": 44105,
+          "entry_pct": 10.0,
+          "mean_fwd_bps": 0.28,
+          "std_fwd_bps": 3.21,
+          "win_rate_pct": 45.36
+        }
+      },
+      "optimal_exit": {
+        "pt_bps": 2.8,
+        "sl_bps": 3.06,
+        "horizon_ticks": 100,
+        "win_rate_pct": 61.15,
+        "mean_fwd_bps": 0.72,
+        "note": "terminal-return approximation over tick horizon; no intra-horizon path simulation. Units: ticks (100ms cadence for BTC/ETH/SOL)."
+      },
+      "ev_bps_after_fee": 0.72,
+      "viable": true,
+      "fee_bps_used": 0.0
+    }
+  ],
+  "top_overall_any_sign": [
+    {
+      "feature": "obi_1",
+      "horizon": "fwd_10t",
+      "avg_ic": 0.2505,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.253,
+        "ETHUSDT": 0.2633,
+        "SOLUSDT": 0.2352
+      }
+    },
+    {
+      "feature": "obi_5",
+      "horizon": "fwd_10t",
+      "avg_ic": 0.2183,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2529,
+        "ETHUSDT": 0.2645,
+        "SOLUSDT": 0.1375
+      }
+    },
+    {
+      "feature": "obi_10",
+      "horizon": "fwd_10t",
+      "avg_ic": 0.2039,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2532,
+        "ETHUSDT": 0.2607,
+        "SOLUSDT": 0.0978
+      }
+    },
+    {
+      "feature": "total_imbalance",
+      "horizon": "fwd_10t",
+      "avg_ic": 0.2039,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2532,
+        "ETHUSDT": 0.2607,
+        "SOLUSDT": 0.0978
+      }
+    },
+    {
+      "feature": "obi_1",
+      "horizon": "fwd_100t",
+      "avg_ic": 0.1988,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2335,
+        "ETHUSDT": 0.2117,
+        "SOLUSDT": 0.1513
+      }
+    },
+    {
+      "feature": "obi_5",
+      "horizon": "fwd_100t",
+      "avg_ic": 0.1797,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2335,
+        "ETHUSDT": 0.211,
+        "SOLUSDT": 0.0945
+      }
+    },
+    {
+      "feature": "obi_5_ewm_10",
+      "horizon": "fwd_10t",
+      "avg_ic": 0.1792,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2128,
+        "ETHUSDT": 0.2226,
+        "SOLUSDT": 0.102
+      }
+    },
+    {
+      "feature": "microprice_diff_bps",
+      "horizon": "fwd_10t",
+      "avg_ic": 0.1723,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.0534,
+        "ETHUSDT": 0.2287,
+        "SOLUSDT": 0.235
+      }
+    },
+    {
+      "feature": "obi_10",
+      "horizon": "fwd_100t",
+      "avg_ic": 0.1714,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2346,
+        "ETHUSDT": 0.2076,
+        "SOLUSDT": 0.0719
+      }
+    },
+    {
+      "feature": "total_imbalance",
+      "horizon": "fwd_100t",
+      "avg_ic": 0.1714,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.2346,
+        "ETHUSDT": 0.2076,
+        "SOLUSDT": 0.0719
+      }
+    }
+  ]
+}

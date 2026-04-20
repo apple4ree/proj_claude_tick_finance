@@ -1,0 +1,69 @@
+{
+  "strategy_id": "crypto_1h_btc_mean_rev_168h_iter1",
+  "timestamp": "2026-04-19T04:12:16.792756Z",
+  "spec": {
+    "paradigm": null,
+    "symbol": "BTCUSDT",
+    "horizon": "1h",
+    "params": {
+      "roc_168h_threshold": -0.056226,
+      "entry_side": "low",
+      "entry_price_mode": "ask",
+      "entry_ttl_ticks": 0,
+      "cancel_on_bid_drop_ticks": 0,
+      "profit_target_bps": 1312.07,
+      "stop_loss_bps": 450.79,
+      "trailing_stop": true,
+      "trailing_activation_bps": 600.0,
+      "trailing_distance_bps": 300.0,
+      "lot_size": 1,
+      "max_entries_per_session": 1
+    }
+  },
+  "backtest": {
+    "return_pct": -7.069428886132689,
+    "sharpe": -0.4180571307290767,
+    "mdd_pct": -22.70261442591647,
+    "ic_pearson": 0.0012152220542060613,
+    "ic_spearman": 0.007387460535382032,
+    "icir": 2.396980392887695,
+    "information_ratio": 0.7090853792384931,
+    "n_roundtrips": 12,
+    "win_rate_pct": 41.67,
+    "avg_exposure": 0.34380692167577415
+  },
+  "validation": {
+    "1_invariants": {
+      "pass": true,
+      "detail": "violations=0 (allow=0)"
+    },
+    "2_oos_sharpe": {
+      "pass": true,
+      "detail": "OOS roundtrips=14 (min=1), Sharpe=-1.31, ret=-8.41%"
+    },
+    "3_ir_vs_bh": {
+      "pass": true,
+      "detail": "OOS IR=+2.35 (min=+0.00), BH=-19.620844206156203"
+    },
+    "4_cross_symbol": {
+      "pass": true,
+      "detail": "standalone (no siblings), soft-pass"
+    }
+  },
+  "oos": {
+    "total_ret_pct": -8.41489300247893,
+    "sharpe": -1.307749292213218,
+    "mdd_pct": -18.24454327765748,
+    "n_rt": 14,
+    "exposure": 0.48541666666666666,
+    "bh_ret_pct": -19.620844206156203,
+    "information_ratio": 2.3538765705694984,
+    "window": [
+      "2025-11-01",
+      "2025-12-31"
+    ]
+  },
+  "notes": [
+    "strong positive IR vs buy-and-hold"
+  ]
+}

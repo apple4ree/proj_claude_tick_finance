@@ -1,0 +1,56 @@
+[
+  {
+    "traj_id": "exec_001",
+    "entry_mode": "passive_maker",
+    "entry_price": "bid",
+    "ttl_ticks": 75,
+    "profit_target_bps": 80,
+    "stop_loss_bps": 80,
+    "sl_reference": "bid_px",
+    "trailing": {
+      "activation": 60,
+      "distance": 40
+    },
+    "time_stop_ticks": 3000,
+    "max_entries_per_session": 3,
+    "cancel_on_bid_drop_ticks": 2,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "exec_002",
+    "entry_mode": "passive_maker",
+    "entry_price": "bid",
+    "ttl_ticks": 75,
+    "profit_target_bps": 80,
+    "stop_loss_bps": 50,
+    "sl_reference": "bid_px",
+    "trailing": {
+      "activation": 50,
+      "distance": 30
+    },
+    "time_stop_ticks": 3000,
+    "max_entries_per_session": 3,
+    "cancel_on_bid_drop_ticks": 2,
+    "score": 0.0,
+    "n_backtests": 0
+  },
+  {
+    "traj_id": "exec_003",
+    "entry_mode": "taker",
+    "entry_price": "ask",
+    "ttl_ticks": 0,
+    "profit_target_bps": 60,
+    "stop_loss_bps": 30,
+    "sl_reference": "bid_px",
+    "trailing": {
+      "activation": 30,
+      "distance": 15
+    },
+    "time_stop_ticks": 1000,
+    "max_entries_per_session": 3,
+    "cancel_on_bid_drop_ticks": 0,
+    "score": 0.0,
+    "n_backtests": 0
+  }
+]

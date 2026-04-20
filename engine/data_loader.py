@@ -18,7 +18,22 @@ import numpy as np
 import pandas as pd
 
 DATA_ROOT = Path("/home/dgu/tick/open-trading-api/data/realtime/H0STASP0")
+CRYPTO_ROOT = Path("/home/dgu/tick/crypto")
 N_LEVELS = 10
+
+# Mutable override — set by engine.runner when spec has data_root
+_active_root: Path | None = None
+
+
+def set_data_root(root: Path | str) -> None:
+    """Override DATA_ROOT for this process (e.g., crypto data)."""
+    global _active_root
+    _active_root = Path(root)
+
+
+def get_data_root() -> Path:
+    """Return the currently active data root."""
+    return _active_root if _active_root is not None else DATA_ROOT
 
 ASK_PX_COLS = [f"ASKP{i}" for i in range(1, N_LEVELS + 1)]
 BID_PX_COLS = [f"BIDP{i}" for i in range(1, N_LEVELS + 1)]
@@ -51,7 +66,7 @@ class OrderBookSnapshot:
 
 
 def _csv_path(date: str, symbol: str) -> Path:
-    return DATA_ROOT / date / f"{symbol}.csv"
+    return get_data_root() / date / f"{symbol}.csv"
 
 
 _STR_COLS = ("MKSC_SHRN_ISCD", "HOUR_CLS_CODE", "tr_id")
@@ -101,6 +116,117 @@ def df_to_snapshots(df: pd.DataFrame) -> Iterator[OrderBookSnapshot]:
 
 def load_day(date: str, symbol: str) -> pd.DataFrame:
     return load_csv(_csv_path(date, symbol))
+
+
+# ---------------------------------------------------------------------------
+# Crypto LOB adapter (2026-04-19 Phase X3)
+#
+# Binance @depth20@100ms parquet archive → OrderBookSnapshot iterator.
+# The engine core is int64-based (KRX KRW-denominated legacy); to fit crypto
+# float prices (e.g. BTC 75468.85) and float qty (e.g. 1.09043) into that
+# contract without rewriting the simulator, we scale by CRYPTO_PRICE_SCALE
+# before loading. Return-percentage metrics are unit-invariant under this
+# scaling, so downstream Sharpe / return_pct / IR numbers are preserved.
+# ---------------------------------------------------------------------------
+
+CRYPTO_LOB_ROOT = Path("data/binance_lob")
+CRYPTO_PRICE_SCALE = 10 ** 8   # 8-decimal precision (satoshi-equivalent)
+CRYPTO_LEVELS = 10             # engine assumes 10 levels (KRX N_LEVELS)
+
+
+def _crypto_scale_int(a: np.ndarray) -> np.ndarray:
+    """Multiply float array by CRYPTO_PRICE_SCALE and cast to int64."""
+    return (a.astype(np.float64) * CRYPTO_PRICE_SCALE).astype(np.int64)
+
+
+def iter_events_crypto_lob(
+    start_ts_ns: int,
+    end_ts_ns: int,
+    symbols: Iterable[str],
+    lob_root: Path | None = None,
+) -> Iterator[OrderBookSnapshot]:
+    """Stream OrderBookSnapshot rows from Binance LOB parquet archive.
+
+    Data layout: <lob_root>/<SYM>/YYYY-MM-DD/HH.parquet with 20-level
+    bid/ask columns. Only the top `CRYPTO_LEVELS` levels are yielded
+    (engine assumption). Prices and quantities are scaled into int64
+    by CRYPTO_PRICE_SCALE; fee / PnL / return_pct are unit-invariant.
+
+    Args:
+        start_ts_ns / end_ts_ns: inclusive/exclusive ns-precision window.
+        symbols: Binance tickers, e.g. ["BTCUSDT", "ETHUSDT", "SOLUSDT"].
+        lob_root: override the default data/binance_lob root.
+
+    Yields snapshots in ts_ns order across the union of symbols (interleaved).
+    """
+    root = Path(lob_root) if lob_root else CRYPTO_LOB_ROOT
+    if not root.exists():
+        return
+
+    # Collect relevant parquet files per symbol, filtered by date range
+    start_day = pd.Timestamp(start_ts_ns, unit="ns", tz="UTC").date()
+    end_day = pd.Timestamp(end_ts_ns, unit="ns", tz="UTC").date()
+
+    frames: list[pd.DataFrame] = []
+    for sym in symbols:
+        sym_dir = root / sym.upper()
+        if not sym_dir.exists():
+            continue
+        for day_dir in sorted(sym_dir.iterdir()):
+            try:
+                d = pd.Timestamp(day_dir.name).date()
+            except Exception:
+                continue
+            if d < start_day or d > end_day:
+                continue
+            for hour_file in sorted(day_dir.glob("*.parquet")):
+                try:
+                    import pyarrow.parquet as pq
+                    tbl = pq.read_table(hour_file)
+                except Exception:
+                    continue
+                df = tbl.to_pandas()
+                df = df[(df["ts_ns"] >= start_ts_ns) & (df["ts_ns"] < end_ts_ns)]
+                if df.empty:
+                    continue
+                df["_symbol"] = sym.upper()
+                frames.append(df)
+
+    if not frames:
+        return
+
+    all_df = pd.concat(frames, ignore_index=True).sort_values("ts_ns").reset_index(drop=True)
+
+    # Scale float → int64 and pack into OrderBookSnapshot (top CRYPTO_LEVELS)
+    ask_px_cols = [f"ask_px_{i}" for i in range(CRYPTO_LEVELS)]
+    ask_qty_cols = [f"ask_qty_{i}" for i in range(CRYPTO_LEVELS)]
+    bid_px_cols = [f"bid_px_{i}" for i in range(CRYPTO_LEVELS)]
+    bid_qty_cols = [f"bid_qty_{i}" for i in range(CRYPTO_LEVELS)]
+
+    ask_px = _crypto_scale_int(all_df[ask_px_cols].to_numpy())
+    ask_qty = _crypto_scale_int(all_df[ask_qty_cols].to_numpy())
+    bid_px = _crypto_scale_int(all_df[bid_px_cols].to_numpy())
+    bid_qty = _crypto_scale_int(all_df[bid_qty_cols].to_numpy())
+    ts = all_df["ts_ns"].to_numpy()
+    syms = all_df["_symbol"].to_numpy()
+    total_a = (all_df["total_ask_qty"].to_numpy() * CRYPTO_PRICE_SCALE).astype(np.int64)
+    total_b = (all_df["total_bid_qty"].to_numpy() * CRYPTO_PRICE_SCALE).astype(np.int64)
+
+    for i in range(len(all_df)):
+        yield OrderBookSnapshot(
+            ts_ns=int(ts[i]),
+            symbol=str(syms[i]),
+            ask_px=ask_px[i],
+            ask_qty=ask_qty[i],
+            bid_px=bid_px[i],
+            bid_qty=bid_qty[i],
+            total_ask_qty=int(total_a[i]),
+            total_bid_qty=int(total_b[i]),
+            acml_vol=0,              # not tracked by partial-depth stream
+            session_cls="0",         # crypto 24/7 — always "regular"
+            antc_px=0,               # auction fields don't apply
+            antc_qty=0,
+        )
 
 
 def clean_lob_df(df: pd.DataFrame) -> pd.DataFrame:
@@ -166,14 +292,15 @@ def summarize(date: str, symbol: str) -> dict:
 
 
 def list_symbols(date: str) -> list[str]:
-    d = DATA_ROOT / date
+    d = get_data_root() / date
     if not d.exists():
         return []
     return sorted(p.stem for p in d.glob("*.csv"))
 
 
 def list_dates() -> list[str]:
-    return sorted(p.name for p in DATA_ROOT.iterdir() if p.is_dir())
+    root = get_data_root()
+    return sorted(p.name for p in root.iterdir() if p.is_dir())
 
 
 def main() -> None:

@@ -55,6 +55,13 @@ class BacktestReport:
     avg_win_bps: float = 0.0
     avg_loss_bps: float = 0.0
     duration_sec: float = 0.0
+    ic_pearson: float = 0.0
+    ic_spearman: float = 0.0
+    icir: float = 0.0
+    icir_chunks: int = 0
+    information_ratio: float = 0.0
+    ic_n: int = 0
+    invariant_violations: list[dict] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
@@ -85,6 +92,15 @@ class BacktestReport:
             "avg_win_bps": round(self.avg_win_bps, 2),
             "avg_loss_bps": round(self.avg_loss_bps, 2),
             "duration_sec": round(self.duration_sec, 3),
+            "ic_pearson": round(self.ic_pearson, 4),
+            "ic_spearman": round(self.ic_spearman, 4),
+            "icir": round(self.icir, 4),
+            "icir_chunks": self.icir_chunks,
+            "information_ratio": round(self.information_ratio, 4),
+            "ic_n": self.ic_n,
+            "invariant_violations": list(self.invariant_violations),
+            "invariant_violation_count": len(self.invariant_violations),
+            "invariant_violation_by_type": self._group_violations(),
             "per_symbol": {
                 s: {
                     "n_events": r.n_events,
@@ -98,6 +114,13 @@ class BacktestReport:
                 for s, r in self.per_symbol.items()
             },
         }
+
+    def _group_violations(self) -> dict[str, int]:
+        grouped: dict[str, int] = {}
+        for v in self.invariant_violations:
+            t = v.get("invariant_type", "unknown") if isinstance(v, dict) else "unknown"
+            grouped[t] = grouped.get(t, 0) + 1
+        return grouped
 
 
 # ---------------------------------------------------------------------------

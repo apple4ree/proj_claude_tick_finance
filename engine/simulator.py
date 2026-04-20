@@ -31,8 +31,13 @@ from typing import Callable, Iterable, Protocol
 
 import numpy as np
 
-from engine.data_loader import OrderBookSnapshot, iter_events
+from engine.data_loader import OrderBookSnapshot, iter_events, iter_events_crypto_lob
+from datetime import datetime, timedelta, timezone
+
+from engine.invariants import InvariantRunner, infer_invariants
 from engine.metrics import BacktestReport, SymbolResult
+
+_KST_TZ = timezone(timedelta(hours=9))
 
 
 # ---------------------------------------------------------------------------
@@ -300,9 +305,19 @@ class Backtester:
         symbols: Iterable[str],
         strategy: Strategy,
         config: BacktestConfig | None = None,
+        spec_dict: dict | None = None,
+        strict_mode: bool = False,
+        market: str = "",
+        time_window: tuple[int, int] | None = None,
     ) -> None:
         self.dates = list(dates)
+        # For crypto symbols (BTCUSDT, etc.) zfill(6) is a no-op since names
+        # already exceed 6 chars; KRX 6-digit codes are padded. Preserves both.
         self.symbols = [str(s).zfill(6) for s in symbols]
+        # LOB mode: market == "crypto_lob" triggers tick-level event iteration
+        # with no date loop and no EOD close (crypto trades 24/7).
+        self.market = market or ""
+        self.time_window = time_window
         self.strategy = strategy
         self.config = config or BacktestConfig()
         self.portfolio = Portfolio(starting_cash=self.config.starting_cash)
@@ -320,10 +335,128 @@ class Backtester:
             "short": 0,             # SELL rejected: insufficient long position
             "no_liquidity": 0,      # book empty → walk_book returned 0
             "non_marketable": 0,    # LIMIT order that was never marketable
+            "strict_invariant": 0,  # strict-mode intervention blocks
         }
         # Trace samples for HTML rendering (kept in memory; serialized by runner)
         self.equity_samples: list[tuple[int, float]] = []
         self.mid_samples: dict[str, list[tuple[int, float]]] = {}
+
+        # Invariant checker (auto-inferred from spec.yaml; zero agent involvement)
+        self._invariants = infer_invariants(spec_dict or {})
+        self._invariant_runner = InvariantRunner(
+            invariants=self._invariants, strict_mode=strict_mode,
+        )
+        self._strict_mode = strict_mode
+        # lot_size — needed to scale max_position_per_symbol into shares
+        _params = (spec_dict or {}).get("params") or {}
+        self._invariant_lot_size = int(_params.get("lot_size", 1))
+        # Per-symbol entry event counter for time_stop tick-held tracking
+        self._event_count_per_symbol: dict[str, int] = {}
+        self._entry_event_count: dict[str, int] = {}
+
+    def _record_fill_for_invariants(self, fill: Fill) -> None:
+        """Hook every Fill into the invariant runner. O(1) overhead."""
+        if not self._invariants:
+            return
+        dt = datetime.fromtimestamp(fill.ts_ns / 1e9, tz=_KST_TZ)
+        kst_sec = dt.hour * 3600 + dt.minute * 60 + dt.second
+        date_str = dt.strftime("%Y%m%d")
+        fill_index = len(self.portfolio.fills) - 1
+        sym = fill.symbol
+        ticks_held: int | None = None
+        if fill.side == BUY:
+            self._entry_event_count[sym] = self._event_count_per_symbol.get(sym, 0)
+        elif fill.side == SELL and sym in self._entry_event_count:
+            ticks_held = self._event_count_per_symbol.get(sym, 0) - self._entry_event_count[sym]
+        self._invariant_runner.on_fill(
+            fill_index=fill_index,
+            side=fill.side,
+            qty=int(fill.qty),
+            price=float(fill.avg_price),
+            tag=fill.tag or "",
+            kst_sec=kst_sec,
+            date_str=date_str,
+            symbol=sym,
+            ticks_held=ticks_held,
+        )
+        # Position invariant check — scale max_position_per_symbol by lot_size
+        pos = self.portfolio.positions.get(sym)
+        if pos:
+            self._invariant_runner.on_position_update(
+                symbol=sym, qty=int(pos.qty), lot_size=self._invariant_lot_size,
+                fill_index=fill_index, date_str=date_str,
+            )
+
+    def get_invariant_violations(self) -> list[dict]:
+        return [v.to_dict() for v in self._invariant_runner.get_violations()]
+
+    def _strict_should_block_buy(self, order: Order, snap: OrderBookSnapshot) -> tuple[bool, str]:
+        """Check if a BUY order should be blocked in strict mode. Returns (block, reason)."""
+        if not self._strict_mode:
+            return False, ""
+        dt = datetime.fromtimestamp(snap.ts_ns / 1e9, tz=_KST_TZ)
+        kst_sec = dt.hour * 3600 + dt.minute * 60 + dt.second
+        date_str = dt.strftime("%Y%m%d")
+        pos = self.portfolio.positions.get(order.symbol)
+        pos_qty = int(pos.qty) if pos else 0
+        entries_today = self._invariant_runner._entries_per_day.get(
+            (date_str, order.symbol), 0
+        )
+        return self._invariant_runner.should_block_order(
+            side=order.side,
+            kst_sec=kst_sec,
+            date_str=date_str,
+            symbol=order.symbol,
+            current_pos_qty=pos_qty,
+            current_day_entries=entries_today,
+            incoming_qty=int(order.qty),
+            lot_size=self._invariant_lot_size,
+        )
+
+    def _strict_force_sell_check(self, snap: OrderBookSnapshot) -> None:
+        """In strict mode, synthesize SELL fills when spec thresholds cross.
+
+        Checks only the symbol in the current snapshot. Emits a synthetic Fill
+        at the current bid price if should_force_sell returns True.
+        """
+        sym = snap.symbol
+        pos = self.portfolio.positions.get(sym)
+        if pos is None or pos.qty <= 0:
+            return
+        # ticks_held = current event count - entry event count
+        entry_event = self._entry_event_count.get(sym)
+        if entry_event is None:
+            return
+        ticks_held = self._event_count_per_symbol.get(sym, 0) - entry_event
+        current_bid = float(snap.bid_px[0]) if int(snap.bid_px[0]) > 0 else float(snap.mid)
+        current_mid = float(snap.mid)
+
+        force, tag = self._invariant_runner.should_force_sell(
+            symbol=sym,
+            current_bid=current_bid,
+            current_mid=current_mid,
+            ticks_held=ticks_held,
+        )
+        if not force:
+            return
+
+        # Synthesize SELL: execute MARKET SELL at current bid (same as walk_book sell)
+        filled_qty, avg_px = walk_book(snap, SELL, pos.qty)
+        if filled_qty <= 0:
+            return
+        fee = self.config.fee_model.compute(SELL, filled_qty, avg_px)
+        fill = Fill(
+            ts_ns=snap.ts_ns,
+            symbol=sym,
+            side=SELL,
+            qty=filled_qty,
+            avg_price=avg_px,
+            fee=fee,
+            tag=tag,  # "strict_sl" or "strict_time_stop"
+            context=_snap_context(snap),
+        )
+        self.portfolio.apply_fill(fill)
+        self._record_fill_for_invariants(fill)
 
     def _match_pending(self, snap: OrderBookSnapshot) -> None:
         if not self.pending:
@@ -358,6 +491,13 @@ class Backtester:
                     self.rejected["short"] += 1
                     continue
 
+            # Strict-mode: block BUYs that would violate invariants (reject-type).
+            if order.side == BUY:
+                blocked, reason = self._strict_should_block_buy(order, snap)
+                if blocked:
+                    self.rejected["strict_invariant"] += 1
+                    continue
+
             filled_qty, avg_px = walk_book(snap, order.side, order.qty)
             if filled_qty <= 0:
                 self.rejected["no_liquidity"] += 1
@@ -386,6 +526,7 @@ class Backtester:
                 context=_snap_context(snap),
             )
             self.portfolio.apply_fill(fill)
+            self._record_fill_for_invariants(fill)
         self.pending = still
 
     def _check_resting_limits(self, snap: OrderBookSnapshot) -> None:
@@ -439,6 +580,13 @@ class Backtester:
 
             fee = self.config.fee_model.compute(order.side, filled_qty, avg_px)
 
+            # Strict-mode: block BUYs that would violate invariants (reject-type).
+            if order.side == BUY:
+                blocked, reason = self._strict_should_block_buy(order, snap)
+                if blocked:
+                    self.rejected["strict_invariant"] += 1
+                    continue
+
             if order.side == BUY:
                 cost = filled_qty * avg_px + fee
                 if cost > self.portfolio.cash:
@@ -456,6 +604,7 @@ class Backtester:
                 context=_snap_context(snap),
             )
             self.portfolio.apply_fill(fill)
+            self._record_fill_for_invariants(fill)
         self.resting_limits = remaining
 
     def _eod_close(self, last_ts_ns: int) -> None:
@@ -491,72 +640,100 @@ class Backtester:
                 tag="exit_eod",
             )
             self.portfolio.apply_fill(fill)
+            self._record_fill_for_invariants(fill)
+
+    def _process_snap(self, snap: OrderBookSnapshot, trace_every: int) -> None:
+        """Per-snapshot body shared by bar and LOB event loops."""
+        self.total_events += 1
+        self.last_mids[snap.symbol] = snap.mid
+        bid0 = float(snap.bid_px[0]) if snap.bid_px[0] > 0 else snap.mid
+        self.last_bids[snap.symbol] = bid0
+
+        sr = self.per_symbol[snap.symbol]
+        if sr.n_events == 0:
+            sr.first_mid = snap.mid
+            sr.first_ts_ns = snap.ts_ns
+        sr.last_mid = snap.mid
+        sr.last_ts_ns = snap.ts_ns
+        sr.n_events += 1
+        self._event_count_per_symbol[snap.symbol] = sr.n_events
+
+        # Strict-mode: force exits when spec thresholds cross (bid-based SL, time_stop)
+        if self._strict_mode and self._invariants:
+            self._strict_force_sell_check(snap)
+
+        # 1) settle any orders whose latency window has elapsed
+        self._match_pending(snap)
+        # 1b) check resting limit orders for price-crossing fills
+        self._check_resting_limits(snap)
+
+        # 2) let strategy observe tick
+        ctx = Context(
+            portfolio=self.portfolio,
+            last_mids=self.last_mids,
+            current_ts_ns=snap.ts_ns,
+        )
+        new_orders = self.strategy.on_tick(snap, ctx)
+        for order in new_orders or []:
+            if order.order_type == CANCEL:
+                # Immediate cancel: remove all resting LIMIT orders for this
+                # symbol. Pending (in-flight, latency-queued) orders are NOT
+                # cleared — a CANCEL targets the resting maker book only.
+                before = len(self.resting_limits)
+                self.resting_limits = [
+                    ro for ro in self.resting_limits
+                    if ro.order.symbol != order.symbol
+                ]
+                cancelled = before - len(self.resting_limits)
+                self.n_resting_cancelled += cancelled
+                continue
+            target = snap.ts_ns + self.config.latency_model.sample_ns()
+            self.pending.append(_PendingOrder(target_ts_ns=target, order=order))
+
+        # 3) trace sample
+        if self.total_events % trace_every == 0:
+            self.equity_samples.append(
+                (snap.ts_ns, self.portfolio.total_equity(self.last_mids))
+            )
+            self.mid_samples.setdefault(snap.symbol, []).append(
+                (snap.ts_ns, float(snap.mid))
+            )
+
+    def _run_bar_loop(self, trace_every: int) -> None:
+        """Date-partitioned bar market loop (KRX-style iter_events)."""
+        for date in self.dates:
+            last_ts_ns: int = 0
+            for snap in iter_events(date, self.symbols, regular_only=self.config.regular_only):
+                last_ts_ns = snap.ts_ns
+                self._process_snap(snap, trace_every)
+            # End-of-day: force-close all open positions before next date.
+            if last_ts_ns:
+                self._eod_close(last_ts_ns)
+
+    def _run_lob_loop(self, trace_every: int) -> None:
+        """Continuous LOB market loop — no date partitioning, no EOD close.
+
+        Crypto LOB streams interleaved across symbols; snapshots arrive in
+        ts_ns order from iter_events_crypto_lob(). At end-of-window we leave
+        any in-flight pending orders as they are (reported in pending_at_end).
+        """
+        if self.time_window is None:
+            raise ValueError(
+                "market='crypto_lob' requires time_window=(start_ns, end_ns); "
+                "check spec.universe.time_window.{start,end}"
+            )
+        start_ns, end_ns = self.time_window
+        for snap in iter_events_crypto_lob(start_ns, end_ns, self.symbols):
+            self._process_snap(snap, trace_every)
 
     def run(self) -> BacktestReport:
         import time
         t0 = time.time()
         trace_every = max(1, int(self.config.trace_every))
-        for date in self.dates:
-            last_ts_ns: int = 0
-            for snap in iter_events(date, self.symbols, regular_only=self.config.regular_only):
-                self.total_events += 1
-                self.last_mids[snap.symbol] = snap.mid
-                bid0 = float(snap.bid_px[0]) if snap.bid_px[0] > 0 else snap.mid
-                self.last_bids[snap.symbol] = bid0
-                last_ts_ns = snap.ts_ns
-
-                sr = self.per_symbol[snap.symbol]
-                if sr.n_events == 0:
-                    sr.first_mid = snap.mid
-                    sr.first_ts_ns = snap.ts_ns
-                sr.last_mid = snap.mid
-                sr.last_ts_ns = snap.ts_ns
-                sr.n_events += 1
-
-                # 1) settle any orders whose latency window has elapsed
-                self._match_pending(snap)
-                # 1b) check resting limit orders for price-crossing fills
-                self._check_resting_limits(snap)
-
-                # 2) let strategy observe tick
-                ctx = Context(
-                    portfolio=self.portfolio,
-                    last_mids=self.last_mids,
-                    current_ts_ns=snap.ts_ns,
-                )
-                new_orders = self.strategy.on_tick(snap, ctx)
-                for order in new_orders or []:
-                    if order.order_type == CANCEL:
-                        # Immediate cancel: remove all resting LIMIT orders for this
-                        # symbol.  Pending (in-flight, latency-queued) orders are NOT
-                        # cleared — a CANCEL targets the resting maker book only.
-                        # This preserves co-submitted MARKET orders (e.g., stop-loss
-                        # MARKET SELL + CANCEL for orphaned resting LIMIT) from being
-                        # accidentally wiped.  No latency applied — cancels in KRX
-                        # equity market are near-instant (sub-ms ACK).
-                        before = len(self.resting_limits)
-                        self.resting_limits = [
-                            ro for ro in self.resting_limits
-                            if ro.order.symbol != order.symbol
-                        ]
-                        cancelled = before - len(self.resting_limits)
-                        self.n_resting_cancelled += cancelled
-                        continue
-                    target = snap.ts_ns + self.config.latency_model.sample_ns()
-                    self.pending.append(_PendingOrder(target_ts_ns=target, order=order))
-
-                # 3) trace sample
-                if self.total_events % trace_every == 0:
-                    self.equity_samples.append(
-                        (snap.ts_ns, self.portfolio.total_equity(self.last_mids))
-                    )
-                    self.mid_samples.setdefault(snap.symbol, []).append(
-                        (snap.ts_ns, float(snap.mid))
-                    )
-
-            # End-of-day: force-close all open positions before next date.
-            if last_ts_ns:
-                self._eod_close(last_ts_ns)
+        if self.market == "crypto_lob":
+            self._run_lob_loop(trace_every)
+        else:
+            self._run_bar_loop(trace_every)
 
         # Realize per-symbol results
         for sym, sr in self.per_symbol.items():
@@ -580,6 +757,7 @@ class Backtester:
         report.pending_at_end = len(self.pending)
         report.n_resting_cancelled = self.n_resting_cancelled
         report.rejected = dict(self.rejected)
+        report.invariant_violations = self.get_invariant_violations()
         return report
 
 

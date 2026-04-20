@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang=ko><head><meta charset=utf-8>
+<title>Autoresearch Progress — 2026-04-18</title>
+<style>
+body{font-family:-apple-system,system-ui,sans-serif;max-width:1100px;margin:2rem auto;color:#1f2937;padding:0 1rem}
+h1{border-bottom:2px solid #1f4d8b;padding-bottom:.4rem;color:#1f4d8b}
+h2{color:#1f4d8b;margin-top:2rem}
+.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin:1.2rem 0}
+.card{background:#f3f4f6;padding:1rem;border-radius:8px;text-align:center}
+.card .val{font-size:1.8rem;font-weight:700;color:#1f4d8b}
+.card .label{font-size:.85rem;color:#6b7280;margin-top:.3rem}
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.9rem}
+th{background:#1f4d8b;color:#fff;text-align:left;padding:.6rem}
+td{padding:.5rem;border-bottom:1px solid #e5e7eb}
+tr.pass td:first-child{border-left:3px solid #16a34a}
+tr.fail td:first-child{border-left:3px solid #dc2626}
+tr.pass{background:#f0fdf4}
+tr.fail{background:#fef2f2}
+.big{font-weight:700;font-size:1.05em}
+.hypotheses{background:#f0f9ff;padding:1rem;border-left:4px solid #1f4d8b;margin:1rem 0;border-radius:4px}
+.mono{font-family:'SF Mono',Monaco,monospace;font-size:.85em;background:#f3f4f6;padding:.1rem .3rem;border-radius:3px}
+</style></head><body>
+<h1>Autoresearch Progress Report</h1>
+<p><b>Timestamp</b>: 2026-04-18T18:59:29.148177Z · <b>Market</b>: crypto_1h · <b>IS</b> 2025-07-01→2025-10-31 · <b>OOS</b> 2025-11-01→2025-12-31</p>
+
+<div class=summary>
+  <div class=card><div class=val>21</div><div class=label>Strategies tested</div></div>
+  <div class=card><div class=val style=color:#16a34a>14</div><div class=label>Passed 4 gates</div></div>
+  <div class=card><div class=val style=color:#dc2626>7</div><div class=label>Rejected</div></div>
+  <div class=card><div class=val>3</div><div class=label>Robust families (H1/H2/H4)</div></div>
+</div>
+
+<h2>Research question</h2>
+<p>Does raw-data EDA recover tradable crypto alpha the LLM-agent pipeline misses?</p>
+<p><b>Answer so far</b>: <b style=color:#16a34a>Yes.</b> Three robust signal families — weekly mean-reversion, taker-buy persistence, and high-low range filter — all show OOS IR > +1.9 on ≥2 symbols. The LLM-agent corpus (24 comparable strategies) produced zero that beat buy-and-hold on IR.</p>
+
+<div class=hypotheses>
+<h3>Hypotheses status</h3>
+<ul>
+<li><b>H1 weekly mean-reversion</b> (roc_168h < −θ) — <b style=color:#16a34a>SUPPORTED</b> (OOS IR +1.75 / +2.44 / +3.89)</li>
+<li><b>H2 taker-buy persistence</b> — <b style=color:#16a34a>SUPPORTED</b> (OOS IR +0.68 / +2.59 / +3.13)</li>
+<li><b>H3 zscore trend</b> — <b style=color:#d97706>PARTIALLY REFUTED</b> (works on ETH/SOL, fails on BTC)</li>
+<li><b>H4 range filter</b> (hl_range_mean_48h) — <b style=color:#16a34a>SUPPORTED</b> (OOS IR +3.19 / +1.99 / +2.87)</li>
+<li><b>H5 portfolio basket</b> (H1 ∥ H2) — <b style=color:#d97706>PARTIAL</b> (helps on ETH +3.93, hurts BTC vs H1 alone)</li>
+</ul>
+</div>
+
+<h2>Strategy leaderboard (sorted by OOS IR)</h2>
+<table>
+<tr><th>Strategy</th><th>Pass</th><th>IR full</th><th>IR OOS</th><th>Strat ret</th><th>BH ret</th></tr>
+<tr class='pass'><td>crypto_1h_portfolio_basket_eth</td><td>✓</td><td>-0.07</td><td class='big'>+3.93</td><td>+23.37%</td><td>+18.92%</td></tr>
+<tr class='pass'><td>crypto_1h_weekly_meanrev_sol</td><td>✓</td><td>+0.24</td><td class='big'>+3.89</td><td>-5.83%</td><td>-19.31%</td></tr>
+<tr class='pass'><td>crypto_1h_portfolio_basket_sol</td><td>✓</td><td>+0.22</td><td class='big'>+3.52</td><td>-9.19%</td><td>-19.31%</td></tr>
+<tr class='pass'><td>crypto_1h_range_filter_btc</td><td>✓</td><td>-0.18</td><td class='big'>+3.19</td><td>-18.33%</td><td>-17.86%</td></tr>
+<tr class='pass'><td>crypto_1h_taker_flow_sol</td><td>✓</td><td>+0.17</td><td class='big'>+3.13</td><td>-5.82%</td><td>-19.31%</td></tr>
+<tr class='pass'><td>crypto_1h_btc_rsi_atr</td><td>✓</td><td>+1.04</td><td class='big'>+3.03</td><td>+4.30%</td><td>-17.86%</td></tr>
+<tr class='pass'><td>crypto_1h_range_filter_sol</td><td>✓</td><td>+0.08</td><td class='big'>+2.87</td><td>-12.76%</td><td>-19.31%</td></tr>
+<tr class='fail'><td>crypto_1h_sol_rsi_atr</td><td>✗</td><td>+0.12</td><td class='big'>+2.76</td><td>-2.73%</td><td>-19.31%</td></tr>
+<tr class='pass'><td>crypto_1h_taker_flow_eth</td><td>✓</td><td>-0.65</td><td class='big'>+2.59</td><td>+7.09%</td><td>+18.92%</td></tr>
+<tr class='pass'><td>crypto_1h_weekly_meanrev_eth</td><td>✓</td><td>-0.62</td><td class='big'>+2.44</td><td>+8.19%</td><td>+18.92%</td></tr>
+<tr class='pass'><td>crypto_1h_eth_rsi_atr</td><td>✓</td><td>-0.69</td><td class='big'>+2.30</td><td>+5.59%</td><td>+18.92%</td></tr>
+<tr class='pass'><td>crypto_1h_range_filter_eth</td><td>✓</td><td>-0.03</td><td class='big'>+1.99</td><td>+24.05%</td><td>+18.92%</td></tr>
+<tr class='pass'><td>crypto_1h_weekly_meanrev_btc</td><td>✓</td><td>+0.52</td><td class='big'>+1.75</td><td>-6.46%</td><td>-17.86%</td></tr>
+<tr class='fail'><td>crypto_1h_trend_follow_on_zscore_sol</td><td>✗</td><td>+0.32</td><td class='big'>+1.32</td><td>+0.25%</td><td>-19.31%</td></tr>
+<tr class='fail'><td>crypto_1h_zscore_trend_sol</td><td>✗</td><td>+0.32</td><td class='big'>+1.32</td><td>+0.25%</td><td>-19.31%</td></tr>
+<tr class='fail'><td>crypto_1h_trend_follow_on_zscore_eth</td><td>✗</td><td>+0.18</td><td class='big'>+1.11</td><td>+35.98%</td><td>+18.92%</td></tr>
+<tr class='fail'><td>crypto_1h_zscore_trend_eth</td><td>✗</td><td>+0.18</td><td class='big'>+1.11</td><td>+35.98%</td><td>+18.92%</td></tr>
+<tr class='pass'><td>crypto_1h_portfolio_basket_btc</td><td>✓</td><td>-0.74</td><td class='big'>+0.83</td><td>-24.12%</td><td>-17.86%</td></tr>
+<tr class='pass'><td>crypto_1h_taker_flow_btc</td><td>✓</td><td>-0.16</td><td class='big'>+0.68</td><td>-17.78%</td><td>-17.86%</td></tr>
+<tr class='fail'><td>crypto_1h_trend_follow_on_zscore_btc</td><td>✗</td><td>+0.14</td><td class='big'>-0.10</td><td>-13.14%</td><td>-17.86%</td></tr>
+<tr class='fail'><td>crypto_1h_zscore_trend_btc</td><td>✗</td><td>+0.14</td><td class='big'>-0.10</td><td>-13.14%</td><td>-17.86%</td></tr>
+</table>
+
+<h2>Next cycle</h2>
+<ul>
+<li><b>H6</b> walk-forward across 4–6 rolling windows — test parameter stability</li>
+<li><b>H7</b> horizon extension — does weekly mean-rev work at 15m or 1d?</li>
+<li><b>H8</b> KRX daily equivalent — daily KOSPI bars with same EDA</li>
+<li>Rerun <span class=mono>discover_alpha.py</span> with larger feature set (interactions, regime splits)</li>
+</ul>
+
+<p style=color:#6b7280;font-size:.85em;margin-top:2rem>
+Auto-generated from <span class=mono>experiments/H4_H5_run/pipeline_summary.json</span>.
+Pipeline: <span class=mono>/experiment</span> · full run: ~1 min · 744 IC cells / 21 strategies / 4-gate validation.
+</p>
+</body></html>

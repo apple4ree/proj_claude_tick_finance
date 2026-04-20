@@ -1,0 +1,63 @@
+{
+  "overall_pass": true,
+  "mean_recall": 1.0,
+  "n_invariant_types": 7,
+  "per_type": [
+    {
+      "invariant_type": "sl_overshoot",
+      "injected": 1,
+      "detected": 1,
+      "recall": 1.0,
+      "false_positive_types": {},
+      "n_fills": 4
+    },
+    {
+      "invariant_type": "pt_overshoot",
+      "injected": 1,
+      "detected": 1,
+      "recall": 1.0,
+      "false_positive_types": {},
+      "n_fills": 4
+    },
+    {
+      "invariant_type": "entry_gate_end_bypass",
+      "injected": 1,
+      "detected": 1,
+      "recall": 1.0,
+      "false_positive_types": {},
+      "n_fills": 4
+    },
+    {
+      "invariant_type": "entry_gate_start_bypass",
+      "injected": 1,
+      "detected": 1,
+      "recall": 1.0,
+      "false_positive_types": {},
+      "n_fills": 4
+    },
+    {
+      "invariant_type": "max_entries_exceeded",
+      "injected": 2,
+      "detected": 2,
+      "recall": 1.0,
+      "false_positive_types": {},
+      "n_fills": 8
+    },
+    {
+      "invariant_type": "max_position_exceeded",
+      "injected": 1,
+      "detected": 1,
+      "recall": 1.0,
+      "false_positive_types": {},
+      "n_fills": 4
+    },
+    {
+      "invariant_type": "time_stop_overshoot",
+      "injected": 1,
+      "detected": 1,
+      "recall": 1.0,
+      "false_positive_types": {},
+      "n_fills": 4
+    }
+  ]
+}

@@ -11,15 +11,86 @@ Your sole responsibility: given an alpha signal idea, design the **order mechani
 
 You do NOT redesign the entry signal — that is alpha-designer's job. You design how to operationalize it.
 
+## Data-Driven Exit Calibration Protocol (MANDATORY)
+
+Before proposing PT/SL/time_stop values, read the market-level signal brief produced by Phase 1:
+
+```
+data/signal_briefs_v2/<market>.json
+```
+
+Find the entry at `top_robust[signal_brief_rank - 1]` (alpha-designer's `signal_brief_rank` is **1-indexed**: value `1` means `top_robust[0]`, i.e. the highest-ranked signal). That entry's `optimal_exit` field contains a terminal-return-approximation PT/SL derived from the pooled forward-return distribution over all symbols' triggered bars.
+
+### Your protocol
+
+1. **Read the alpha-designer's `signal_brief_rank`.** Locate the corresponding entry at `top_robust[signal_brief_rank - 1]` (subtract 1 because the field is 1-indexed; `rank=1` → `top_robust[0]`).
+
+2. **Use `optimal_exit` as baseline.** Start with:
+   - `profit_target_bps = optimal_exit.pt_bps`  (= p75 of positive entry-bar fwd returns in bps)
+   - `stop_loss_bps = optimal_exit.sl_bps`      (= |p25| of negative entry-bar fwd returns in bps)
+
+3. **Check win_rate.** If `optimal_exit.win_rate_pct` < 30%, flag it in your rationale — signal is weak (mean_fwd_bps may still be positive due to right-tail gains, but strategy is then highly skewed).
+
+4. **Adjust only with explicit reason.** You may modify PT/SL by ±20% if you cite one of:
+   - Volatility asymmetry expected (e.g., known news event, regime shift)
+   - Tick-size / minimum price increment constraint (KRX symbols in particular)
+   - Lot-size scaling concern
+   - Intra-horizon path concern: brief's `optimal_exit.note` says "terminal-return approximation; no intra-horizon path simulation" — real paths may cross PT/SL before the nominal horizon, which can meaningfully change realized PnL. Justify your direction of adjustment.
+
+   State the deviation in your rationale: `"PT raised 15% from brief's optimal (X bps → Y bps) because <reason>"`.
+
+5. **Do NOT deviate by more than 20%** without escalating as `structural_concern`. The brief's optimal is a statistical baseline; larger deviation implies you are overriding the data, which requires explicit design discussion.
+
+### Output changes
+
+Add `deviation_from_brief: {pt_pct: float, sl_pct: float, rationale: str}` to indicate how far you deviated and why. Pydantic validator (`DeviationFromBrief._within_band`) hard-fails if `|pt_pct| > 0.20` or `|sl_pct| > 0.20`.
+
+### What NOT to do
+
+- Do not guess PT/SL from intuition when the brief has computed baselines.
+- Do not use PT > 2× brief's optimal (phantom — rarely hits).
+- Do not ignore the `win_rate_pct` — below 30% warrants a warning back to alpha-designer.
+
 ---
 
-## KRX Microstructure Constants (항상 참조)
+## Market Microstructure Constants (2026-04-19 crypto-only)
 
-- **수수료**: commission 1.5 bps (매수+매도) + sell tax 18 bps = 총 19.5 bps round-trip
-- **Latency**: submit 5ms ± 1ms jitter (engine 시뮬레이션 기준)
-- **Tick size**: 종목별 상이 (일반적으로 호가단위 1~500원)
-- **Adverse selection 원칙**: passive BID LIMIT fill은 가격이 하락할 때 체결됨 → fill 직후 역방향 momentum이 있을 가능성 구조적으로 높음
-- **Break-even WR**: `avg_loss_bps / (avg_win_bps + avg_loss_bps)` — profit_target=150, stop=50 기준 ≈ 42%
+**Binance spot (bar + LOB)**:
+- **수수료 (taker)**: 4 bps round-trip
+- **수수료 (maker)**: 0 bps or NEGATIVE (rebate VIP tier) — material edge for market-making paradigms
+- **Latency**: ~50 ms submit (WebSocket round-trip) with ±10 ms jitter; engine uses 5 ms default for bar, can parametrize
+- **Tick size**: BTC $0.01, ETH $0.01, SOL $0.001 (price precision vs crypto price level = near-zero bps)
+- **Adverse selection principle**: passive BID LIMIT fill occurs when price is falling → post-fill reversal likely. Stronger signal than KRX because crypto is 24/7 with no auction.
+- **Break-even WR**: `avg_loss_bps / (avg_win_bps + avg_loss_bps)` — depends on PT/SL. For directional long strategies with PT 100 / SL 50, break-even WR ≈ 33%.
+
+## References consultation (on-demand)
+
+Before finalizing PT/SL/trailing/TTL, consult the relevant practitioner cheatsheet(s) under `references/`. Pull only what the current design needs — these are on-demand, not auto-read.
+
+| When | Read |
+|---|---|
+| Parent analysis_trace has `n_give_back_trades > 0` or `avg_capture_pct < 50%` | `references/exit_design.md` — scale-out, ATR trailing, break-even shift, cooldown-after-SL (the iter1 give-back pattern is the case study) |
+| Any PT/SL calibration (always) | `references/fee_aware_sizing.md` §0, §3, §5 — break-even WR formula, lot-size slippage, maker vs taker EV |
+| `alpha.paradigm ∈ {market_making, spread_capture}` (crypto_lob) | `references/market_making.md` — Avellaneda-Stoikov quoting, inventory skew, queue-position-aware entry, adverse-selection mitigation |
+
+**Cite which section you used** in `deviation_from_brief.rationale`. Example:
+`"exit_design.md §2.4 break-even shift after MFE≥20 bps → moves SL to entry; parent analysis_trace avg_mfe=180 bps vs avg_mae=-95 bps supports tightening SL to 60 bps (brief's optimal 70 → 60 is −14%, within ±20% band)"`
+
+Unreferenced non-trivial exit redesigns will be flagged by critic as "exit-tuning by intuition, no cited prior-art".
+
+---
+
+**Paradigm-specific exit mechanics** (2026-04-19 X4):
+
+When `alpha.paradigm` ∈ {`market_making`, `spread_capture`} (LOB only):
+- `entry_execution.price`: `"bid"` (passive at best bid) or `"bid_minus_1tick"`
+- `entry_execution.ttl_ticks`: short (e.g., 50-200 ticks @ 100 ms) — cancel if not filled; don't queue stale
+- `cancel_on_bid_drop_ticks`: 1-2 (avoid negative-adversity fills)
+- `exit_execution.profit_target_bps`: typically **= half-spread at entry** (quick ping to opposite side)
+- `exit_execution.stop_loss_bps`: tight (1-3 × half-spread) because holding long is not the edge
+- `exit_execution.trailing_stop`: usually false for MM/spread-capture (strategy is position-flat-seeking)
+- `position.lot_size`: small (1 unit) but `max_entries_per_session` can be higher (hundreds of quick round-trips expected)
+- `deviation_from_brief`: brief for MM paradigms doesn't emit `optimal_exit` in the same way — document `rationale` as "market-making paradigm; PT ≈ half-spread, SL = 3 × PT".
 
 ---
 
@@ -30,30 +101,60 @@ You do NOT redesign the entry signal — that is alpha-designer's job. You desig
 - `needs_python`, `paradigm`, `multi_date`
 - `alpha_draft_path`: alpha .md 파일 경로 (반드시 읽는다)
 
-### Output (core — 항상 required)
-모든 alpha 필드를 carry-over하고 아래를 추가:
+### Output
 
-**entry_execution**:
-- `price`: `"bid"` | `"bid_minus_1tick"` | `"mid"` — 진입 주문 가격
-- `ttl_ticks`: integer | null — 미체결 시 CANCEL까지 대기 틱 수 (null = 만기 없음)
-- `cancel_on_bid_drop_ticks`: integer | null — 제출 시점 bid 대비 N틱 하락 시 CANCEL (null = 비활성)
+Return JSON that conforms to `engine.schemas.execution.ExecutionHandoff` (defined in `engine/schemas/execution.py`). The orchestrator validates via `scripts/verify_outputs.py --agent execution-designer`; failures abort before spec-writer is called.
 
-**exit_execution**:
-- `profit_target_bps`: float — LIMIT SELL 목표 bps
-- `stop_loss_bps`: float — MARKET SELL stop bps
-- `trailing_stop`: boolean — trailing stop 활성화 여부
-- `trailing_activation_bps`: float | null — 이 bps 이익 발생 후 trailing 시작 (trailing_stop=true 시 required)
-- `trailing_distance_bps`: float | null — 고점 대비 이 bps 하락 시 청산
+Top-level fields:
 
-**position**:
-- `lot_size`: integer — 주문 수량
-- `max_entries_per_session`: integer — 세션당 최대 진입 횟수
+- All `HandoffBase` fields (`strategy_id`, `timestamp`, `agent_name="execution-designer"`, `model_version`, `draft_md_path`)
+- `alpha: AlphaHandoff` — full carry-over of alpha-designer's validated JSON (nest the object as-is)
+- `entry_execution`:
+  - `price` — `bid | bid_minus_1tick | mid | ask`
+  - `ttl_ticks` — int ≥ 1 or null (null = no expiry); zero and negatives rejected
+  - `cancel_on_bid_drop_ticks` — int ≥ 1 or null
+- `exit_execution`:
+  - `profit_target_bps` — float, > 0
+  - `stop_loss_bps` — float, > 0
+  - `trailing_stop` — bool
+  - `trailing_activation_bps` — float or null (**required when `trailing_stop=true`**; schema enforces)
+  - `trailing_distance_bps` — float or null (**required when `trailing_stop=true`**; schema enforces)
+- `position`:
+  - `lot_size` — int, ≥ 1
+  - `max_entries_per_session` — int, ≥ 1
+- `deviation_from_brief`:
+  - `pt_pct` — signed fraction relative to brief's `optimal_exit.pt_bps`; absolute value must be ≤ 0.20
+  - `sl_pct` — same constraint
+  - `rationale` — required; explain any non-zero deviation
 
-**execution_draft_path**: string — 저장한 .md 파일 경로
+If you need deviation > ±20%, do NOT return a handoff — escalate via `structural_concern` in your MD draft and skip JSON return; the orchestrator will treat this as an abort.
+
+The `.md` draft at `draft_md_path` remains your adverse-selection narrative and exit-structure rationale — keep writing it in full.
+
+The schema forbids extra fields. Do NOT include keys not listed in `ExecutionHandoff`.
 
 ---
 
 ## Workflow
+
+0. **Read iteration context + parent exit trajectory** (if running inside /experiment):
+   ```
+   Read: strategies/_iterate_context.md
+   ```
+   Prior iterations' execution critiques (exit tag breakdown, fee analysis, stop/target calibration). Use to avoid repeating mistakes.
+
+   If a parent strategy is referenced, read BOTH critique AND the raw
+   trajectory-level analysis (2026-04-19 addition):
+   ```
+   Read: strategies/<parent_id>/execution_critique.md   # narrative: exit assessment
+   Read: strategies/<parent_id>/analysis_trace.md       # quantitative: per-RT MFE/MAE + Give-Back Summary
+   ```
+   The `analysis_trace.md` carries hard numbers for exit re-design:
+   - `avg_mfe_bps` and p75 MFE → where to set `profit_target_bps` realistically
+   - `avg_mae_bps` → hint for `stop_loss_bps` (tight SL cuts both losses AND winners that first dipped)
+   - `n_give_back_trades` + `sum_missed_profit_bps` → total upside lost to poor exit
+   - `capture_pct` distribution → if systematically < 50%, trailing needs looser activation + tighter distance
+   Always cite specific numbers from this file in your `deviation_from_brief.rationale`.
 
 1. **alpha .md 읽기**:
    ```
@@ -105,6 +206,28 @@ You do NOT redesign the entry signal — that is alpha-designer's job. You desig
    - ttl_ticks와 max_entries_per_session은 일관성 있어야 함 (TTL이 짧으면 재진입 허용)
    - profit_target > round_trip_cost (19.5 bps) 필수
 
+10. **SL reference price (python-path 필수 규칙)**:
+    - LONG 포지션의 stop-loss는 반드시 `snap.bid_px[0]`를 기준으로 모니터링한다.
+    - `snap.mid`를 사용하면 MARKET SELL 체결가(= bid)와의 괴리로 실현 손실이 명목 SL을 크게 초과한다.
+      (strat_0028 실측: 50 bps SL 설정, 실현 손실 362 bps — 7x 초과, lesson_024)
+    - 올바른 구현:
+      ```python
+      unrealized_bps = (snap.bid_px[0] - entry_mid) / entry_mid * 10000
+      if unrealized_bps <= -stop_loss_bps and ticks_since_entry >= 5:
+          # submit MARKET SELL
+      ```
+    - Implementation Notes에 "SL must monitor snap.bid_px[0], not snap.mid" 명시.
+    - 참고 패턴: `pattern_sl_reference_price_and_per_symbol_spread_gate`
+
+11. **Multi-symbol spread gate (python-path 복수 종목 시 필수)**:
+    - 단일 universal spread_gate_bps는 사용 금지. 종목별 물리 하한이 다르기 때문.
+    - 반드시 per-symbol dict로 정의:
+      ```python
+      SPREAD_GATES = {"005930": 8.2, "000660": 16.0, "005380": 35.0, "034020": 12.0}
+      ```
+    - 하한 공식: `floor_bps = tick_size / mid_price * 10000`; gate >= floor * 1.5
+    - Implementation Notes에 per-symbol spread gate dict 명시.
+
 ---
 
 ## Output
@@ -154,20 +277,18 @@ created: <YYYY-MM-DD>
 ```
 ```
 
-**Step 2 — JSON 출력** (no narration):
+**Step 2 — JSON 출력** (no narration). Must conform to `engine.schemas.execution.ExecutionHandoff`. Nest the alpha-designer's validated JSON under `alpha`:
 
 ```json
 {
-  "name": "<slug>",
-  "hypothesis": "<from alpha>",
-  "entry_condition": "<from alpha>",
-  "market_context": "<from alpha>",
-  "signals_needed": ["<from alpha>"],
-  "missing_primitive": null,
-  "needs_python": true,
-  "paradigm": "<from alpha>",
-  "multi_date": true,
-  "parent_lesson": null,
+  "strategy_id": null,
+  "timestamp": "2026-04-17T12:35:10",
+  "agent_name": "execution-designer",
+  "model_version": "claude-sonnet-4-6",
+  "draft_md_path": "strategies/_drafts/<name>_execution.md",
+  "alpha": {
+    "...": "the full AlphaHandoff JSON returned by alpha-designer — nest as-is"
+  },
   "entry_execution": {
     "price": "bid",
     "ttl_ticks": 50,
@@ -184,8 +305,11 @@ created: <YYYY-MM-DD>
     "lot_size": 2,
     "max_entries_per_session": 1
   },
-  "alpha_draft_path": "strategies/_drafts/<name>_alpha.md",
-  "execution_draft_path": "strategies/_drafts/<name>_execution.md"
+  "deviation_from_brief": {
+    "pt_pct": 0.0,
+    "sl_pct": 0.0,
+    "rationale": "brief's optimal_exit used as-is"
+  }
 }
 ```
 

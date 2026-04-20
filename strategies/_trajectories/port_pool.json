@@ -1,0 +1,25 @@
+[
+  {
+    "traj_id": "port_001",
+    "allocation_method": "ic_proportional",
+    "symbols": [
+      "042700",
+      "010140",
+      "035420"
+    ],
+    "weights": {
+      "042700": 0.47,
+      "010140": 0.34,
+      "035420": 0.19
+    },
+    "lot_sizes": {
+      "042700": 78,
+      "010140": 11,
+      "035420": 2
+    },
+    "max_total_exposure_pct": 24.0,
+    "max_correlated_symbols": 3,
+    "score": 0.0,
+    "n_backtests": 0
+  }
+]

@@ -1,0 +1,207 @@
+{
+  "market": "crypto_1h",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT"
+  ],
+  "is_period": {
+    "start": "2025-07-01",
+    "end": "2025-10-31"
+  },
+  "robustness": {
+    "min_abs_ic": 0.04,
+    "criterion": "same sign across all symbols AND min |IC| >= threshold"
+  },
+  "top_robust": [
+    {
+      "feature": "roc_168h",
+      "horizon": "fwd_168h",
+      "avg_ic": -0.2093,
+      "min_abs_ic": 0.0511,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.2907,
+        "ETHUSDT": -0.0511,
+        "SOLUSDT": -0.2861
+      }
+    },
+    {
+      "feature": "hl_range_mean_48h",
+      "horizon": "fwd_168h",
+      "avg_ic": -0.1219,
+      "min_abs_ic": 0.0419,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.2105,
+        "ETHUSDT": -0.0419,
+        "SOLUSDT": -0.1134
+      }
+    },
+    {
+      "feature": "zscore_168h",
+      "horizon": "fwd_24h",
+      "avg_ic": 0.0885,
+      "min_abs_ic": 0.0562,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.081,
+        "ETHUSDT": 0.1282,
+        "SOLUSDT": 0.0562
+      }
+    },
+    {
+      "feature": "taker_buy_persistence",
+      "horizon": "fwd_168h",
+      "avg_ic": 0.0755,
+      "min_abs_ic": 0.0404,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.0404,
+        "ETHUSDT": 0.0673,
+        "SOLUSDT": 0.1189
+      }
+    },
+    {
+      "feature": "zscore_168h",
+      "horizon": "fwd_12h",
+      "avg_ic": 0.0664,
+      "min_abs_ic": 0.046,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.046,
+        "ETHUSDT": 0.0982,
+        "SOLUSDT": 0.0549
+      }
+    },
+    {
+      "feature": "lower_wick_rel",
+      "horizon": "fwd_24h",
+      "avg_ic": -0.0599,
+      "min_abs_ic": 0.0434,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.0565,
+        "ETHUSDT": -0.0434,
+        "SOLUSDT": -0.0797
+      }
+    },
+    {
+      "feature": "hl_range_z_48h",
+      "horizon": "fwd_24h",
+      "avg_ic": -0.0582,
+      "min_abs_ic": 0.0494,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.0621,
+        "ETHUSDT": -0.0631,
+        "SOLUSDT": -0.0494
+      }
+    }
+  ],
+  "top_overall_any_sign": [
+    {
+      "feature": "roc_168h",
+      "horizon": "fwd_168h",
+      "avg_ic": -0.2093,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.2907,
+        "ETHUSDT": -0.0511,
+        "SOLUSDT": -0.2861
+      }
+    },
+    {
+      "feature": "hl_range_mean_48h",
+      "horizon": "fwd_168h",
+      "avg_ic": -0.1219,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.2105,
+        "ETHUSDT": -0.0419,
+        "SOLUSDT": -0.1134
+      }
+    },
+    {
+      "feature": "hl_range_mean_24h",
+      "horizon": "fwd_168h",
+      "avg_ic": -0.1107,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.1986,
+        "ETHUSDT": -0.0242,
+        "SOLUSDT": -0.1094
+      }
+    },
+    {
+      "feature": "hl_range_mean_12h",
+      "horizon": "fwd_24h",
+      "avg_ic": -0.1035,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.1523,
+        "ETHUSDT": -0.0262,
+        "SOLUSDT": -0.132
+      }
+    },
+    {
+      "feature": "hl_range_mean_12h",
+      "horizon": "fwd_168h",
+      "avg_ic": -0.1007,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.1777,
+        "ETHUSDT": -0.0203,
+        "SOLUSDT": -0.104
+      }
+    },
+    {
+      "feature": "rv_24h",
+      "horizon": "fwd_12h",
+      "avg_ic": -0.0925,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.1261,
+        "ETHUSDT": -0.0321,
+        "SOLUSDT": -0.1195
+      }
+    },
+    {
+      "feature": "rv_z_24h",
+      "horizon": "fwd_12h",
+      "avg_ic": -0.0904,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.1058,
+        "ETHUSDT": -0.0314,
+        "SOLUSDT": -0.1341
+      }
+    },
+    {
+      "feature": "zscore_168h",
+      "horizon": "fwd_24h",
+      "avg_ic": 0.0885,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": 0.081,
+        "ETHUSDT": 0.1282,
+        "SOLUSDT": 0.0562
+      }
+    },
+    {
+      "feature": "hl_range_mean_24h",
+      "horizon": "fwd_12h",
+      "avg_ic": -0.0859,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.1255,
+        "ETHUSDT": -0.0225,
+        "SOLUSDT": -0.1096
+      }
+    },
+    {
+      "feature": "rv_z_24h",
+      "horizon": "fwd_24h",
+      "avg_ic": -0.0813,
+      "same_sign": true,
+      "per_symbol_ic": {
+        "BTCUSDT": -0.0599,
+        "ETHUSDT": -0.0116,
+        "SOLUSDT": -0.1725
+      }
+    }
+  ]
+}

@@ -17,18 +17,57 @@ You do NOT perform primary analysis — alpha-critic and execution-critic alread
 - `execution_critique`: JSON from execution-critic
 - Optional: backtest-runner metrics JSON (for reference numbers)
 
-### Output (core)
-- `strategy_id`, `lesson_id`, `primary_finding`, `next_idea_seed`, `local_seed`, `escape_seed`, `stop_suggested`: same as before
-- `agreement_points`: string[] — where both critics agree
-- `disagreement_points`: string[] — where they diverge
-- `priority_action`: "alpha" | "execution" | "both" — which to fix first
+### Output
 
-### Output (extensions)
-- `pattern_id`: string | null
-- `structural_concern`: string | null
-- `data_requests`: string[] — aggregated from both critics
+Return JSON that conforms to `engine.schemas.feedback.FeedbackOutput` (defined in `engine/schemas/feedback.py`). The orchestrator validates via `scripts/verify_outputs.py --agent feedback-analyst`; failures prevent the lesson from being recorded as canonical.
+
+Required fields:
+
+- All `HandoffBase` fields (`strategy_id`, `timestamp`, `agent_name="feedback-analyst"`, `model_version`, `draft_md_path`)
+- `lesson_id` — string or null (null if this iteration produced no new durable lesson)
+- `pattern_id` — string or null
+- `primary_finding` — 1–3 sentences, the bottom line
+- `agreement_points` — list of strings (may be empty, but the field is required)
+- `disagreement_points` — list of strings
+- `priority_action` — one of `alpha | execution | both | neither | meta`
+- `next_idea_seed`, `local_seed`, `escape_seed` — required strings
+- `stop_suggested` — bool
+- `structural_concern` — string or null
+- `data_requests` — list of strings
+- `extensions` — dict (carries `clean_pnl_gate`, `invariant_classification`, etc., per the existing post-backtest protocol in this document)
+
+Seeds that cite specific evidence from the critiques (WIN/LOSS deltas, fill-time OBI, regime trend) are preferred — the schema does not enforce evidence citation but critics and meta-reviewer may flag empty-evidence seeds.
 
 ## Workflow
+
+0. **Check clean_pnl HARD GATE (MANDATORY — before any other analysis)**:
+
+   The metrics now include attribution data:
+   - `clean_pnl`: PnL if strategy obeyed spec exactly (invariant-compliant)
+   - `bug_pnl`: PnL portion attributable to spec violations
+   - `clean_pct_of_total`: clean_pnl / total_pnl × 100
+   - `invariant_violation_by_type`: which violations occurred
+
+   **HARD GATE RULES:**
+   
+   a. If `clean_pnl < 0` (even if `total_pnl > 0`):
+      - The strategy has NO genuine edge — positive return is entirely from bugs.
+      - Set `stop_suggested: false` (don't stop the loop — there's work to do).
+      - Use `escape_seed` — the current signal/execution approach has failed.
+      - In `primary_finding`: explicitly state "clean_pnl is negative; apparent profit is entirely from invariant violations (bug_pnl=+X KRW)."
+
+   b. If `clean_pct_of_total < 50%`:
+      - The strategy has a weak edge contaminated by bugs.
+      - In `primary_finding`: state the clean/bug split.
+      - Use `local_seed` focused on FIXING the violation (not tuning parameters).
+
+   c. If `clean_pct_of_total >= 80%`:
+      - The strategy's return is mostly genuine edge.
+      - Proceed with normal critique-based seed selection (no gate override).
+
+   d. If invariant_violations is empty AND clean_pnl > 0:
+      - Clean strategy with genuine edge.
+      - This is the ONLY scenario where tuning parameters makes sense.
 
 1. **Read both critiques** (passed as input — do NOT re-analyze raw data):
 
@@ -37,6 +76,7 @@ You do NOT perform primary analysis — alpha-critic and execution-critic alread
    - `win_loss_separation`: OBI/spread/volume deltas
    - `hypothesis_supported`: bool
    - `critique` + `alpha_improvement`
+   - **NEW**: invariant-aware notes (if clean_pnl < 0, alpha-critic already flagged "none")
 
    From execution-critic:
    - `execution_assessment`: efficient/suboptimal/poor/inconclusive
@@ -44,6 +84,7 @@ You do NOT perform primary analysis — alpha-critic and execution-critic alread
    - `fee_analysis`: fee burden %
    - `critique` + `execution_improvement`
    - `data_requests`: what infra needs building
+   - **NEW**: invariant violation type + PnL impact
 
 2. **Identify agreement and disagreement**:
 
@@ -129,9 +170,15 @@ You do NOT perform primary analysis — alpha-critic and execution-critic alread
 
 ## Output (JSON only)
 
+Conforms to `engine.schemas.feedback.FeedbackOutput` (see `## Schema` above for field-level docs).
+
 ```json
 {
   "strategy_id": "<id>",
+  "timestamp": "2026-04-17T12:34:56",
+  "agent_name": "feedback-analyst",
+  "model_version": "claude-sonnet-4-6",
+  "draft_md_path": "strategies/<id>/feedback_notes.md",
   "lesson_id": "<lesson_id>",
   "pattern_id": null,
   "primary_finding": "<1 sentence synthesized from both critiques>",
