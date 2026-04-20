@@ -1,0 +1,46 @@
+{
+  "strategy_id": "lob_iter1_obi1_spread_capture",
+  "path": "/home/dgu/tick/proj_claude_tick_finance/strategies/lob_iter1_obi1_spread_capture",
+  "files_present": {
+    "spec.yaml": true,
+    "strategy.py": true,
+    "idea.json": true,
+    "report.json": true,
+    "report_strict.json": true,
+    "alpha_design.md": true,
+    "execution_design.md": true,
+    "alpha_critique.md": true,
+    "execution_critique.md": true,
+    "feedback.json": true,
+    "agent_trace.jsonl": false
+  },
+  "files_missing": [
+    "agent_trace.jsonl"
+  ],
+  "idea_fields_present": {
+    "signal_brief_rank": true,
+    "deviation_from_brief": true,
+    "alpha_specified": true,
+    "execution_specified": true
+  },
+  "idea_fields_missing": [],
+  "model_version_logged": false,
+  "attribution": {
+    "normal_pnl": 101711967693.0,
+    "strict_pnl_clean": 100618872209.0,
+    "bug_pnl": 1093095484.0,
+    "clean_pct_of_total": 98.92530298175008
+  },
+  "invariant_violation_count": 0,
+  "invariant_violation_by_type": {},
+  "agent_trace": null,
+  "referenced_in_iterate_context": true,
+  "summary": {
+    "critical_missing": [],
+    "fidelity_missing": [
+      "agent_trace.jsonl"
+    ],
+    "idea_fields_missing_count": 0,
+    "fully_instrumented": false
+  }
+}

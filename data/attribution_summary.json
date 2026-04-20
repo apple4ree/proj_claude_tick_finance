@@ -1,12 +1,12 @@
 [
   {
-    "strategy_id": "crypto_1h_btc_mean_rev_168h_iter1",
-    "normal_return_pct": -7.069428886132689,
-    "strict_return_pct": 0.0,
-    "normal_pnl": -706942.89,
-    "strict_pnl_clean": 0.0,
-    "bug_pnl": -706942.89,
-    "clean_pct_of_total": -0.0,
+    "strategy_id": "lob_iter2_obi1_spread_gate",
+    "normal_return_pct": 0.1021,
+    "strict_return_pct": 0.101,
+    "normal_pnl": 102122875231.0,
+    "strict_pnl_clean": 100973779746.0,
+    "bug_pnl": 1149095485.0,
+    "clean_pct_of_total": 98.87,
     "normal_violations_by_type": {},
     "strict_blocks_total": 0,
     "interpretation": "strict_pnl_clean is the return if strategy obeyed spec exactly; bug_pnl is the portion attributable to spec violations"

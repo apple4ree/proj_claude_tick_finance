@@ -507,3 +507,41 @@ Per-iteration summaries across `/iterate` runs. Read by downstream agents (alpha
 - **Priority**: both — exit wiring bug + wrong symbol (BTC has no 168h mean-rev edge; ETH/SOL do)
 - **Structural concern**: exit_signal condition in generate_signal() overrides PT/SL/time_stop; SL check is only in the signal=1 branch, not enforced before re-entry gate
 - **Seed → next**: fix SL/PT exit loop wiring AND move to ETHUSDT where raw mean_fwd is +613 bps; add roc_24h >= 0 confirmation gate if BTC is retried
+
+## Iteration 1 (crypto_lob) — lob_iter1_obi1_spread_capture [feedback-analyst]
+- **Timestamp**: 2026-04-20T05:25:13Z
+- **Result**: return +0.1017%, WR 26.0%, 1500 roundtrips, fee=0 bps (zero-fee construct)
+- **Attribution**: clean_pct=N/A (attribute_pnl.py not run; 0 invariant_violations)
+- **Alpha**: moderate for BTC+ETH only — BTC edge +0.267 bps (WR 37.0%), ETH edge +0.184 bps (WR 37.8%), SOL edge −0.962 bps (WR 3.0% — implementation bug: avg_entry_obi=−0.028 vs threshold 0.749589, all 500 SOL entries fired without OBI gate). Portfolio total_edge = −0.170 bps (SOL drag dominates). Hypothesis supported for BTC/ETH; untested/invalidated for SOL.
+- **Execution**: suboptimal — time_stop-as-primary-exit architecture is correct (91.3%, BTC/ETH +0.147/+0.113 bps). Two defects: (1) no per-symbol spread gate (SOL spread 1.17 bps > PT 1.09 bps — structural entry loss independent of OBI); (2) at real 4 bps taker fee, fee_to_edge_ratio=94.7% — non-deployable with MARKET orders.
+- **Priority**: both — fix SOL OBI threshold bypass in strategy.py AND add spread gate (reject if spread_bps >= profit_target_bps)
+- **Key number**: BTC+ETH combined edge without SOL = +0.226 bps; fee_to_edge at 4 bps = 94.7% → maker-only execution required for viability
+- **Lesson recorded**: lesson_20260420_001_lob_spread_gt_pt_blocks_symbol_before_obi_signal_can_work_implementation_bypass_invalidates_cross_symbol_alpha_assessment
+- **Seed → iter 2**: (local) Fix strategy.py SOL OBI gate; add per-symbol spread gate (`if spread_bps >= profit_target_bps: skip`); enable track_mfe=true; rerun BTC/ETH/SOL with corrected implementation — expect BTC+ETH portfolio edge ~+0.226 bps at fee=0 and SOL exclusion via spread gate; (escape) pivot to passive LIMIT maker entry (post at bid, wait for fill within 2 ticks) to reduce entry cost from taker 4 bps to near-zero maker — at fee=0 maker, BTC+ETH edge is already viable; LOB depth data enables queue-position estimation
+
+## Iteration 1 — lob_iter1_obi1_spread_capture [local]
+- **Timestamp**: 2026-04-20T05:28:59+00:00
+- **Result**: return +0.1000%, WR n/a%, 1500 roundtrips
+- **Attribution**: clean_pct=98.9%, bug_pnl=+1093095484.00
+- **Alpha**: SOL OBI threshold bypass + spread 1.17 bps > PT 1.09 bps; BTC/ETH +0.226 bps gross
+- **Execution**: time_stop (91%) architecture correct; SL gap risk 10/11 overshoot; fee_to_edge 94.7% at 4bps taker = non-deployable
+- **Priority**: both
+- **Seed → next**: lob_iter2: fix SOL OBI gate in strategy.py + add per-symbol spread gate (reject if spread_bps >= profit_target_bps); enable track_mfe=true; rerun BTC/ETH/SOL
+
+## Iteration 2 — lob_iter2_obi1_spread_gate [local]
+- **Timestamp**: 2026-04-20T05:42:01+00:00
+- **Result**: return +0.1000%, WR n/a%, 1000 roundtrips
+- **Attribution**: clean_pct=98.9%, bug_pnl=+1149095485.00
+- **Alpha**: spread_gate + OBI_strict fix: BTC +0.267/37.2%, ETH +0.184/37.8%, SOL excluded (1.17>1.09)
+- **Execution**: time_stop 91% unchanged; 0 rejected.cash; 4-gate pass ✓✓✓✓; IR beats BH (-1.53%) by +1.63%
+- **Priority**: alpha
+- **Seed → next**: iter3+ maker execution (passive LIMIT_AT_BID/ASK) to make BTC+ETH +0.226 bps edge fee-viable; avg_capture_pct still NaN-heavy — enable track_mfe=true in engine or dense mid_series sampling for LOB
+
+
+## 2026-04-20 05:47Z — lob_iter2_obi1_spread_gate [programmatic feedback]
+- **Spec**: — on BTCUSDT,ETHUSDT,SOLUSDT crypto_lob
+- **Backtest**: return +0.10%, Sharpe +2.11, MDD -0.00%, RT 1000
+- **IC/ICIR/IR**: +0.0000 / +0.000 / +0.000
+- **4-Gate**: PASS  (1_invariants, 2_oos_sharpe, 3_ir_vs_bh, 4_cross_symbol)
+- **OOS**: ret 0.0664, IR 1.0693796354824576
+- **Notes**: (none)
