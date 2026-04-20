@@ -1,0 +1,1 @@
+Figure 12: Cross-run instability of grok-4.1-fast under different decoding temperatures.

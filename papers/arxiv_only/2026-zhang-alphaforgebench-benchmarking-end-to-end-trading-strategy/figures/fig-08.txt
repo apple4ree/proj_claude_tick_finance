@@ -1,0 +1,1 @@
+Figure 8: Cross-run instability of gemini-3-flash-preview under different decoding temperatures.

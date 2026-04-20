@@ -1,0 +1,1 @@
+Figure 11: The query prompt for the **inferred** knowledge used in case study 2. [[Predicates]]

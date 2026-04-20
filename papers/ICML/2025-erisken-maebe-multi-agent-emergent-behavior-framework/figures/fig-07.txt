@@ -1,0 +1,1 @@
+Figure 7. Single agent responses per single GGB benchmark questions and double-inverted GGB questions introduced in this work. Error

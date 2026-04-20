@@ -1,0 +1,108 @@
+name: lob_run20260420_iter1_obi1_maker
+description: |
+  [crypto_lob / spread_capture] LOB run-20260420 iter-1 전략: 최우선호가 수준 OBI(depth=1)가
+  심볼별 90번째 백분위수 임계값을 돌파할 때 best_bid에 지정가(Passive Maker) 진입.
+  시그널 근거: obi_1 x fwd_10t 신호가 BTC/ETH/SOL 전 심볼에서 avg_ic=0.2514,
+  min_abs_ic=0.2352로 robust — signal_brief top_robust rank-1.
+  체결 방식: LIMIT_AT_BID (bid 가격 수동 호가), maker fee 0 bps (Binance 지정가 리베이트 가정).
+  iter-1 vs iter-0 차이: entry_price_mode=bid (passive maker) vs ask (taker); max_entries_per_session=5 (보수적).
+  진입 조건: spread_bps < profit_target_bps(1.21) 게이트 통과 후 obi_1 >= sym_thresh.
+  청산 우선순위: (1) profit_target 1.21 bps — brief optimal_exit 그대로; (2) stop_loss 1.64 bps — brief 그대로.
+  TTL: 진입 주문이 10 틱 내 미체결이면 취소; bid 1 틱 하락 시 즉시 취소 (adverse selection 방어).
+  편차=0%: brief의 optimal_exit를 그대로 사용 (pt_pct=0.0, sl_pct=0.0).
+  parent_lesson: lesson_20260420_001 — spread > PT 조건이 심볼 진입을 막기 전에 구현 우회 문제 방지.
+  IS 창: 2026-04-19 06:00-22:00 UTC (단일 LOB 수집 세션).
+
+capital: 1000000.0  # $1M USD — runner auto-scales × CRYPTO_PRICE_SCALE=1e8 for crypto_lob
+
+universe:
+  market: crypto_lob
+  symbols: [BTCUSDT, ETHUSDT, SOLUSDT]
+  time_window:
+    start: "2026-04-19T06:00:00"
+    end:   "2026-04-19T22:00:00"
+  dates: []  # LOB 모드: date-partitioned 루프 없음 — time_window로 대체
+
+fees:
+  commission_bps: 0.0   # Binance maker fee 0 (지정가 리베이트 가정)
+  tax_bps: 0.0          # 크립토: 매도세 없음
+
+latency:
+  submit_ms: 5.0
+  jitter_ms: 1.0
+  seed: 42
+
+strategy_kind: python
+
+params:
+  # --- alpha params ---
+  obi_thresholds:
+    BTCUSDT: 0.918997
+    ETHUSDT: 0.942049
+    SOLUSDT: 0.749589
+  spread_gate: true        # spread_bps < profit_target_bps 이면 진입 허용
+  # --- entry execution params ---
+  entry_price_mode: bid    # LIMIT_AT_BID — passive maker (best_bid 호가)
+  entry_ttl_ticks: 10      # 10 틱(~1초) 내 미체결 시 취소
+  cancel_on_bid_drop_ticks: 1  # bid 1 틱 하락 시 즉시 취소 (adverse selection 방어)
+  # --- exit execution params ---
+  profit_target_bps: 1.21  # brief optimal_exit.pt_bps 그대로 (편차 0%)
+  stop_loss_bps: 1.64      # brief optimal_exit.sl_bps 그대로 (편차 0%)
+  trailing_stop: false
+  trailing_activation_bps: 0.0
+  trailing_distance_bps: 0.0
+  # --- sizing / session ---
+  lot_size: 1
+  max_entries_per_session: 5   # 보수적 세션 한도 (passive maker 미체결 적체 방지)
+  max_position_per_symbol: 1
+
+# Invariant-checker 추론을 위한 플래그
+track_mfe: true
+
+# DSL placeholders — strategy_kind=python; logic is in strategy.py (strategy-coder 담당)
+signals: {}
+entry:
+  when: false
+  size: 1
+exit:
+  when: false
+
+risk:
+  max_position_per_symbol: 1
+
+# ---------------------------------------------------------------------------
+# Handoff metadata — 감사 추적성 보존 (실행 소비 안 함)
+# ---------------------------------------------------------------------------
+handoff_metadata:
+  signal_brief_rank: 1  # 1-indexed: top_robust[0] = obi_1 x fwd_10t
+  universe_rationale: >
+    BTCUSDT/ETHUSDT/SOLUSDT 전 심볼에서 same-sign IC (BTC=0.2556, ETH=0.2633, SOL=0.2352)
+    및 min_abs_ic=0.2352 >> 0.02 floor — LOB brief 내 가장 강한 cross-symbol robustness.
+  brief_realism:
+    brief_ev_bps_raw: 0.39
+    entry_order_type: LIMIT_AT_BID
+    spread_cross_cost_bps: 0.0
+    brief_horizon_ticks: 10
+    planned_holding_ticks_estimate: 10
+    horizon_scale_factor: 1.0
+    symbol_trend_pct_during_target_window: -1.53
+    regime_compatibility: match
+    regime_adjustment_bps: 0.0
+    adjusted_ev_bps: 0.39
+    decision: proceed
+    rationale: >
+      LIMIT_AT_BID spread_capture; spread_cross=0 (maker에서 bid 호가 — spread 비용 없음);
+      horizon_scale=1; regime=match; adjusted_ev=0.39 > 0; proceed.
+  deviation_from_brief:
+    pt_pct: 0.0
+    sl_pct: 0.0
+    rationale: >
+      Brief optimal_exit를 그대로 사용. maker 진입(fee=0)으로 EV 침식 없음.
+      pt=1.21 bps (brief.pt_bps), sl=1.64 bps (brief.sl_bps) 변경 없음.
+  draft_notes:
+    alpha_draft_path: strategies/_drafts/lob_run20260420_iter1_alpha.md
+    execution_draft_path: strategies/_drafts/lob_run20260420_iter1_execution.md
+  parent_lesson: "lesson_20260420_001_lob_spread_gt_pt_blocks_symbol_before_obi_signal_can_work_implementation_bypass_invalidates_cross_symbol_alpha_assessment"
+  agent_name: execution-designer
+  model_version: claude-sonnet-4-6
+  timestamp: "2026-04-20T00:00:00"

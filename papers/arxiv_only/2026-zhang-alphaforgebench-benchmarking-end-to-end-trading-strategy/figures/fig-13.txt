@@ -1,0 +1,1 @@
+Figure 13: Decision instability across decoding temperatures (grok-

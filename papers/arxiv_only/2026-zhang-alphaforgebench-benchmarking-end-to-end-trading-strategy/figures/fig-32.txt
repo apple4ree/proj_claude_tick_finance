@@ -1,0 +1,1 @@
+Figure 32: Boxplot distributions aggregated by three main difficulty levels (L1, L2, L3). This coarse-grained view highlights the

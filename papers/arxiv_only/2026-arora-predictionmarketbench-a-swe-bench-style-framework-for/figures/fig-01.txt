@@ -1,0 +1,1 @@
+Figure 1: PredictionMarketBench execution flow. The harness iterates over episodes, the simulator

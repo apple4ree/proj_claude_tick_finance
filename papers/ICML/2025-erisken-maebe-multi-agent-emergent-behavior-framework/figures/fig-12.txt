@@ -1,0 +1,1 @@
+Figure 12. Response frequencies between single and round robin first model calls, for original and double-inverted questions. Error bars

@@ -1,0 +1,1 @@
+Figure 44: claude-sonnet-4.5 performance across 9 difficulty levels.

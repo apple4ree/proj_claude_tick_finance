@@ -1,0 +1,1 @@
+Figure 23: Aligned return curves across all assets (smoothed with 20-query moving average, 25–75% quantile band). Queries

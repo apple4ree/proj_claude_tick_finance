@@ -1,0 +1,1 @@
+Figure 9: The Level-1 interpretation abstraction prompt for case study 2. [[Variables]] and [[Pred-

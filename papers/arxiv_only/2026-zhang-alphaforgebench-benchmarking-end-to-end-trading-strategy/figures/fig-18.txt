@@ -1,0 +1,1 @@
+Figure 18: Normalized radar chart of model performance on the Stage 1 real-world benchmark across five metrics. Each

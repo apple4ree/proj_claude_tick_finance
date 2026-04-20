@@ -1,0 +1,1 @@
+Figure 4: Sharpe Ratio by asset on LLM-augmented queries

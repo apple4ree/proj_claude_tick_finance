@@ -1,0 +1,1 @@
+Figure 16: Cross-run instability of gpt-5.2 under different decoding temperatures.

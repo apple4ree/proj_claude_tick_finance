@@ -1,0 +1,1 @@
+Figure 8: The first time and last time LLM generated investment belief updates by CVRF for GOOG.

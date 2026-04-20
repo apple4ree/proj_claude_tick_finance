@@ -1,0 +1,34 @@
+{
+  "id": "lob_run20260420_iter1_obi1_maker",
+  "passed": false,
+  "gates": {
+    "1_invariants": {
+      "pass": false,
+      "detail": "violations=4 (allow=0)"
+    },
+    "2_oos_sharpe": {
+      "pass": true,
+      "detail": "OOS roundtrips=27 (min=1), Sharpe=-0.64, ret=-0.01%"
+    },
+    "3_ir_vs_bh": {
+      "pass": true,
+      "detail": "OOS IR=+0.98 (min=+0.00), BH=-0.485801209694004"
+    },
+    "4_cross_symbol": {
+      "pass": true,
+      "detail": "standalone (no siblings), soft-pass"
+    }
+  },
+  "oos_result": {
+    "n_rt": 27,
+    "sharpe": -0.6425,
+    "total_ret_pct": -0.0114,
+    "bh_ret_pct": -0.485801209694004,
+    "information_ratio": 0.9765336113362487,
+    "window": [
+      "2026-04-19T22:00:00",
+      "2026-04-20T06:00:00"
+    ]
+  },
+  "oos_error": null
+}

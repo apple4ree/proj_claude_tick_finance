@@ -1,0 +1,1 @@
+Figure 1: An overview of RvLLM. Given an LLM’s context and outputs, RvLLM first extracts relevant

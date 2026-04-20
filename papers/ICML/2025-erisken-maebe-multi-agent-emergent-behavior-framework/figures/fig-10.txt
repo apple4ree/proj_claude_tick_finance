@@ -1,0 +1,1 @@
+Figure 10. Distribution of excluded data across all models by category. We see that a large percent are excluded due to an empty response

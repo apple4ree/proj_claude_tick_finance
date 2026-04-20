@@ -1,0 +1,1 @@
+Figure 4: The detailed modular design of the manager and analyst agents. The general configuration

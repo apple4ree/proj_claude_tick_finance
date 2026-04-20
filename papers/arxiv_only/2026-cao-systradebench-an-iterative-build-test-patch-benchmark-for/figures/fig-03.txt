@@ -1,0 +1,1 @@
+Figure 3: RQ4: Token usage heatmap (3 models × 4 iterations).

@@ -1,0 +1,1 @@
+Figure 31: Boxplot distributions across 9 fine-grained difficulty levels. Box boundaries represent the interquartile range (IQR),

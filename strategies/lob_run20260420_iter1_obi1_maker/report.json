@@ -1,0 +1,410 @@
+{
+  "spec_name": "lob_run20260420_iter1_obi1_maker",
+  "symbols": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT"
+  ],
+  "dates": [],
+  "total_events": 1553771,
+  "total_pnl": -5908999998.0,
+  "realized_pnl": -5908999998.0,
+  "unrealized_pnl": 0.0,
+  "total_fees": 0.0,
+  "n_trades": 26,
+  "n_partial_fills": 0,
+  "pending_at_end": 0,
+  "n_resting_cancelled": 0,
+  "rejected": {
+    "cash": 0,
+    "short": 0,
+    "no_liquidity": 0,
+    "non_marketable": 0,
+    "strict_invariant": 0
+  },
+  "starting_cash": 100000000000000.0,
+  "ending_cash": 99994091000002.0,
+  "return_pct": -0.0059,
+  "sharpe_raw": -0.0225,
+  "sharpe_annualized": -0.3574,
+  "mdd_pct": -0.0059,
+  "n_roundtrips": 11,
+  "win_rate_pct": 0.0,
+  "avg_trade_pnl": -537181818.0,
+  "best_trade": -999999.0,
+  "worst_trade": -4658000000.0,
+  "avg_win_bps": 0.0,
+  "avg_loss_bps": -1.57,
+  "duration_sec": 67.03,
+  "ic_pearson": 0.0,
+  "ic_spearman": 0.0,
+  "icir": 0.0,
+  "icir_chunks": 0,
+  "information_ratio": 0.0,
+  "ic_n": 0,
+  "invariant_violations": [
+    {
+      "invariant_type": "max_position_exceeded",
+      "expected": 1.0,
+      "actual": 2.0,
+      "fill_index": 12,
+      "severity": "high",
+      "context": {
+        "symbol": "SOLUSDT",
+        "date": "20260419"
+      }
+    },
+    {
+      "invariant_type": "max_position_exceeded",
+      "expected": 1.0,
+      "actual": 2.0,
+      "fill_index": 13,
+      "severity": "high",
+      "context": {
+        "symbol": "ETHUSDT",
+        "date": "20260419"
+      }
+    },
+    {
+      "invariant_type": "max_position_exceeded",
+      "expected": 1.0,
+      "actual": 3.0,
+      "fill_index": 14,
+      "severity": "high",
+      "context": {
+        "symbol": "ETHUSDT",
+        "date": "20260419"
+      }
+    },
+    {
+      "invariant_type": "max_position_exceeded",
+      "expected": 1.0,
+      "actual": 2.0,
+      "fill_index": 22,
+      "severity": "high",
+      "context": {
+        "symbol": "BTCUSDT",
+        "date": "20260419"
+      }
+    }
+  ],
+  "invariant_violation_count": 4,
+  "invariant_violation_by_type": {
+    "max_position_exceeded": 4
+  },
+  "per_symbol": {
+    "BTCUSDT": {
+      "n_events": 540339,
+      "first_mid": 7546884500000.0,
+      "last_mid": 7442515499999.5,
+      "position": 0,
+      "realized_pnl": -5676000000.0,
+      "mark_to_mid_pnl": 0.0,
+      "buy_hold_return_pct": -1.3829
+    },
+    "ETHUSDT": {
+      "n_events": 572286,
+      "first_mid": 233045499999.5,
+      "last_mid": 227608500000.0,
+      "position": 0,
+      "realized_pnl": -221999999.0,
+      "mark_to_mid_pnl": 0.0,
+      "buy_hold_return_pct": -2.333
+    },
+    "SOLUSDT": {
+      "n_events": 441146,
+      "first_mid": 8543500000.0,
+      "last_mid": 8469500000.0,
+      "position": 0,
+      "realized_pnl": -10999999.0,
+      "mark_to_mid_pnl": 0.0,
+      "buy_hold_return_pct": -0.8662
+    }
+  },
+  "roundtrips": [
+    {
+      "symbol": "SOLUSDT",
+      "entry_ts_ns": 1776578808508379561,
+      "exit_ts_ns": 1776578809507985209,
+      "qty": 1,
+      "entry_price": 8545999999.0,
+      "exit_price": 8545000000.0,
+      "gross_pnl": -999999.0,
+      "net_pnl": -999999.0,
+      "pnl_bps": -1.17,
+      "outcome": "LOSS",
+      "exit_tag": "time_stop",
+      "entry_context": {
+        "obi": -0.0754,
+        "spread_bps": 1.17,
+        "bid_px": 8545000000,
+        "ask_px": 8545999999,
+        "mid": 8545499999.5,
+        "acml_vol": 0
+      },
+      "mfe_bps": null,
+      "mae_bps": null,
+      "capture_pct": null
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entry_ts_ns": 1776578834328334436,
+      "exit_ts_ns": 1776578835328328500,
+      "qty": 1,
+      "entry_price": 233167000000.0,
+      "exit_price": 233156000000.0,
+      "gross_pnl": -11000000.0,
+      "net_pnl": -11000000.0,
+      "pnl_bps": -0.47,
+      "outcome": "LOSS",
+      "exit_tag": "time_stop",
+      "entry_context": {
+        "obi": -0.9943,
+        "spread_bps": 0.04,
+        "bid_px": 233156000000,
+        "ask_px": 233157000000,
+        "mid": 233156500000.0,
+        "acml_vol": 0
+      },
+      "mfe_bps": null,
+      "mae_bps": null,
+      "capture_pct": null
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entry_ts_ns": 1776578863408461809,
+      "exit_ts_ns": 1776578863910451964,
+      "qty": 1,
+      "entry_price": 8545000000.0,
+      "exit_price": 8543000000.0,
+      "gross_pnl": -2000000.0,
+      "net_pnl": -2000000.0,
+      "pnl_bps": -2.34,
+      "outcome": "LOSS",
+      "exit_tag": "stop_loss",
+      "entry_context": {
+        "obi": -0.1475,
+        "spread_bps": 1.17,
+        "bid_px": 8543000000,
+        "ask_px": 8544000000,
+        "mid": 8543500000.0,
+        "acml_vol": 0
+      },
+      "mfe_bps": null,
+      "mae_bps": null,
+      "capture_pct": null
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entry_ts_ns": 1776578881210834725,
+      "exit_ts_ns": 1776578882208548317,
+      "qty": 1,
+      "entry_price": 8543000000.0,
+      "exit_price": 8542000000.0,
+      "gross_pnl": -1000000.0,
+      "net_pnl": -1000000.0,
+      "pnl_bps": -1.17,
+      "outcome": "LOSS",
+      "exit_tag": "time_stop",
+      "entry_context": {
+        "obi": -0.2053,
+        "spread_bps": 1.17,
+        "bid_px": 8542000000,
+        "ask_px": 8543000000,
+        "mid": 8542500000.0,
+        "acml_vol": 0
+      },
+      "mfe_bps": null,
+      "mae_bps": null,
+      "capture_pct": null
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entry_ts_ns": 1776578881229310103,
+      "exit_ts_ns": 1776578882228454883,
+      "qty": 1,
+      "entry_price": 233096999999.0,
+      "exit_price": 233077000000.0,
+      "gross_pnl": -19999999.0,
+      "net_pnl": -19999999.0,
+      "pnl_bps": -0.86,
+      "outcome": "LOSS",
+      "exit_tag": "time_stop",
+      "entry_context": {
+        "obi": -0.9779,
+        "spread_bps": 0.04,
+        "bid_px": 233091000000,
+        "ask_px": 233092000000,
+        "mid": 233091500000.0,
+        "acml_vol": 0
+      },
+      "mfe_bps": null,
+      "mae_bps": null,
+      "capture_pct": null
+    },
+    {
+      "symbol": "SOLUSDT",
+      "entry_ts_ns": 1776578952541165061,
+      "exit_ts_ns": 1776578953034723552,
+      "qty": 1,
+      "entry_price": 8542000000.0,
+      "exit_price": 8538000000.0,
+      "gross_pnl": -4000000.0,
+      "net_pnl": -4000000.0,
+      "pnl_bps": -4.68,
+      "outcome": "LOSS",
+      "exit_tag": "stop_loss",
+      "entry_context": {
+        "obi": -0.2894,
+        "spread_bps": 1.17,
+        "bid_px": 8541000000,
+        "ask_px": 8542000000,
+        "mid": 8541500000.0,
+        "acml_vol": 0
+      },
+      "mfe_bps": null,
+      "mae_bps": null,
+      "capture_pct": null
+    },
+    {
+      "symbol": "ETHUSDT",
+      "entry_ts_ns": 1776578952577702138,
+      "exit_ts_ns": 1776578953050103395,
+      "qty": 1,
+      "entry_price": 233127000000.0,
+      "exit_price": 232992000000.0,
+      "gross_pnl": -135000000.0,
+      "net_pnl": -135000000.0,
+      "pnl_bps": -5.79,
+      "outcome": "LOSS",
+      "exit_tag": "stop_loss",
+      "entry_context": {
+        "obi": -0.8494,
+        "spread_bps": 1.72,
+        "bid_px": 233028000000,
+        "ask_px": 233067999999,
+        "mid": 233047999999.5,
+        "acml_vol": 0
+      },
+      "mfe_bps": null,
+      "mae_bps": null,
+      "capture_pct": null
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entry_ts_ns": 1776582106515623087,
+      "exit_ts_ns": 1776582107515610741,
+      "qty": 1,
+      "entry_price": 7538602000000.0,
+      "exit_price": 7538530000000.0,
+      "gross_pnl": -72000000.0,
+      "net_pnl": -72000000.0,
+      "pnl_bps": -0.1,
+      "outcome": "LOSS",
+      "exit_tag": "time_stop",
+      "entry_context": {
+        "obi": -0.6778,
+        "spread_bps": 0.0,
+        "bid_px": 7538530000000,
+        "ask_px": 7538531000000,
+        "mid": 7538530500000.0,
+        "acml_vol": 0
+      },
+      "mfe_bps": null,
+      "mae_bps": null,
+      "capture_pct": null
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entry_ts_ns": 1776582361619736754,
+      "exit_ts_ns": 1776582362619774896,
+      "qty": 1,
+      "entry_price": 7533399000000.0,
+      "exit_price": 7532970000000.0,
+      "gross_pnl": -429000000.0,
+      "net_pnl": -429000000.0,
+      "pnl_bps": -0.57,
+      "outcome": "LOSS",
+      "exit_tag": "time_stop",
+      "entry_context": {
+        "obi": -0.4744,
+        "spread_bps": 0.0,
+        "bid_px": 7532970000000,
+        "ask_px": 7532971000000,
+        "mid": 7532970500000.0,
+        "acml_vol": 0
+      },
+      "mfe_bps": null,
+      "mae_bps": null,
+      "capture_pct": null
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entry_ts_ns": 1776582401148258352,
+      "exit_ts_ns": 1776582401620414658,
+      "qty": 1,
+      "entry_price": 7531952000000.0,
+      "exit_price": 7530000000000.0,
+      "gross_pnl": -1952000000.0,
+      "net_pnl": -1952000000.0,
+      "pnl_bps": -2.59,
+      "outcome": "LOSS",
+      "exit_tag": "stop_loss",
+      "entry_context": {
+        "obi": -0.1556,
+        "spread_bps": 0.0,
+        "bid_px": 7530000000000,
+        "ask_px": 7530000999999,
+        "mid": 7530000499999.5,
+        "acml_vol": 0
+      },
+      "mfe_bps": null,
+      "mae_bps": null,
+      "capture_pct": null
+    },
+    {
+      "symbol": "BTCUSDT",
+      "entry_ts_ns": 1776582401148258352,
+      "exit_ts_ns": 1776582483621063030,
+      "qty": 1,
+      "entry_price": 7532706000000.0,
+      "exit_price": 7525492000000.0,
+      "gross_pnl": -7214000000.0,
+      "net_pnl": -7214000000.0,
+      "pnl_bps": -9.58,
+      "outcome": "LOSS",
+      "exit_tag": "time_stop",
+      "entry_context": {
+        "obi": -0.1556,
+        "spread_bps": 0.0,
+        "bid_px": 7530000000000,
+        "ask_px": 7530000999999,
+        "mid": 7530000499999.5,
+        "acml_vol": 0
+      },
+      "mfe_bps": -9.66,
+      "mae_bps": -9.78,
+      "capture_pct": null
+    }
+  ],
+  "per_day": {
+    "2026-04-19": {
+      "n_entries": 15,
+      "n_roundtrips": 11,
+      "n_wins": 0,
+      "n_losses": 11,
+      "n_stops": 11,
+      "n_eod": 0,
+      "net_pnl": -9840999998.0
+    }
+  },
+  "artifacts": {
+    "spec": "strategies/lob_run20260420_iter1_obi1_maker/spec.yaml",
+    "strategy_py": "strategies/lob_run20260420_iter1_obi1_maker/strategy.py",
+    "idea_json": "strategies/lob_run20260420_iter1_obi1_maker/idea.json",
+    "trace_json": "strategies/lob_run20260420_iter1_obi1_maker/trace.json",
+    "report_json": "strategies/lob_run20260420_iter1_obi1_maker/report.json",
+    "report_html": "strategies/lob_run20260420_iter1_obi1_maker/report.html",
+    "feedback_json": null
+  }
+}

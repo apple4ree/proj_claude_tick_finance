@@ -1,0 +1,27 @@
+{
+  "strategies": [
+    {
+      "id": "lob_run20260420_iter2_obi1_maker_fixed",
+      "symbol": "BTCUSDT,ETHUSDT,SOLUSDT",
+      "horizon": "lob",
+      "dates": [
+        "2026-04-19T06:00:00",
+        "2026-04-19T22:00:00"
+      ],
+      "market": "crypto_lob",
+      "strategy_return_pct": -0.0059,
+      "strategy_sharpe": -0.3574,
+      "strategy_mdd_pct": -0.0059,
+      "information_ratio": 0.0,
+      "bh_return_pct": -1.5323726306597178,
+      "diff_pct": 1.5264726306597178,
+      "beats_bh_absolute": true
+    }
+  ],
+  "summary": {
+    "total": 1,
+    "comparable": 1,
+    "beat_bh_absolute": 1,
+    "positive_ir_vs_bh": 0
+  }
+}

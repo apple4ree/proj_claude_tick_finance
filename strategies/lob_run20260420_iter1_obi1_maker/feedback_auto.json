@@ -1,0 +1,73 @@
+{
+  "strategy_id": "lob_run20260420_iter1_obi1_maker",
+  "timestamp": "2026-04-20T13:04:00.652450Z",
+  "spec": {
+    "paradigm": "\u2014",
+    "symbol": "BTCUSDT,ETHUSDT,SOLUSDT",
+    "horizon": "crypto_lob",
+    "market": "crypto_lob",
+    "params": {
+      "obi_thresholds": {
+        "BTCUSDT": 0.918997,
+        "ETHUSDT": 0.942049,
+        "SOLUSDT": 0.749589
+      },
+      "spread_gate": true,
+      "entry_price_mode": "bid",
+      "entry_ttl_ticks": 10,
+      "cancel_on_bid_drop_ticks": 1,
+      "profit_target_bps": 1.21,
+      "stop_loss_bps": 1.64,
+      "trailing_stop": false,
+      "trailing_activation_bps": 0.0,
+      "trailing_distance_bps": 0.0,
+      "lot_size": 1,
+      "max_entries_per_session": 5,
+      "max_position_per_symbol": 1
+    }
+  },
+  "backtest": {
+    "return_pct": -0.0059,
+    "sharpe": -0.3574,
+    "mdd_pct": -0.0059,
+    "ic_pearson": 0.0,
+    "ic_spearman": 0.0,
+    "icir": 0.0,
+    "information_ratio": 0.0,
+    "n_roundtrips": 11,
+    "win_rate_pct": 0.0,
+    "avg_exposure": 0.0
+  },
+  "validation": {
+    "1_invariants": {
+      "pass": false,
+      "detail": "violations=4 (allow=0)"
+    },
+    "2_oos_sharpe": {
+      "pass": true,
+      "detail": "OOS roundtrips=27 (min=1), Sharpe=-0.64, ret=-0.01%"
+    },
+    "3_ir_vs_bh": {
+      "pass": true,
+      "detail": "OOS IR=+0.98 (min=+0.00), BH=-0.485801209694004"
+    },
+    "4_cross_symbol": {
+      "pass": true,
+      "detail": "standalone (no siblings), soft-pass"
+    }
+  },
+  "oos": {
+    "n_rt": 27,
+    "sharpe": -0.6425,
+    "total_ret_pct": -0.0114,
+    "bh_ret_pct": -0.485801209694004,
+    "information_ratio": 0.9765336113362487,
+    "window": [
+      "2026-04-19T22:00:00",
+      "2026-04-20T06:00:00"
+    ]
+  },
+  "notes": [
+    "invariant violations: 4 (['max_position_exceeded'])"
+  ]
+}

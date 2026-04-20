@@ -1,0 +1,1 @@
+Figure 3. Integrated Gradients (IG) saliency on clean vs. adversarial inputs. Visual comparison for digit “7” shows that adversarial

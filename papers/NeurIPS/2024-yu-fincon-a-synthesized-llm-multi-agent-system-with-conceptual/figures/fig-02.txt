@@ -1,0 +1,1 @@
+Figure 2: The detailed architecture of FINCON contains two key components: Manager-Analyst

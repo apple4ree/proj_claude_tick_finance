@@ -1,0 +1,1 @@
+Figure 8: The query prompt for case study 2, where [[comp_a]] and [[comp_b]] are replaced with the

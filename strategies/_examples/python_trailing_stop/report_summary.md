@@ -1,6 +1,6 @@
 # Backtest Report: python_trailing_stop
 
-spec: python_trailing_stop_example | mode: single | generated: 2026-04-20 05:42
+spec: python_trailing_stop_example | mode: single | generated: 2026-04-20 12:46
 
 ## Summary Metrics
 

@@ -1,0 +1,1 @@
+Figure 3: Portfolio values of Portfolio 1 & 2 changes over time for all the strategies. The computation of

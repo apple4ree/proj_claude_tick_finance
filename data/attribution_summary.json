@@ -1,14 +1,16 @@
 [
   {
-    "strategy_id": "lob_iter2_obi1_spread_gate",
-    "normal_return_pct": 0.1021,
-    "strict_return_pct": 0.101,
-    "normal_pnl": 102122875231.0,
-    "strict_pnl_clean": 100973779746.0,
-    "bug_pnl": 1149095485.0,
-    "clean_pct_of_total": 98.87,
-    "normal_violations_by_type": {},
-    "strict_blocks_total": 0,
+    "strategy_id": "lob_run20260420_iter2_obi1_maker_fixed",
+    "normal_return_pct": -0.0059,
+    "strict_return_pct": -0.0032,
+    "normal_pnl": -5908999998.0,
+    "strict_pnl_clean": -3177999998.0,
+    "bug_pnl": -2731000000.0,
+    "clean_pct_of_total": 53.78,
+    "normal_violations_by_type": {
+      "max_position_exceeded": 4
+    },
+    "strict_blocks_total": 2,
     "interpretation": "strict_pnl_clean is the return if strategy obeyed spec exactly; bug_pnl is the portion attributable to spec violations"
   }
 ]

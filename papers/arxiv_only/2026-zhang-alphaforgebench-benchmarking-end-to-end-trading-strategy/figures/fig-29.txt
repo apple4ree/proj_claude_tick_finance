@@ -1,0 +1,1 @@
+Figure 29: Performance trends across difficulty levels (model-averaged). Core metrics generally decline from Level 1 to Level

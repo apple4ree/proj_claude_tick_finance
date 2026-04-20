@@ -1,0 +1,1 @@
+Figure 13: The prompt template of interpretation abstraction used in case study 3: Factorization Error.

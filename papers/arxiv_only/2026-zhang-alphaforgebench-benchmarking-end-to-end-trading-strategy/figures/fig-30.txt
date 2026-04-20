@@ -1,0 +1,1 @@
+Figure 30: Detailed performance breakdown across 9 fine-grained difficulty levels. Each level (L1, L2, L3) is subdivided into easy,

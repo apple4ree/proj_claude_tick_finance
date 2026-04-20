@@ -1,0 +1,1 @@
+Figure 40: gemini-3-pro-preview performance across 9 difficulty levels.

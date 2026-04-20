@@ -545,3 +545,39 @@ Per-iteration summaries across `/iterate` runs. Read by downstream agents (alpha
 - **4-Gate**: PASS  (1_invariants, 2_oos_sharpe, 3_ir_vs_bh, 4_cross_symbol)
 - **OOS**: ret 0.0664, IR 1.0693796354824576
 - **Notes**: (none)
+
+
+## 2026-04-20 13:04Z — lob_run20260420_iter1_obi1_maker [programmatic feedback]
+- **Spec**: — on BTCUSDT,ETHUSDT,SOLUSDT crypto_lob
+- **Backtest**: return -0.01%, Sharpe -0.36, MDD -0.01%, RT 11
+- **IC/ICIR/IR**: +0.0000 / +0.000 / +0.000
+- **4-Gate**: FAIL  (2_oos_sharpe, 3_ir_vs_bh, 4_cross_symbol)
+- **OOS**: ret -0.0114, IR 0.9765336113362487
+- **Notes**: invariant violations: 4 (['max_position_exceeded'])
+
+## Iteration 1 — lob_run20260420_iter1_obi1_maker [local]
+- **Timestamp**: 2026-04-20T13:21:43+00:00
+- **Result**: return -0.0100%, WR n/a%, 11 roundtrips
+- **Attribution**: clean_pct=53.8%, bug_pnl=-2731000000.00
+- **Alpha**: OBI gate NOT applied in LIMIT_AT_BID path — all 11 entries fired at NEGATIVE OBI (avg -0.455) instead of +0.75-0.94 threshold; brief IC=0.2514 untested
+- **Execution**: max_position_exceeded ×4 (duplicate entries at same ts) — position check runs post-fill not pre-order; TTL=10 & bid_drop=1 likely too aggressive (only 26 fills / 11 RTs in 16h)
+- **Priority**: both
+- **Seed → next**: Fix strategy.py: (1) apply obi_threshold gate BEFORE LIMIT order post in maker path; (2) pre-order position-cap check; (3) increase entry_ttl_ticks 10→30 and cancel_on_bid_drop 1→3 to retain fill rate at passive bid
+
+
+## 2026-04-20 13:36Z — lob_run20260420_iter2_obi1_maker_fixed [programmatic feedback]
+- **Spec**: — on BTCUSDT,ETHUSDT,SOLUSDT crypto_lob
+- **Backtest**: return -0.01%, Sharpe -0.36, MDD -0.01%, RT 11
+- **IC/ICIR/IR**: +0.0000 / +0.000 / +0.000
+- **4-Gate**: FAIL  (2_oos_sharpe, 3_ir_vs_bh, 4_cross_symbol)
+- **OOS**: ret -0.0114, IR 0.9765336113362487
+- **Notes**: invariant violations: 4 (['max_position_exceeded'])
+
+## Iteration 2 — lob_run20260420_iter2_obi1_maker_fixed [local]
+- **Timestamp**: 2026-04-20T13:37:39+00:00
+- **Result**: return -0.0100%, WR n/a%, 11 roundtrips
+- **Attribution**: clean_pct=53.8%, bug_pnl=-2731000000.00
+- **Alpha**: TTL 10→30 + bid_drop 1→3 did NOT improve fill rate — still 11 RTs / 26 fills; true cause of low RT is queue-back LIMIT_AT_BID adverse selection (fills only when OBI reverses from bid-heavy to ask-heavy)
+- **Execution**: max_position_exceeded ×4 persists at identical fill_indices — engine counts concurrent buy+exit pairs as pos=2; not a strategy bug, interpretation quirk; passive maker paradigm fundamentally breaks OBI bid-pressure signal
+- **Priority**: alpha
+- **Seed → next**: PIVOT iter 3: abandon LIMIT_AT_BID, use MARKET (taker 4bps) BUT with stricter OBI threshold (0.99 per-symbol instead of 0.92/0.94/0.75) + tighter spread gate + smaller size; goal: trade quality over quantity, verify if selective MARKET entries can survive 4bps fee

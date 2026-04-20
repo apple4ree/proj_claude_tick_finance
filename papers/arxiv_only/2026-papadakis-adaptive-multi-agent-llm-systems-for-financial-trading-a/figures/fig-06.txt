@@ -1,0 +1,1 @@
+Figure 6.1.1: StockSim system performance metrics (memory/CPU usage) for varying numbers of

@@ -1,0 +1,1 @@
+Figure 4: The initial graph G is constructed in (4a). The literal node sets Lit↑and Lit↓are updated

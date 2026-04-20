@@ -1,0 +1,1 @@
+Figure 2: RQ3: Learning curves for Bollinger Mean Reversion
