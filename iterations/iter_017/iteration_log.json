@@ -1,0 +1,48 @@
+{
+  "iteration_idx": 17,
+  "started_at": "2026-04-22T02:21:41.315108",
+  "finished_at": "2026-04-22T02:31:06.608462",
+  "signal_specs": [
+    "iter017_exhaustion_extreme",
+    "iter017_deep_book_absorption_extreme",
+    "iter017_bbo_divergence_trade_confirm",
+    "iter017_fragile_ask_exhaustion"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_017/evaluations/iter017_exhaustion_extreme.json",
+    "iterations/iter_017/evaluations/iter017_deep_book_absorption_extreme.json",
+    "iterations/iter_017/evaluations/iter017_bbo_divergence_trade_confirm.json",
+    "iterations/iter_017/evaluations/iter017_fragile_ask_exhaustion.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_017/code/iter017_exhaustion_extreme.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_017/code/iter017_deep_book_absorption_extreme.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_017/code/iter017_bbo_divergence_trade_confirm.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_017/code/iter017_fragile_ask_exhaustion.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_017/fidelity/iter017_exhaustion_extreme.json",
+    "iterations/iter_017/fidelity/iter017_deep_book_absorption_extreme.json",
+    "iterations/iter_017/fidelity/iter017_bbo_divergence_trade_confirm.json",
+    "iterations/iter_017/fidelity/iter017_fragile_ask_exhaustion.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_017/results/iter017_exhaustion_extreme.json",
+    "iterations/iter_017/results/iter017_deep_book_absorption_extreme.json",
+    "iterations/iter_017/results/iter017_bbo_divergence_trade_confirm.json",
+    "iterations/iter_017/results/iter017_fragile_ask_exhaustion.json"
+  ],
+  "feedback": [
+    "iterations/iter_017/feedback/iter017_exhaustion_extreme.json",
+    "iterations/iter_017/feedback/iter017_deep_book_absorption_extreme.json",
+    "iterations/iter_017/feedback/iter017_bbo_divergence_trade_confirm.json",
+    "iterations/iter_017/feedback/iter017_fragile_ask_exhaustion.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_017/improvements/iter017_bbo_divergence_trade_confirm.json",
+    "iterations/iter_017/improvements/iter017_exhaustion_extreme.json",
+    "iterations/iter_017/improvements/iter017_fragile_ask_exhaustion.json",
+    "iterations/iter_017/improvements/iter017_deep_book_absorption_extreme.json"
+  ],
+  "stop_reason": null
+}

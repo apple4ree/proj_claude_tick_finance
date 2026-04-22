@@ -1,0 +1,38 @@
+{
+  "agent_name": "chain2-gate",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:51:29.197207",
+  "iteration_idx": 12,
+  "iterations_scanned": [
+    12
+  ],
+  "total_valid_specs": 3,
+  "scenarios": [
+    {
+      "fee_scenario": "krx_cash_23bps",
+      "fee_rt_bps": 23.0,
+      "top_candidates": [],
+      "excluded": {
+        "iter012_ask_conc_low_vol": "gate_failed:G1_density:43.3<300.0",
+        "iter012_mega_consensus": "gate_failed:G1_density:0.0<300.0",
+        "iter012_deep_book_vs_bbo_reversal": "gate_failed:G2_wr:0.0904<0.55"
+      }
+    },
+    {
+      "fee_scenario": "hypothetical_low_fee_5bps",
+      "fee_rt_bps": 5.0,
+      "top_candidates": [],
+      "excluded": {
+        "iter012_ask_conc_low_vol": "gate_failed:G1_density:43.3<300.0",
+        "iter012_mega_consensus": "gate_failed:G1_density:0.0<300.0",
+        "iter012_deep_book_vs_bbo_reversal": "gate_failed:G2_wr:0.0904<0.55"
+      }
+    }
+  ],
+  "cross_scenario_consensus": [],
+  "warnings": [
+    "no candidates passed gates under krx_cash_23bps",
+    "no candidates passed gates under hypothetical_low_fee_5bps"
+  ],
+  "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 통과 후보 없음\n- **hypothetical_low_fee_5bps**: 통과 후보 없음"
+}

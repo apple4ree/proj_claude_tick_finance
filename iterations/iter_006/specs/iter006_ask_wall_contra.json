@@ -1,0 +1,26 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-14T12:00:00Z",
+  "iteration_idx": 6,
+  "spec_id": "iter006_ask_wall_contra",
+  "name": "Ask Wall Contra-Directional Signal",
+  "hypothesis": "A high concentration of ask-side liquidity at the best ask price (`ask_depth_concentration`) forms a resistance wall, predicting a near-term price decrease. The signal is therefore contra-directional: we go long when this concentration is low and short when it is high.",
+  "formula": "ask_depth_concentration",
+  "primitives_used": [
+    "ask_depth_concentration"
+  ],
+  "threshold": 0.3,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md",
+    "signal-generator/references/prior_iterations_index.md"
+  ],
+  "parent_spec_id": null,
+  "mutation_note": "New signal based on Block C smoke tests showing strong contra-directional performance for ask_depth_concentration.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:00:00Z",
+  "iteration_idx": 7,
+  "parent_spec_id": "iter007_ask_conc_zscore_ultra",
+  "proposed_mutations": [
+    "threshold 5.0 -> 5.5"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent spec achieved a new peak expectancy of +7.60 bps with 90.3% WR. Following feedback to find the signal's conviction limit, this proposal tightens the z-score threshold from 5.0 to 5.5, testing for further improvement before returns diminish."
+}

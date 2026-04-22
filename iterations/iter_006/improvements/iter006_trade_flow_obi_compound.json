@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T04:03:38.261786",
+  "iteration_idx": 6,
+  "parent_spec_id": "iter006_trade_flow_obi_compound",
+  "proposed_mutations": [
+    "threshold 2.5 → 3.0"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "The parent spec has excellent performance (WR=90.3%, exp=+6.19 bps) over a large sample (26k trades). The feedback explicitly recommends tightening the threshold. This proposal applies a moderate increase (2.5 -> 3.0), following the heuristic of a 1.2x multiplier, to test performance sensitivity."
+}

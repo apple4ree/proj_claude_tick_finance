@@ -1,0 +1,26 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:05:00Z",
+  "iteration_idx": 5,
+  "spec_id": "iter005_obi_momentum_ensemble",
+  "name": "OBI-1 with Momentum Confirmation",
+  "hypothesis": "The predictive power of order book imbalance (OBI) is amplified when it aligns with recent price momentum. This spec combines a strong OBI-1 signal with a check for positive mid-price momentum over the last 50 ticks (5 seconds), filtering for entries where flow and trend are in agreement.",
+  "formula": "obi_1 * (rolling_momentum(mid_px, 50) > 0)",
+  "primitives_used": [
+    "obi_1",
+    "mid_px"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 1,
+  "references": [
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/cheat_sheets/regime_primitives.md"
+  ],
+  "parent_spec_id": "iter000_obi1_gt_05",
+  "mutation_note": "Adding a momentum regime filter (`rolling_momentum > 0`) to a foundational OBI-1 signal to create a new ensemble signal, aiming to improve precision by requiring trend confirmation.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

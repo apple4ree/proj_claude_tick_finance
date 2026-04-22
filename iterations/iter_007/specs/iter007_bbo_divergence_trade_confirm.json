@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-22T15:00:00Z",
+  "iteration_idx": 7,
+  "spec_id": "iter007_bbo_divergence_trade_confirm",
+  "name": "BBO vs Deep Book Divergence with Trade Flow Confirmation",
+  "hypothesis": "A large divergence between BBO imbalance (high obi_1) and deep book imbalance (low/negative obi_ex_bbo) signals an aggressive, short-term push. This is distinct from a consensus move. Requiring confirmation from positive signed trade flow ensures this is a real transaction-driven event, not just quoting activity, predicting a strong but brief momentum continuation.",
+  "formula": "(obi_1 - obi_ex_bbo) * (zscore(trade_imbalance_signed, 300) > 1.0)",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "trade_imbalance_signed"
+  ],
+  "threshold": 1.2,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 5,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": "iter014_book_divergence_short_horizon",
+  "mutation_note": "Inspired by the success of 'obi_1 - obi_ex_bbo' at short horizons, this spec adds a trade flow confirmation filter to improve signal quality by removing instances of pure quote-stuffing.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

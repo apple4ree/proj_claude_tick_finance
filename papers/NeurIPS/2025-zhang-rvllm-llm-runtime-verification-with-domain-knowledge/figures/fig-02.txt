@@ -1,1 +1,0 @@
-Figure 2: Runtime verification of GPT 4.1 nano by RvLLM for a number comparison task.

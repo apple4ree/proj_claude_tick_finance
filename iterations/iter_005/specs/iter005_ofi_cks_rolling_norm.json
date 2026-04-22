@@ -1,0 +1,25 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:05:00Z",
+  "iteration_idx": 5,
+  "spec_id": "iter005_ofi_cks_rolling_norm",
+  "name": "Normalized Rolling CKS OFI",
+  "hypothesis": "Single-tick OFI is noisy. A smoothed, rolling average of the formal CKS OFI over 50 ticks (5s) that exceeds its own rolling standard deviation should provide a more robust predictor of next-tick price moves than noisy, single-tick proxies.",
+  "formula": "rolling_mean(ofi_cks_1, 50) / rolling_std(ofi_cks_1, 50)",
+  "primitives_used": [
+    "ofi_cks_1"
+  ],
+  "threshold": 1.0,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 1,
+  "references": [
+    "_shared/references/papers/cont_kukanov_stoikov_2014_ofi.md",
+    "_shared/references/cheat_sheets/ofi_family_formulas.md"
+  ],
+  "parent_spec_id": null,
+  "mutation_note": "Introducing a new signal based on the formal CKS OFI primitive, smoothed and self-normalized to address noise issues seen in prior `ofi_proxy` attempts.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

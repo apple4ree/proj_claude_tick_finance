@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:22:15.890123Z",
+  "iteration_idx": 16,
+  "spec_id": "iter016_bbo_vs_deep_reversal",
+  "valid": false,
+  "concerns": [
+    "Duplicate of spec iter007_inverted_book_divergence which tested an identical formula and horizon."
+  ],
+  "duplicate_of": "iter007_inverted_book_divergence",
+  "expected_merit": "low",
+  "reasoning": "The spec passed all initial mechanical checks, including whitelist validation for primitives 'obi_1' and 'obi_ex_bbo' and well-formedness of the formula. However, the duplicate detection check found a prior spec, iter007_inverted_book_divergence, with an identical formula ('obi_1 > 0.7 AND obi_ex_bbo < -0.3') and prediction horizon (10 ticks). That spec was conclusively invalidated, recording a win rate of 5.3% and a large negative expectancy of -6.78 bps. This current spec is a direct repeat, only changing the direction to 'long_if_neg', which is the correct interpretation for a reversal signal. However, since the original spec already failed so spectacularly, simply inverting the trading direction is unlikely to produce a positive result from such a low win rate. Therefore, the spec is marked as a duplicate and invalid."
+}

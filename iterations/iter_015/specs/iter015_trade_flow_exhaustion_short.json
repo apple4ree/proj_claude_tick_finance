@@ -1,0 +1,25 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-15T10:05:01.123456Z",
+  "iteration_idx": 15,
+  "spec_id": "iter015_trade_flow_exhaustion_short",
+  "name": "Trade Flow Exhaustion (Short)",
+  "hypothesis": "Extreme buyer-initiated trade flow, as measured by a high positive z-score of trade_imbalance_signed, often marks a point of exhaustion or a 'bull trap' rather than the start of a continued move up. This spec hypothesizes that such an event is a high-probability predictor of a near-term price reversal downwards. We therefore take a short position (long_if_neg).",
+  "formula": "zscore(trade_imbalance_signed, 300)",
+  "primitives_used": [
+    "trade_imbalance_signed"
+  ],
+  "threshold": 2.5,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": "iter014_book_shape_reversal",
+  "mutation_note": "The parent spec had a dismal WR of 38.2%, and feedback indicated it was likely identifying exhaustion points but betting the wrong way. This new spec directly tests the core exhaustion hypothesis by using the key primitive (trade imbalance z-score) as a standalone short signal (long_if_neg).",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

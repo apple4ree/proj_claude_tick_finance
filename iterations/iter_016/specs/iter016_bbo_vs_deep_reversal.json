@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:21:45.123456Z",
+  "iteration_idx": 16,
+  "spec_id": "iter016_bbo_vs_deep_reversal",
+  "name": "BBO vs Deep Book Divergence (Reversal)",
+  "hypothesis": "Previous tests (e.g., iter006_deep_book_vs_bbo_divergence) showed that when BBO imbalance is strongly positive but the deep book is negative, betting on the BBO direction fails spectacularly. This spec tests the opposite: that this divergence is a high-conviction reversal signal predicting an imminent price drop.",
+  "formula": "obi_1 > 0.7 AND obi_ex_bbo < -0.3",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md",
+    "signal-generator/references/prior_iterations_index.md"
+  ],
+  "parent_spec_id": "iter006_deep_book_vs_bbo_divergence",
+  "mutation_note": "Inverting the direction of the parent spec from long_if_pos to long_if_neg to test the reversal hypothesis, based on its documented failure with WR < 10%.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

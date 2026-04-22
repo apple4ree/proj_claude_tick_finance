@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-15T10:06:15.845123Z",
+  "iteration_idx": 15,
+  "spec_id": "iter015_book_divergence_spread_filter",
+  "valid": false,
+  "concerns": [
+    "The spec's `threshold` field is set to 0.5, but the `formula` '(obi_1 - obi_ex_bbo) > 1.2 AND spread_bps < 10' is a self-contained boolean expression. This creates ambiguity: the signal trigger is defined inside the formula string (`> 1.2`), making the separate `threshold` field redundant and potentially confusing for the execution logic."
+  ],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passes all initial hard-fail checks. Primitives ['obi_1', 'obi_ex_bbo', 'spread_bps'] are whitelisted. The spec is not a duplicate of any prior iteration. The hypothesis is well-formed and directly follows the 'add_regime_filter' recommendation for its high-performing parent, iter014_book_divergence_short_horizon (WR 94.9%). It cites relevant references and proposes a logical combination of a strong signal with a standard liquidity filter. However, a fatal structural issue is identified: the formula contains its own thresholding logic ('(obi_1 - obi_ex_bbo) > 1.2'), making the separate `threshold: 0.5` field in the spec ambiguous and contradictory. This violates the implicit structural requirement that the formula computes a scalar value to be compared against the `threshold`. This ambiguity renders the spec invalid for direct implementation."
+}

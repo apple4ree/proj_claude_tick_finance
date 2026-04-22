@@ -1,0 +1,519 @@
+{
+  "agent_name": "backtest-runner",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T04:02:53.171891",
+  "iteration_idx": 6,
+  "spec_id": "iter006_trade_flow_obi_compound",
+  "per_symbol": [
+    {
+      "symbol": "005930",
+      "date": "20260317",
+      "n_ticks": 105487,
+      "n_trades": 3850,
+      "n_wins": 3503,
+      "n_losses": 347,
+      "wr": 0.9098701298701298,
+      "sum_win_bps": 19939.82026802001,
+      "sum_loss_bps": 1945.0799725770798,
+      "expectancy_bps": 4.673958518296864,
+      "horizon_curve": [
+        {
+          "horizon": 1,
+          "n_trades": 821,
+          "n_wins": 743,
+          "n_losses": 78,
+          "wr": 0.904993909866017,
+          "sum_win_bps": 3546.8564299366726,
+          "sum_loss_bps": 298.651288790006,
+          "expectancy_bps": 3.9564009027364997
+        },
+        {
+          "horizon": 5,
+          "n_trades": 2022,
+          "n_wins": 1859,
+          "n_losses": 163,
+          "wr": 0.9193867457962414,
+          "sum_win_bps": 9728.015214967543,
+          "sum_loss_bps": 779.2719468554402,
+          "expectancy_bps": 4.425689054457024
+        },
+        {
+          "horizon": 20,
+          "n_trades": 3850,
+          "n_wins": 3503,
+          "n_losses": 347,
+          "wr": 0.9098701298701298,
+          "sum_win_bps": 19939.82026802001,
+          "sum_loss_bps": 1945.0799725770798,
+          "expectancy_bps": 4.673958518296864
+        },
+        {
+          "horizon": 50,
+          "n_trades": 5538,
+          "n_wins": 4856,
+          "n_losses": 682,
+          "wr": 0.8768508486818346,
+          "sum_win_bps": 29970.50012134188,
+          "sum_loss_bps": 4573.2318876356285,
+          "expectancy_bps": 4.586000042200479
+        },
+        {
+          "horizon": 100,
+          "n_trades": 7242,
+          "n_wins": 6083,
+          "n_losses": 1159,
+          "wr": 0.839961336647335,
+          "sum_win_bps": 41788.595579238245,
+          "sum_loss_bps": 9443.630606891817,
+          "expectancy_bps": 4.466302813082909
+        },
+        {
+          "horizon": 200,
+          "n_trades": 8048,
+          "n_wins": 6122,
+          "n_losses": 1926,
+          "wr": 0.760685884691849,
+          "sum_win_bps": 52738.689294448195,
+          "sum_loss_bps": 19290.8247142242,
+          "expectancy_bps": 4.156046791777335
+        }
+      ]
+    },
+    {
+      "symbol": "005930",
+      "date": "20260323",
+      "n_ticks": 105278,
+      "n_trades": 7099,
+      "n_wins": 6189,
+      "n_losses": 910,
+      "wr": 0.8718129313987886,
+      "sum_win_bps": 37699.44553958095,
+      "sum_loss_bps": 5710.309857351631,
+      "expectancy_bps": 4.506146736474055,
+      "horizon_curve": [
+        {
+          "horizon": 1,
+          "n_trades": 1989,
+          "n_wins": 1810,
+          "n_losses": 179,
+          "wr": 0.9100050276520865,
+          "sum_win_bps": 9334.745637226088,
+          "sum_loss_bps": 840.712779994451,
+          "expectancy_bps": 4.270504201725307
+        },
+        {
+          "horizon": 5,
+          "n_trades": 4012,
+          "n_wins": 3661,
+          "n_losses": 351,
+          "wr": 0.9125124626121635,
+          "sum_win_bps": 20877.215224079962,
+          "sum_loss_bps": 1861.6921731700284,
+          "expectancy_bps": 4.739661777395297
+        },
+        {
+          "horizon": 20,
+          "n_trades": 7099,
+          "n_wins": 6189,
+          "n_losses": 910,
+          "wr": 0.8718129313987886,
+          "sum_win_bps": 37699.44553958095,
+          "sum_loss_bps": 5710.309857351631,
+          "expectancy_bps": 4.506146736474055
+        },
+        {
+          "horizon": 50,
+          "n_trades": 8969,
+          "n_wins": 7326,
+          "n_losses": 1643,
+          "wr": 0.8168134686141153,
+          "sum_win_bps": 50412.5087527902,
+          "sum_loss_bps": 12088.113912004468,
+          "expectancy_bps": 4.272984149937087
+        },
+        {
+          "horizon": 100,
+          "n_trades": 10646,
+          "n_wins": 7792,
+          "n_losses": 2854,
+          "wr": 0.7319180913018974,
+          "sum_win_bps": 62970.264940680085,
+          "sum_loss_bps": 24134.998805660485,
+          "expectancy_bps": 3.6478739559477362
+        },
+        {
+          "horizon": 200,
+          "n_trades": 12247,
+          "n_wins": 7856,
+          "n_losses": 4391,
+          "wr": 0.6414632154813423,
+          "sum_win_bps": 76511.29211477528,
+          "sum_loss_bps": 41867.62667624291,
+          "expectancy_bps": 2.828747075898781
+        }
+      ]
+    },
+    {
+      "symbol": "005930",
+      "date": "20260326",
+      "n_ticks": 107777,
+      "n_trades": 6541,
+      "n_wins": 5896,
+      "n_losses": 645,
+      "wr": 0.901391224583397,
+      "sum_win_bps": 35837.17962912692,
+      "sum_loss_bps": 3880.3855381374196,
+      "expectancy_bps": 4.885612917136447,
+      "horizon_curve": [
+        {
+          "horizon": 1,
+          "n_trades": 1377,
+          "n_wins": 1292,
+          "n_losses": 85,
+          "wr": 0.9382716049382716,
+          "sum_win_bps": 6781.201305012792,
+          "sum_loss_bps": 394.4334849638983,
+          "expectancy_bps": 4.638175613688376
+        },
+        {
+          "horizon": 5,
+          "n_trades": 3358,
+          "n_wins": 3138,
+          "n_losses": 220,
+          "wr": 0.9344848123883264,
+          "sum_win_bps": 17708.286819125467,
+          "sum_loss_bps": 1199.4397780037455,
+          "expectancy_bps": 4.916273687052329
+        },
+        {
+          "horizon": 20,
+          "n_trades": 6541,
+          "n_wins": 5896,
+          "n_losses": 645,
+          "wr": 0.901391224583397,
+          "sum_win_bps": 35837.17962912692,
+          "sum_loss_bps": 3880.3855381374196,
+          "expectancy_bps": 4.885612917136447
+        },
+        {
+          "horizon": 50,
+          "n_trades": 8604,
+          "n_wins": 7240,
+          "n_losses": 1364,
+          "wr": 0.8414690841469085,
+          "sum_win_bps": 46642.581190473764,
+          "sum_loss_bps": 9299.020494002922,
+          "expectancy_bps": 4.340255775972901
+        },
+        {
+          "horizon": 100,
+          "n_trades": 10635,
+          "n_wins": 8257,
+          "n_losses": 2378,
+          "wr": 0.7763986835919134,
+          "sum_win_bps": 60438.991315054365,
+          "sum_loss_bps": 19033.330451802634,
+          "expectancy_bps": 3.893339056253101
+        },
+        {
+          "horizon": 200,
+          "n_trades": 12428,
+          "n_wins": 8667,
+          "n_losses": 3761,
+          "wr": 0.6973768908915352,
+          "sum_win_bps": 74727.9092953294,
+          "sum_loss_bps": 34478.71829070918,
+          "expectancy_bps": 3.238589556213407
+        }
+      ]
+    },
+    {
+      "symbol": "000660",
+      "date": "20260317",
+      "n_ticks": 97436,
+      "n_trades": 3416,
+      "n_wins": 3145,
+      "n_losses": 271,
+      "wr": 0.9206674473067916,
+      "sum_win_bps": 32023.194972475165,
+      "sum_loss_bps": 2855.082423534814,
+      "expectancy_bps": 8.538674633764739,
+      "horizon_curve": [
+        {
+          "horizon": 1,
+          "n_trades": 781,
+          "n_wins": 708,
+          "n_losses": 73,
+          "wr": 0.9065300896286812,
+          "sum_win_bps": 6235.255775552937,
+          "sum_loss_bps": 518.9255482399491,
+          "expectancy_bps": 7.319244849312404
+        },
+        {
+          "horizon": 5,
+          "n_trades": 1855,
+          "n_wins": 1725,
+          "n_losses": 130,
+          "wr": 0.9299191374663073,
+          "sum_win_bps": 16657.349741404738,
+          "sum_loss_bps": 1070.9719930109452,
+          "expectancy_bps": 8.402359972179942
+        },
+        {
+          "horizon": 20,
+          "n_trades": 3416,
+          "n_wins": 3145,
+          "n_losses": 271,
+          "wr": 0.9206674473067916,
+          "sum_win_bps": 32023.194972475165,
+          "sum_loss_bps": 2855.082423534814,
+          "expectancy_bps": 8.538674633764739
+        },
+        {
+          "horizon": 50,
+          "n_trades": 4430,
+          "n_wins": 3943,
+          "n_losses": 487,
+          "wr": 0.8900677200902934,
+          "sum_win_bps": 42862.37957566727,
+          "sum_loss_bps": 5930.16306160238,
+          "expectancy_bps": 8.336843456899523
+        },
+        {
+          "horizon": 100,
+          "n_trades": 5516,
+          "n_wins": 4715,
+          "n_losses": 801,
+          "wr": 0.8547860768672951,
+          "sum_win_bps": 55791.286429697226,
+          "sum_loss_bps": 10067.755251070535,
+          "expectancy_bps": 8.289255108525506
+        },
+        {
+          "horizon": 200,
+          "n_trades": 6720,
+          "n_wins": 5391,
+          "n_losses": 1329,
+          "wr": 0.8022321428571428,
+          "sum_win_bps": 70391.38934503701,
+          "sum_loss_bps": 19199.285480667826,
+          "expectancy_bps": 7.617872598864462
+        }
+      ]
+    },
+    {
+      "symbol": "000660",
+      "date": "20260323",
+      "n_ticks": 102012,
+      "n_trades": 2644,
+      "n_wins": 2461,
+      "n_losses": 183,
+      "wr": 0.930786686838124,
+      "sum_win_bps": 27227.784596548256,
+      "sum_loss_bps": 1767.7011538941222,
+      "expectancy_bps": 9.62938102974816,
+      "horizon_curve": [
+        {
+          "horizon": 1,
+          "n_trades": 580,
+          "n_wins": 531,
+          "n_losses": 49,
+          "wr": 0.9155172413793103,
+          "sum_win_bps": 4967.788974622273,
+          "sum_loss_bps": 397.69758247172325,
+          "expectancy_bps": 7.879467917500948
+        },
+        {
+          "horizon": 5,
+          "n_trades": 1412,
+          "n_wins": 1313,
+          "n_losses": 99,
+          "wr": 0.9298866855524079,
+          "sum_win_bps": 13880.422650562998,
+          "sum_loss_bps": 1006.4466193436148,
+          "expectancy_bps": 9.117546764319677
+        },
+        {
+          "horizon": 20,
+          "n_trades": 2644,
+          "n_wins": 2461,
+          "n_losses": 183,
+          "wr": 0.930786686838124,
+          "sum_win_bps": 27227.784596548256,
+          "sum_loss_bps": 1767.7011538941222,
+          "expectancy_bps": 9.62938102974816
+        },
+        {
+          "horizon": 50,
+          "n_trades": 3737,
+          "n_wins": 3327,
+          "n_losses": 410,
+          "wr": 0.8902863259298903,
+          "sum_win_bps": 40772.89397566514,
+          "sum_loss_bps": 4500.9629300177485,
+          "expectancy_bps": 9.706162977160126
+        },
+        {
+          "horizon": 100,
+          "n_trades": 4735,
+          "n_wins": 3734,
+          "n_losses": 1001,
+          "wr": 0.7885955649419218,
+          "sum_win_bps": 51936.37519742115,
+          "sum_loss_bps": 12406.712939821138,
+          "expectancy_bps": 8.348397520084479
+        },
+        {
+          "horizon": 200,
+          "n_trades": 5838,
+          "n_wins": 3881,
+          "n_losses": 1957,
+          "wr": 0.6647824597464885,
+          "sum_win_bps": 67199.2678490045,
+          "sum_loss_bps": 27459.914992493595,
+          "expectancy_bps": 6.807014877785354
+        }
+      ]
+    },
+    {
+      "symbol": "000660",
+      "date": "20260326",
+      "n_ticks": 106148,
+      "n_trades": 2903,
+      "n_wins": 2682,
+      "n_losses": 221,
+      "wr": 0.9238718566999655,
+      "sum_win_bps": 29378.216075784618,
+      "sum_loss_bps": 2229.569060194943,
+      "expectancy_bps": 9.351928010881734,
+      "horizon_curve": [
+        {
+          "horizon": 1,
+          "n_trades": 585,
+          "n_wins": 535,
+          "n_losses": 50,
+          "wr": 0.9145299145299145,
+          "sum_win_bps": 5111.309158868409,
+          "sum_loss_bps": 374.2878485843968,
+          "expectancy_bps": 8.097472325271816
+        },
+        {
+          "horizon": 5,
+          "n_trades": 1500,
+          "n_wins": 1410,
+          "n_losses": 90,
+          "wr": 0.94,
+          "sum_win_bps": 14573.005876014626,
+          "sum_loss_bps": 762.3042720205347,
+          "expectancy_bps": 9.207134402662728
+        },
+        {
+          "horizon": 20,
+          "n_trades": 2903,
+          "n_wins": 2682,
+          "n_losses": 221,
+          "wr": 0.9238718566999655,
+          "sum_win_bps": 29378.216075784618,
+          "sum_loss_bps": 2229.569060194943,
+          "expectancy_bps": 9.351928010881734
+        },
+        {
+          "horizon": 50,
+          "n_trades": 3788,
+          "n_wins": 3415,
+          "n_losses": 373,
+          "wr": 0.9015311510031679,
+          "sum_win_bps": 39205.52847191412,
+          "sum_loss_bps": 4667.950867059575,
+          "expectancy_bps": 9.117628723562445
+        },
+        {
+          "horizon": 100,
+          "n_trades": 4630,
+          "n_wins": 3850,
+          "n_losses": 780,
+          "wr": 0.8315334773218143,
+          "sum_win_bps": 46596.275193261165,
+          "sum_loss_bps": 10383.085191706632,
+          "expectancy_bps": 7.821423326469661
+        },
+        {
+          "horizon": 200,
+          "n_trades": 5411,
+          "n_wins": 4214,
+          "n_losses": 1197,
+          "wr": 0.7787839586028461,
+          "sum_win_bps": 58201.292308059965,
+          "sum_loss_bps": 17477.56812207989,
+          "expectancy_bps": 7.526099461463698
+        }
+      ]
+    }
+  ],
+  "aggregate_n_trades": 26453,
+  "aggregate_wr": 0.9025819377764337,
+  "aggregate_expectancy_bps": 6.1889960713660415,
+  "trace_path": "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_006/traces/iter006_trade_flow_obi_compound.trace.json",
+  "horizon_curve": [
+    {
+      "horizon": 1,
+      "n_trades": 6133,
+      "n_wins": 5619,
+      "n_losses": 514,
+      "wr": 0.9161910973422469,
+      "sum_win_bps": 35977.157281219166,
+      "sum_loss_bps": 2824.7085330444243,
+      "expectancy_bps": 5.405584338525149
+    },
+    {
+      "horizon": 5,
+      "n_trades": 14159,
+      "n_wins": 13106,
+      "n_losses": 1053,
+      "wr": 0.9256303411257857,
+      "sum_win_bps": 93424.29552615533,
+      "sum_loss_bps": 6680.126782404309,
+      "expectancy_bps": 6.126433275213717
+    },
+    {
+      "horizon": 20,
+      "n_trades": 26453,
+      "n_wins": 23876,
+      "n_losses": 2577,
+      "wr": 0.9025819377764337,
+      "sum_win_bps": 182105.6410815359,
+      "sum_loss_bps": 18388.12800569001,
+      "expectancy_bps": 6.1889960713660415
+    },
+    {
+      "horizon": 50,
+      "n_trades": 35066,
+      "n_wins": 30107,
+      "n_losses": 4959,
+      "wr": 0.8585809616152398,
+      "sum_win_bps": 249866.39208785235,
+      "sum_loss_bps": 41059.443152322725,
+      "expectancy_bps": 5.954683994054914
+    },
+    {
+      "horizon": 100,
+      "n_trades": 43404,
+      "n_wins": 34431,
+      "n_losses": 8973,
+      "wr": 0.7932679015758917,
+      "sum_win_bps": 319521.78865535225,
+      "sum_loss_bps": 85469.51324695324,
+      "expectancy_bps": 5.392412575071399
+    },
+    {
+      "horizon": 200,
+      "n_trades": 50692,
+      "n_wins": 36131,
+      "n_losses": 14561,
+      "wr": 0.7127554643730766,
+      "sum_win_bps": 399769.84020665433,
+      "sum_loss_bps": 159773.93827641758,
+      "expectancy_bps": 4.734394025294657
+    }
+  ]
+}

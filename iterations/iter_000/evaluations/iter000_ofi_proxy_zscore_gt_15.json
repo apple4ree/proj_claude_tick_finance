@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T10:00:15Z",
+  "iteration_idx": 0,
+  "spec_id": "iter000_ofi_proxy_zscore_gt_15",
+  "valid": true,
+  "concerns": [
+    "helpers_in_primitives_used:stripped:['zscore'] (helpers belong in formula, not primitives_used — auto-fixed)"
+  ],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "Spec is valid. Hard checks passed: spec_id and iteration match; `measured_*` fields are null on first submission. No lookahead patterns found. The formula `zscore(ofi_proxy, 300)` uses whitelisted primitives and helpers correctly. The threshold of 1.5 is reasonable for a z-score. The hypothesis is well-articulated and directly supported by two cited references. As this is the first iteration, it is not a duplicate. Expected merit is high due to strong theoretical grounding and novelty."
+}

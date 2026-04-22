@@ -1,0 +1,23 @@
+{
+  "iteration_idx": 7,
+  "started_at": "2026-04-22T04:04:27.565913",
+  "finished_at": "2026-04-22T04:06:20.473083",
+  "signal_specs": [
+    "iter007_trade_flow_obi_compound_tight",
+    "iter007_bbo_divergence_trade_confirm",
+    "iter007_trade_flow_exhaustion_into_wall",
+    "iter007_ask_conc_zscore_ultra"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_007/evaluations/iter007_trade_flow_obi_compound_tight.json",
+    "iterations/iter_007/evaluations/iter007_bbo_divergence_trade_confirm.json",
+    "iterations/iter_007/evaluations/iter007_trade_flow_exhaustion_into_wall.json",
+    "iterations/iter_007/evaluations/iter007_ask_conc_zscore_ultra.json"
+  ],
+  "generated_codes": [],
+  "fidelity_reports": [],
+  "backtest_results": [],
+  "feedback": [],
+  "improvement_proposals": [],
+  "stop_reason": null
+}

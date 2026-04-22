@@ -1,0 +1,57 @@
+# Chain 1 operational configuration.
+#
+# Loaded by chain1/orchestrator.py at startup via load_config(). CLI flags
+# override values here. Deep-merged over the DEFAULT_RUN_CONFIG dict.
+#
+# NOT for secrets — API keys live in .env (gitignored).
+
+chain1:
+
+  universe:
+    # KRX symbols (6-digit codes). These must exist under
+    # /home/dgu/tick/open-trading-api/data/realtime/H0STASP0/<date>/<symbol>.csv
+    symbols:
+      - "005930"   # 삼성전자
+      - "000660"   # SK하이닉스
+      - "005380"   # 현대차
+
+    # YYYYMMDD strings. Start with 1 day and expand once per-iteration quality
+    # is established. Multi-day is expensive (107k ticks/symbol/day).
+    dates:
+      - "20260326"
+
+  iteration:
+    # Hard cap on Chain 1 iterations per `run` invocation.
+    max_iterations: 5
+
+    # Number of SignalSpec candidates each iteration proposes.
+    n_candidates_per_iter: 3
+
+    # Convergence detection: stop after N consecutive iterations without
+    # best_wr improving by more than epsilon (absolute, not relative).
+    convergence_window: 3
+    convergence_epsilon: 0.005   # 0.5 percentage points of WR
+
+  fidelity:
+    # If the generated code fails the 6-check fidelity gate, retry code
+    # generation up to this many times before retiring the spec for the
+    # current iteration.
+    max_retries_on_fail: 3
+
+  artifacts:
+    # Iteration artifacts live under <repo_root>/<root>/iter_<NNN>/.
+    root: "iterations"
+
+    # Per-trade traces are large (~few MB each). Disable unless debugging.
+    retain_traces: false
+
+  execution:
+    # skip_llm_agents=true runs deterministic evaluator/feedback/improver
+    # and expects a --seed-specs JSON for iteration 0 (generator is LLM-only).
+    # Useful for offline debugging of the pipeline skeleton without API cost.
+    skip_llm_agents: false
+
+# ---------------------------------------------------------------------------
+# Model selection is intentionally NOT here — it lives in .env so that
+# provider/model switches don't pollute git history. See .env.example.
+# ---------------------------------------------------------------------------

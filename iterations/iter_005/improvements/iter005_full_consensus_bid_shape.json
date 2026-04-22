@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T12:00:00Z",
+  "iteration_idx": 5,
+  "parent_spec_id": "iter005_full_consensus_bid_shape",
+  "proposed_mutations": [
+    "combine with iter005_ask_conc_zscore_ultra"
+  ],
+  "search_axes": [
+    "combine"
+  ],
+  "reasoning": "Parent spec has an outstanding WR of 96.2% and +6.80 bps expectancy. As per feedback, further tightening is risky. This proposal combines this high-precision book shape signal with another top performer from this batch (`ask_conc_zscore_ultra`), aiming for a robust ensemble."
+}

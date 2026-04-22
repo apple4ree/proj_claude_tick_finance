@@ -1,0 +1,25 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T10:00:01Z",
+  "iteration_idx": 2,
+  "spec_id": "iter002_ofi_proxy_zscore_gt_25",
+  "name": "Z-Scored OFI Proxy > 2.5",
+  "hypothesis": "Continuing to tighten the z-score threshold for OFI proxy from 2.0 to 2.5 (a ~99.4th percentile event) should isolate the most extreme order flow imbalances. These rare events are hypothesized to have the strongest predictive power, leading to a higher win rate and expectancy, though trade frequency will be very low.",
+  "formula": "zscore(ofi_proxy, 300)",
+  "primitives_used": [
+    "ofi_proxy"
+  ],
+  "threshold": 2.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 1,
+  "references": [
+    "_shared/references/cheat_sheets/ofi_family_formulas.md",
+    "_shared/references/papers/cont_kukanov_stoikov_2014_ofi.md"
+  ],
+  "parent_spec_id": "iter001_ofi_proxy_zscore_gt_20",
+  "mutation_note": "Following feedback analyst recommendation to 'tighten_threshold' again. Increased threshold from 2.0 to 2.5 to fully characterize the signal's strength at its extremes.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

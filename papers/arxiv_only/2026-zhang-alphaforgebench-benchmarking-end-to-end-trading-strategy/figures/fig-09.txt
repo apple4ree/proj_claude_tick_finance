@@ -1,1 +1,0 @@
-Figure 9: Decision instability across decoding temperatures

@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-15T12:00:01Z",
+  "iteration_idx": 19,
+  "spec_id": "iter019_contra_consensus_tight_obi",
+  "name": "Contra Consensus (Tight Deep Book)",
+  "hypothesis": "The parent spec (iter018_contra_consensus) proved a highly effective contra-signal (WR 93.4%) by combining a dense ask wall with deep-book selling pressure. Feedback suggested tightening thresholds. While the improver targeted 'ask_depth_concentration', this mutation tightens the other component, 'obi_ex_bbo', from 0.3 to 0.4. This tests if deep-book pressure is the more sensitive parameter for improving signal conviction.",
+  "formula": "ask_depth_concentration > 0.4 AND obi_ex_bbo > 0.4",
+  "primitives_used": [
+    "ask_depth_concentration",
+    "obi_ex_bbo"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md",
+    "signal-generator/references/prior_iterations_index.md"
+  ],
+  "parent_spec_id": "iter018_contra_consensus",
+  "mutation_note": "Tightened the 'obi_ex_bbo' threshold from 0.3 to 0.4, following feedback to isolate a higher-conviction subset of trades.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

@@ -1,0 +1,21 @@
+{
+  "agent_name": "feedback-analyst",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:57:54.132997",
+  "iteration_idx": 13,
+  "spec_id": "iter013_book_divergence_inverted",
+  "strengths": [
+    "The signal is triggered frequently, generating a very large and statistically significant sample of 25,739 trades, which makes the negative performance results conclusive."
+  ],
+  "weaknesses": [
+    "The core hypothesis that inverting the parent spec would yield a high win rate was completely invalidated, resulting in an aggregate Win Rate of only 9.0% — nearly identical to its non-inverted parent.",
+    "The signal is highly unprofitable, with a deeply negative aggregate expectancy of -6.25 bps.",
+    "Performance is consistently poor across all symbol-date pairs, with win rates for symbol 000660 (avg. 6.4%) being substantially lower than for 005930 (avg. 10.2%).",
+    "This result, combined with the parent's identical failure, suggests the formula `obi_1 - obi_ex_bbo` identifies market states where book imbalance has no predictive power for the subsequent price move in either direction."
+  ],
+  "win_bucket_insight": "The trace file shows that the very rare winning trades (9.0% of the total) are not concentrated in any discernible market regime. They occur sporadically across different volatility, spread, and time-of-day conditions, appearing to be random noise rather than a systematic pattern.",
+  "loss_bucket_insight": "The trace file indicates that losses are systemic and direction-independent. The signal flags market conditions where subsequent price action appears detached from the book's imbalance state. The market moves against the predicted direction over 90% of the time, suggesting these are periods of high uncertainty or state transition where simple imbalance measures fail.",
+  "cross_symbol_consistency": "mixed",
+  "recommended_next_direction": "change_horizon",
+  "recommended_direction_reasoning": "The spec's hypothesis was conclusively invalidated, yielding an aggregate WR of 9.0% and expectancy of -6.25 bps over 25,739 trades. The fact that this inverted spec performed identically to its parent strongly suggests the signal has no predictive power at the 20-tick horizon. As a final diagnostic step before retiring this feature family, we will probe a different prediction timescale by changing the horizon to see if any dynamic emerges at a much longer (e.g., 200 tick) or shorter (e.g., 1 tick) window."
+}

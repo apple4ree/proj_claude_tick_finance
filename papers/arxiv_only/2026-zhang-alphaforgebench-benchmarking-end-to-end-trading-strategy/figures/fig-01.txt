@@ -1,1 +1,0 @@
-Figure 1: The framework of AlphaForgeBench.

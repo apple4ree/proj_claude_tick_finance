@@ -1,1 +1,0 @@
-Figure 5: Performance comparison of trading strategies on the MSFT stock and SPY ETF.

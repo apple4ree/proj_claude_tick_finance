@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-15T10:05:01.123456Z",
+  "iteration_idx": 15,
+  "spec_id": "iter015_book_divergence_spread_filter",
+  "name": "BBO vs Deep Book Divergence (Spread Filter)",
+  "hypothesis": "The divergence between BBO imbalance (obi_1) and deep-book imbalance (obi_ex_bbo) is a powerful but short-lived signal. Losses are often due to 'spoofing' in illiquid states. By adding a filter for tight spreads (spread_bps < 10), we can isolate more liquid market conditions where the signal is more likely to represent genuine, impactful flow, thereby reducing noise and increasing expectancy.",
+  "formula": "(obi_1 - obi_ex_bbo) > 1.2 AND spread_bps < 10",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "spread_bps"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 1,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md"
+  ],
+  "parent_spec_id": "iter014_book_divergence_short_horizon",
+  "mutation_note": "Following feedback to 'add_regime_filter' to improve expectancy, this spec adds a tight spread filter to the highly successful parent. This aims to mitigate losses attributed to spoofing in wider-spread, less liquid conditions.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

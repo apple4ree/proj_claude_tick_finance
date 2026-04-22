@@ -1,0 +1,44 @@
+{
+  "iteration_idx": 12,
+  "started_at": "2026-04-22T01:44:44.791752",
+  "finished_at": "2026-04-22T01:51:29.194126",
+  "signal_specs": [
+    "iter012_ask_conc_low_vol",
+    "iter012_mega_consensus",
+    "iter012_tradeflow_exhaustion_filtered",
+    "iter012_deep_book_vs_bbo_reversal"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_012/evaluations/iter012_ask_conc_low_vol.json",
+    "iterations/iter_012/evaluations/iter012_mega_consensus.json",
+    "iterations/iter_012/evaluations/iter012_tradeflow_exhaustion_filtered.json",
+    "iterations/iter_012/evaluations/iter012_deep_book_vs_bbo_reversal.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_012/code/iter012_ask_conc_low_vol.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_012/code/iter012_mega_consensus.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_012/code/iter012_deep_book_vs_bbo_reversal.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_012/fidelity/iter012_ask_conc_low_vol.json",
+    "iterations/iter_012/fidelity/iter012_mega_consensus.json",
+    "iterations/iter_012/fidelity/iter012_deep_book_vs_bbo_reversal.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_012/results/iter012_ask_conc_low_vol.json",
+    "iterations/iter_012/results/iter012_mega_consensus.json",
+    "iterations/iter_012/results/iter012_deep_book_vs_bbo_reversal.json"
+  ],
+  "feedback": [
+    "iterations/iter_012/feedback/iter012_ask_conc_low_vol.json",
+    "iterations/iter_012/feedback/iter012_mega_consensus.json",
+    "iterations/iter_012/feedback/iter012_deep_book_vs_bbo_reversal.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_012/improvements/iter012_ask_conc_low_vol.json",
+    "iterations/iter_012/improvements/iter012_ask_conc_low_vol_v1.json",
+    "iterations/iter_012/improvements/iter012_mega_consensus.json",
+    "iterations/iter_012/improvements/iter012_mega_consensus_v1.json"
+  ],
+  "stop_reason": null
+}

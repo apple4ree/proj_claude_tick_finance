@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:30:00Z",
+  "iteration_idx": 11,
+  "parent_spec_id": "iter011_tradeflow_plus_shape",
+  "proposed_mutations": [
+    "add filter: AND rolling_realized_vol(mid_px, 100) > 40"
+  ],
+  "search_axes": [
+    "filter"
+  ],
+  "reasoning": "Parent spec has a high WR (88.2%) but on a borderline sample size (n=85). The feedback suggested adding a regime filter to improve robustness. This proposal explores the opposite regime from the spread filter, testing if the signal performs better during high-volatility periods where microstructure edges are often stronger."
+}

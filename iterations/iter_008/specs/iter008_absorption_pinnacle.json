@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:00:00Z",
+  "iteration_idx": 8,
+  "spec_id": "iter008_absorption_pinnacle",
+  "name": "Bid Wall Absorption (Pinnacle Threshold)",
+  "hypothesis": "The 'bid wall absorption' signal (strong OBI + strong sell-side trade flow) has shown a consistent edge. This mutation tightens both OBI and trade imbalance thresholds to their practical limits (0.95 and -3.0 z-score) to isolate only the most extreme absorption events, testing if this boosts WR and expectancy despite an expected reduction in trade count.",
+  "formula": "obi_1 > 0.95 AND zscore(trade_imbalance_signed, 300) < -3.0",
+  "primitives_used": [
+    "obi_1",
+    "trade_imbalance_signed"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": "iter007_bid_wall_absorption_extreme",
+  "mutation_note": "Simultaneously tightened both conditions: `obi_1 > 0.9` -> `> 0.95` and `zscore < -2.5` -> `< -3.0`.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:00:00Z",
+  "iteration_idx": 7,
+  "parent_spec_id": "iter007_inverted_book_divergence",
+  "proposed_mutations": [
+    "horizon 10 -> 200 ticks"
+  ],
+  "search_axes": [
+    "horizon"
+  ],
+  "reasoning": "The parent spec's hypothesis was invalidated at the 10-tick horizon (5.3% WR). Based on feedback indicating a potential long-term mean-reversion effect, this proposal makes a large jump in horizon to 200 ticks as a final test before retiring this concept."
+}

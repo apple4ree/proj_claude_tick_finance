@@ -1,0 +1,85 @@
+{
+  "agent_name": "backtest-runner",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T08:56:20.093646",
+  "iteration_idx": 8,
+  "spec_id": "iter008_trifecta_plus_spread_filter",
+  "per_symbol": [
+    {
+      "symbol": "005930",
+      "date": "20260317",
+      "n_ticks": 105487,
+      "n_trades": 182,
+      "n_wins": 171,
+      "n_losses": 11,
+      "wr": 0.9395604395604396,
+      "sum_win_bps": 827.0847623826522,
+      "sum_loss_bps": 30.61942398882026,
+      "expectancy_bps": 4.3761831779880875
+    },
+    {
+      "symbol": "005930",
+      "date": "20260323",
+      "n_ticks": 105278,
+      "n_trades": 408,
+      "n_wins": 388,
+      "n_losses": 20,
+      "wr": 0.9509803921568627,
+      "sum_win_bps": 1998.085550233,
+      "sum_loss_bps": 92.69711604151927,
+      "expectancy_bps": 4.670069691645787
+    },
+    {
+      "symbol": "005930",
+      "date": "20260326",
+      "n_ticks": 107777,
+      "n_trades": 306,
+      "n_wins": 297,
+      "n_losses": 9,
+      "wr": 0.9705882352941176,
+      "sum_win_bps": 1568.8329394860054,
+      "sum_loss_bps": 32.98310535037608,
+      "expectancy_bps": 5.019117105018397
+    },
+    {
+      "symbol": "000660",
+      "date": "20260317",
+      "n_ticks": 97436,
+      "n_trades": 131,
+      "n_wins": 125,
+      "n_losses": 6,
+      "wr": 0.9541984732824428,
+      "sum_win_bps": 1183.4479821247517,
+      "sum_loss_bps": 50.11392839834849,
+      "expectancy_bps": 8.651404990277888
+    },
+    {
+      "symbol": "000660",
+      "date": "20260323",
+      "n_ticks": 102012,
+      "n_trades": 146,
+      "n_wins": 141,
+      "n_losses": 5,
+      "wr": 0.9657534246575342,
+      "sum_win_bps": 1341.0369258202343,
+      "sum_loss_bps": 53.08789332145381,
+      "expectancy_bps": 8.821568715745071
+    },
+    {
+      "symbol": "000660",
+      "date": "20260326",
+      "n_ticks": 106148,
+      "n_trades": 117,
+      "n_wins": 115,
+      "n_losses": 2,
+      "wr": 0.9829059829059829,
+      "sum_win_bps": 1121.4633494204636,
+      "sum_loss_bps": 20.736221874349138,
+      "expectancy_bps": 9.407924167060807
+    }
+  ],
+  "aggregate_n_trades": 1290,
+  "aggregate_wr": 0.9589147286821705,
+  "aggregate_expectancy_bps": 6.015282031389333,
+  "trace_path": "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_008/traces/iter008_trifecta_plus_spread_filter.trace.json"
+}

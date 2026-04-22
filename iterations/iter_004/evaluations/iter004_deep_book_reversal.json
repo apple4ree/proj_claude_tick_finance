@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-21T18:00:03.123456Z",
+  "iteration_idx": 4,
+  "spec_id": "iter004_deep_book_reversal",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "1-2. Spec ID and iteration index are well-formed and match (iter004_deep_book_reversal, #4). 3. Measured fields are correctly null. 4-5. Primitives 'obi_1' and 'obi_ex_bbo' are whitelisted and the formula has no lookahead. 6-7. The hypothesis describes a non-trivial reversal mechanism, and the thresholds (0.5 for obi_1, -0.3 for obi_ex_bbo) are within the valid [-1, 1] range for these primitives. 8. A duplicate check against 'prior_iterations_index.md' found a parent spec, 'iter000_deepbook_reversal_h20', with identical formula, threshold, and horizon. However, the current spec has a different 'direction' ('long_if_neg' vs the parent's 'long_if_pos'). This change is explicitly motivated by the parent's <10% WR, making this a valid, non-duplicate mutation. 9. Expected merit is 'high' due to its strong theoretical motivation (testing a reversal based on prior failure) and novel primitive combination. The spec is valid."
+}

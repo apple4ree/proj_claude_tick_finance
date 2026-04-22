@@ -1,1 +1,0 @@
-Figure 12: The query prompt for case study 3, where [[inequality]] is replaced with the specific

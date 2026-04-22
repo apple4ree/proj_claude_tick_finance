@@ -1,0 +1,48 @@
+{
+  "iteration_idx": 3,
+  "started_at": "2026-04-21T10:04:15.549365",
+  "finished_at": "2026-04-21T10:12:16.129753",
+  "signal_specs": [
+    "iter003_full_consensus_tight",
+    "iter003_ask_conc_zscore_contra_tight",
+    "iter003_book_consensus_tradeflow_confirm",
+    "iter003_tradeflow_momentum_combo_h20"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_003/evaluations/iter003_full_consensus_tight.json",
+    "iterations/iter_003/evaluations/iter003_ask_conc_zscore_contra_tight.json",
+    "iterations/iter_003/evaluations/iter003_book_consensus_tradeflow_confirm.json",
+    "iterations/iter_003/evaluations/iter003_tradeflow_momentum_combo_h20.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_003/code/iter003_full_consensus_tight.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_003/code/iter003_ask_conc_zscore_contra_tight.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_003/code/iter003_book_consensus_tradeflow_confirm.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_003/code/iter003_tradeflow_momentum_combo_h20.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_003/fidelity/iter003_full_consensus_tight.json",
+    "iterations/iter_003/fidelity/iter003_ask_conc_zscore_contra_tight.json",
+    "iterations/iter_003/fidelity/iter003_book_consensus_tradeflow_confirm.json",
+    "iterations/iter_003/fidelity/iter003_tradeflow_momentum_combo_h20.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_003/results/iter003_full_consensus_tight.json",
+    "iterations/iter_003/results/iter003_ask_conc_zscore_contra_tight.json",
+    "iterations/iter_003/results/iter003_book_consensus_tradeflow_confirm.json",
+    "iterations/iter_003/results/iter003_tradeflow_momentum_combo_h20.json"
+  ],
+  "feedback": [
+    "iterations/iter_003/feedback/iter003_full_consensus_tight.json",
+    "iterations/iter_003/feedback/iter003_ask_conc_zscore_contra_tight.json",
+    "iterations/iter_003/feedback/iter003_book_consensus_tradeflow_confirm.json",
+    "iterations/iter_003/feedback/iter003_tradeflow_momentum_combo_h20.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_003/improvements/iter003_full_consensus_tight.json",
+    "iterations/iter_003/improvements/iter003_full_consensus_tight_v1.json",
+    "iterations/iter_003/improvements/iter003_ask_conc_zscore_contra_tight.json",
+    "iterations/iter_003/improvements/iter003_tradeflow_momentum_combo_h20.json"
+  ],
+  "stop_reason": null
+}

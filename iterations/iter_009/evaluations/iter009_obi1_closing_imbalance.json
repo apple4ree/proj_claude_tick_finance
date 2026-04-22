@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-25T13:00:01Z",
+  "iteration_idx": 9,
+  "spec_id": "iter009_obi1_closing_imbalance",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passes all mechanical validity checks. 1. The primitives 'obi_1' and 'minute_of_session' are whitelisted in 'obi_family_formulas.md' and 'regime_primitives.md' respectively. 2. The formula contains no lookahead syntax. 3. Spec ID and iteration index match. 4. Measured fields are correctly null for a new submission. 5. The hypothesis is well-formed. 6. The thresholds (obi_1 > 0.9, minute_of_session > 350) are within the valid domain of their respective primitives. 7. The spec is not a duplicate of any entry in the prior iterations index. 8. The spec represents a logical, well-motivated mutation of its parent 'iter008_obi1_gt_099_h50', testing a specific time-based regime as suggested by prior feedback. Merit is rated 'high' due to this strong theoretical and data-driven motivation."
+}

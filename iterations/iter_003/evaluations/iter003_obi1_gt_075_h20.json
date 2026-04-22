@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-15T15:30:10.123456Z",
+  "iteration_idx": 3,
+  "spec_id": "iter003_obi1_gt_075_h20",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passed all validity checks. Primitives used ('obi_1') are whitelisted per obi_family_formulas.md. The formula is well-formed with no lookahead. Metadata fields (spec_id, iteration_idx, measured fields) are correct. The hypothesis is well-articulated, and the threshold of 0.75 is sane for the primitive's [-1, 1] range. Duplicate check against prior iterations confirms this is a novel spec, as it modifies the prediction horizon from its parent 'iter002_obi1_gt_075_h5' (20 ticks vs 5). The spec is a logical and well-motivated test of signal persistence based on strong prior results, warranting high expected merit."
+}

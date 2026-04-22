@@ -1,0 +1,25 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-21T10:00:02Z",
+  "iteration_idx": 0,
+  "spec_id": "iter000_microprice_dev_gt_1",
+  "name": "Microprice Deviation from Mid",
+  "hypothesis": "The microprice, a volume-weighted average of bid/ask prices, is a superior short-term predictor of the future mid-price. A positive deviation from the current mid-price (in basis points) indicates that the order book imbalance is pulling the expected price upwards.",
+  "formula": "microprice_dev_bps",
+  "primitives_used": [
+    "microprice_dev_bps"
+  ],
+  "threshold": 1.0,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 1,
+  "references": [
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/papers/stoikov_2018_microprice.md"
+  ],
+  "parent_spec_id": null,
+  "mutation_note": null,
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

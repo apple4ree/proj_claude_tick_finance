@@ -1,0 +1,29 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:23:45.123456Z",
+  "iteration_idx": 3,
+  "spec_id": "iter003_full_consensus_tight",
+  "name": "Full Consensus (Contra Ask Concentration) Tighter",
+  "hypothesis": "Tightening the threshold on the successful multi-primitive consensus model `(obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration` will isolate higher-conviction signals, potentially increasing the win rate and expectancy beyond the current +6.72 bps plateau.",
+  "formula": "(obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "ask_depth_concentration"
+  ],
+  "threshold": 1.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md"
+  ],
+  "parent_spec_id": "iter002_full_consensus_contra_ask_h10",
+  "mutation_note": "Implemented signal-improver proposal: tightened threshold from 1.2 to 1.5 to test high-conviction subset.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T12:00:10Z",
+  "iteration_idx": 14,
+  "spec_id": "iter014_consensus_without_tradeflow",
+  "valid": false,
+  "concerns": [
+    "llm_reject_without_concern: The spec passed all initial mechanical checks, including primitive whitelisting and formula syntax. However, the duplicate detection check found an exact match in the prior iterations index. The spec'"
+  ],
+  "duplicate_of": "iter003_full_consensus_tight",
+  "expected_merit": "low",
+  "reasoning": "The spec passed all initial mechanical checks, including primitive whitelisting and formula syntax. However, the duplicate detection check found an exact match in the prior iterations index. The spec's formula `(obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration`, threshold `1.5`, and horizon `10` are identical to `iter003_full_consensus_tight`. As per the duplication rule, this spec is marked as invalid."
+}

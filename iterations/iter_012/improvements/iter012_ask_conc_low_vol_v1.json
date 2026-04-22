@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:23:45.123456Z",
+  "iteration_idx": 12,
+  "parent_spec_id": "iter012_ask_conc_low_vol",
+  "proposed_mutations": [
+    "horizon 20 → 100 ticks"
+  ],
+  "search_axes": [
+    "horizon"
+  ],
+  "reasoning": "As a second proposal for the high-merit parent (WR=1.0), this pushes the horizon test further to 100 ticks. This aggressively explores the limits of the signal's predictive power, aiming to find the optimal profitability window, as suggested by the 'change_horizon' feedback."
+}

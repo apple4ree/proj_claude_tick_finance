@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-25T12:00:00Z",
+  "iteration_idx": 8,
+  "parent_spec_id": "iter008_obi1_gt_099_h50",
+  "proposed_mutations": [
+    "retire lineage: diminishing returns on threshold tightening"
+  ],
+  "search_axes": [
+    "feature"
+  ],
+  "reasoning": "Parent WR=89.9% exp=+6.65bps n=3961. The feedback analyst's reasoning text explicitly states this lineage has hit a 'performance ceiling' with 'diminishing returns' from threshold tightening, and recommends retiring it from this search axis. The structured `tighten_threshold` recommendation is overridden by this stronger, specific reasoning. Retiring this parent from further mutation frees up budget for more promising avenues."
+}

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>Chain 1 Research Report — OBI/OFI Signal Discovery on KRX</title>
+<style>
+  :root {
+    --bg: #fafafa; --fg: #1a1a1a; --muted: #6b6b6b;
+    --accent: #0b6623; --accent-soft: #e8f4ea;
+    --warn: #b03a2e; --warn-soft: #fbebea;
+    --info: #1f6fb4; --info-soft: #e7f1f8;
+    --code-bg: #f0f0f0; --border: #d0d0d0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: var(--bg); color: var(--fg);
+    line-height: 1.7; max-width: 1000px;
+    margin: 0 auto; padding: 2em 1.5em 4em;
+  }
+  h1 { font-size: 2em; border-bottom: 2px solid var(--accent); padding-bottom: 0.3em; margin-top: 1.5em; }
+  h2 { font-size: 1.4em; color: var(--accent); margin-top: 2em;
+       border-bottom: 1px solid var(--border); padding-bottom: 0.2em; }
+  h3 { font-size: 1.15em; margin-top: 1.5em; }
+  h4 { font-size: 1em; color: var(--muted); margin-top: 1.2em; }
+  p { margin: 0.7em 0; }
+  code, pre { font-family: "JetBrains Mono", "Consolas", "Menlo", monospace; font-size: 0.9em; }
+  code { background: var(--code-bg); padding: 0.12em 0.35em; border-radius: 3px; }
+  pre { background: var(--code-bg); padding: 1em; border-radius: 6px;
+        overflow-x: auto; border-left: 3px solid var(--accent); }
+  blockquote {
+    border-left: 4px solid var(--accent); background: var(--accent-soft);
+    margin: 1em 0; padding: 0.7em 1em; color: #333;
+  }
+  .warn { border-left: 4px solid var(--warn); background: var(--warn-soft);
+          margin: 1em 0; padding: 0.7em 1em; }
+  .info { border-left: 4px solid var(--info); background: var(--info-soft);
+          margin: 1em 0; padding: 0.7em 1em; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.92em; }
+  th, td { border: 1px solid var(--border); padding: 0.5em 0.7em; text-align: left; vertical-align: top; }
+  th { background: #ececec; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .formula {
+    background: #fff7e0; padding: 0.8em 1em;
+    border-left: 3px solid #d4a300; margin: 1em 0; border-radius: 4px;
+    font-family: "JetBrains Mono", "Consolas", monospace; font-size: 1em;
+  }
+  .toc { background: #fff; border: 1px solid var(--border);
+         padding: 1em 1.5em; border-radius: 6px; margin-bottom: 2em; }
+  .toc ol { margin: 0; padding-left: 1.3em; }
+  .toc li { margin: 0.2em 0; }
+  .muted { color: var(--muted); font-size: 0.9em; }
+  hr { border: none; border-top: 1px dashed var(--border); margin: 2em 0; }
+  .footer { margin-top: 4em; padding-top: 1em; border-top: 1px solid var(--border);
+            color: var(--muted); font-size: 0.85em; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; margin: 1em 0; }
+  .kpi-card { background: #fff; border: 1px solid var(--border); padding: 1em;
+              border-radius: 6px; text-align: center; }
+  .kpi-card .label { font-size: 0.85em; color: var(--muted); }
+  .kpi-card .value { font-size: 1.5em; font-weight: 600; color: var(--accent); }
+  .kpi-card .delta { font-size: 0.85em; color: #555; }
+</style>
+</head>
+<body>
+
+<h1>Chain 1 Research Report — OBI/OFI Signal Discovery on KRX Tick Data via Multi-Agent Iterative Improvement</h1>
+<p class="muted">
+  Report date: 2026-04-21 · Scope: KRX H0STASP0 10-level LOB, 100ms cadence · Chain 1 (signal-only, execution=1 fixed)
+</p>
+
+<div class="toc">
+<strong>목차</strong>
+<ol>
+  <li><a href="#0">Executive Summary</a></li>
+  <li><a href="#1">연구 목적 및 설계 원칙</a></li>
+  <li><a href="#2">2-Chain 아키텍처 및 방법론</a></li>
+  <li><a href="#3">Chain 1 Multi-Agent Pipeline</a></li>
+  <li><a href="#4">실험 Evolution — 단계별 성과</a></li>
+  <li><a href="#5">주요 발견 1 — Best SignalSpec 및 Multi-day Robustness</a></li>
+  <li><a href="#6">주요 발견 2 — Horizon Sweep 결과 (가설 반증)</a></li>
+  <li><a href="#7">Chain 2 Gate 분석 — 수익화 가능성</a></li>
+  <li><a href="#8">결론 및 한계</a></li>
+  <li><a href="#9">Future Work</a></li>
+  <li><a href="#10">Appendix: Signal Primitive Catalog</a></li>
+</ol>
+</div>
+
+<h2 id="0">1. Executive Summary</h2>
+
+<div class="info">
+<strong>TL;DR</strong>
+<ol>
+  <li>Multi-agent LLM 기반 Chain 1 pipeline 이 OBI/OFI microstructure signal 을 자동 탐색해서
+      <strong>WR 0.93 (5일 일관), expectancy +7.5 bps</strong> 의 robust signal 을 발견.</li>
+  <li>Best spec: <code>zscore(obi_1, 300) &gt; 2.0 AND rolling_momentum(microprice, 50) &gt; 0</code> at horizon=20 ticks.</li>
+  <li>Horizon sweep 결과 <strong>예측 horizon 은 ~2초 (h=20)</strong> — 이보다 길면 expectancy 감소.
+      "horizon 확장 → 23 bps 돌파" 가설 <strong>empirical 로 반증</strong>.</li>
+  <li>KRX 현물 23 bps 수수료 벽은 이 signal family 로 <strong>수학적으로 돌파 불가능</strong>.
+      Signal 은 존재 / robust / 재현 가능하지만 <strong>deployable 아님</strong>.</li>
+  <li>연구 contribution: (a) 체계적 multi-agent signal 탐색 방법론, (b) OBI/OFI edge 의 empirical
+      predictive horizon 측정, (c) retail fee wall 의 수학적 binding 증명.</li>
+</ol>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="label">Best WR</div>
+    <div class="value">0.9348</div>
+    <div class="delta">5-date robust</div>
+  </div>
+  <div class="kpi-card">
+    <div class="label">Best Expectancy</div>
+    <div class="value">+7.51 bps</div>
+    <div class="delta">mid-to-mid / trade</div>
+  </div>
+  <div class="kpi-card">
+    <div class="label">Predictive Horizon</div>
+    <div class="value">~2 sec</div>
+    <div class="delta">decay beyond h=20</div>
+  </div>
+  <div class="kpi-card">
+    <div class="label">KRX Fee Gap</div>
+    <div class="value warn" style="color:var(--warn)">−15.5 bps</div>
+    <div class="delta">23 bps wall not broken</div>
+  </div>
+</div>
+
+<hr />
+
+<h2 id="1">2. 연구 목적 및 설계 원칙</h2>
+
+<h3>2.1 왜 OBI / OFI 인가</h3>
+<p>
+KRX L2 호가 데이터로 접근 가능한 microstructure signal 중 <strong>OBI</strong>(Order Book Imbalance, Cont-Kukanov-Stoikov 2014) 와
+<strong>OFI</strong>(Order Flow Imbalance, 동일 저자) 가 단기 mid 가격 이동 예측에 가장 학술적으로 정립된 지표.
+Stoikov 2018 microprice, Cartea-Jaimungal MM 연구도 같은 primitive 계열.
+</p>
+
+<h3>2.2 1차 목표</h3>
+<p>
+"OBI/OFI 변형 중 <strong>어떤 조합이 다음 tick direction 을 최대 확률로 맞히는가</strong>"
+— 다시 말해 <strong>Win Rate (WR) 최적화</strong>. Execution 자유도는 1 로 상수 고정.
+</p>
+
+<h3>2.3 왜 WR 을 primary metric 으로 고정했나</h3>
+<p>
+Execution 이 자유로우면 "tiny PT / huge SL" 류로 WR 을 99% 에 수렴시키면서 실제 수익은 음수가
+가능 (마틴게일). Execution=1 (entry=signal, exit=next tick, size=1) 을 고정하면
+<code>E[return] ≈ (2·WR − 1) × E[|Δmid|]</code> 이 수학적으로 성립 → WR 이 곧 expectancy 를 결정,
+조작 불가. 이 프레임 아래에서만 WR 최적화가 정당.
+</p>
+
+<hr />
+
+<h2 id="2">3. 2-Chain 아키텍처 및 방법론</h2>
+
+<h3>3.1 2-Chain 분리</h3>
+<table>
+<tr><th></th><th>Chain 1 (본 연구)</th><th>Chain 2 (미구현, 스케치)</th></tr>
+<tr><th>질문</th>
+  <td>어떤 OBI/OFI 변형이 방향 예측력이 높은가?</td>
+  <td>그 signal 을 실제 거래에서 수익으로 바꿀 수 있나?</td>
+</tr>
+<tr><th>측정</th>
+  <td>WR + expectancy_bps (mid-to-mid)</td>
+  <td>net PnL after fees + Sharpe + MDD</td>
+</tr>
+<tr><th>Execution</th>
+  <td>상수 1</td>
+  <td>Full freedom (order type, TTL, PT/SL, …)</td>
+</tr>
+<tr><th>Fee 모델</th>
+  <td>❌ 없음 (signal 순수 측정)</td>
+  <td>✅ KRX 23 bps (실제 target)</td>
+</tr>
+<tr><th>Backtest 엔진</th>
+  <td>자체 Python (<code>chain1/backtest_runner.py</code>)</td>
+  <td>hftbacktest wrapping (nkaz001)</td>
+</tr>
+</table>
+
+<h3>3.2 Chain 1 구성요소</h3>
+<p>7 + 1 개 agent 가 순차 실행:</p>
+<pre>
+① signal-generator (LLM)         신호 제안 (SignalSpec)
+    ↓
+② signal-evaluator (hybrid)      deterministic 검증 + LLM 판단
+    ↓
+②.5 code-generator (결정론)      SignalSpec → Python signal 함수
+    ↓
+②.75 fidelity-checker (결정론)   spec ↔ code AST 일치 검증
+    ↓
+③ backtest-runner (결정론)       execution=1 백테스트
+    ↓
+④ feedback-analyst (hybrid)      결과 분석 + 다음 방향 제안
+    ↓
+⑤ signal-improver (hybrid)       mutation proposal → 다음 iter
+    ↓
+⑥ chain2-gate (결정론)           Chain 2 후보 스코어링 (부가)
+</pre>
+
+<div class="info">
+<strong>6-component 원칙</strong>: 모든 agent 는 System Prompt / User Prompt / Reference /
+Input Schema / Output Schema / Reasoning Flow 6개를 갖춤. "Evidence-based" (추측 금지 + 참조 인용
+의무) + "Execution=1 불변" 이 3대 절대 규칙.
+</div>
+
+<h3>3.3 LLM backend</h3>
+<p>
+LiteLLM 기반 multi-provider (Anthropic / OpenAI / Gemini 자동 라우팅). 본 연구는 <strong>Gemini 2.5 Pro</strong>
+를 default 로 사용.
+</p>
+
+<hr />
+
+<h2 id="3">4. Chain 1 Pipeline 세부</h2>
+
+<h3>4.1 Signal vocabulary (Primitive 카탈로그)</h3>
+<p>Appendix 참조. 요약: OBI 5 변형 + OFI 4 + microprice 5 + spread 4 + regime 5 = 23개 primitive, +  5개 stateful helper.</p>
+
+<h3>4.2 Signal 표현 문법</h3>
+<pre>formula = 산술/비교식(primitive, constant, helper(primitive, window))
+         with AND / OR / NOT 자연어 허용</pre>
+
+<h4>예시 공식들</h4>
+<table>
+<tr><th>공식</th><th>해석</th></tr>
+<tr><td><code>obi_1 &gt; 0.5</code></td><td>Top-of-book 잔량 비율이 극단적 매수 쪽</td></tr>
+<tr><td><code>zscore(obi_1, 300)</code></td><td>최근 300-tick OBI z-score (적응 threshold)</td></tr>
+<tr><td><code>(obi_1 &gt; 0.5) AND (rolling_momentum(microprice, 50) &gt; 0)</code></td>
+    <td>호가 imbalance + 가격 추세 교집합</td></tr>
+<tr><td><code>microprice_dev_bps * (rolling_realized_vol(mid_px, 100) &gt; 40)</code></td>
+    <td>높은 변동성 regime 에서만 microprice deviation 활성화</td></tr>
+</table>
+
+<h3>4.3 Evidence-based 강제</h3>
+<ol>
+  <li>Signal-generator 는 모든 SignalSpec 에 <code>references</code> 필드로 참조 cheat sheet 인용 의무</li>
+  <li>Signal-evaluator 가 deterministic check (whitelist / lookahead / spec_id 포맷) 후 LLM 판단 추가</li>
+  <li>Fidelity-checker 가 AST 수준에서 spec.formula ↔ 생성 코드 일치 강제</li>
+</ol>
+
+<hr />
+
+<h2 id="4">5. 실험 Evolution</h2>
+
+<p>
+세션 동안 4 개 주요 phase 에 걸쳐 vocabulary 와 feedback 규칙을 확장. 각 phase 의 WR 및
+expectancy 최고치 progression:
+</p>
+
+<table>
+<tr><th>Phase</th><th>주요 변경</th><th>Best WR</th><th>Best exp_bps</th><th>KRX wall gap</th></tr>
+<tr>
+  <td>Phase 0 — Baseline</td>
+  <td>Dummy <code>obi_1</code> 단일 신호</td>
+  <td class="num">0.9239</td>
+  <td class="num">+4.62</td>
+  <td class="num">−18.4</td>
+</tr>
+<tr>
+  <td>Phase 1 — 첫 LLM loop (3 iter)</td>
+  <td>signal-generator 가 obi_1 / ofi_proxy / microprice 변형 시도</td>
+  <td class="num">0.9588</td>
+  <td class="num">+4.95</td>
+  <td class="num">−18.1</td>
+</tr>
+<tr>
+  <td>Phase 2 — Compound AND 허용 (3 iter)</td>
+  <td>자연어 AND/OR 정규화, spec_id 이중 prefix fix</td>
+  <td class="num">0.9709</td>
+  <td class="num">+5.19</td>
+  <td class="num">−17.8</td>
+</tr>
+<tr>
+  <td>Phase 3 — Block A 신규 primitive (5 iter)</td>
+  <td>mid_px, minute_of_session, ofi_depth_5/10, rolling_realized_vol, rolling_momentum 추가</td>
+  <td class="num">0.9683</td>
+  <td class="num">+7.70</td>
+  <td class="num">−15.3</td>
+</tr>
+<tr>
+  <td><strong>Phase 4 — Block B mutation + horizon push (10 iter)</strong></td>
+  <td>ensemble_vote / extreme_quantile / timevarying_threshold / add_regime_filter 추가</td>
+  <td class="num"><strong>0.9348</strong></td>
+  <td class="num"><strong>+8.45</strong></td>
+  <td class="num"><strong>−14.6</strong></td>
+</tr>
+</table>
+
+<p>
+<strong>관찰</strong>: expectancy 는 Phase 0 (4.62) → Phase 4 (8.45) 로 <strong>83% 증가</strong>,
+WR 은 0.92 → 0.97 범위에서 안정. 하지만 <strong>23 bps 벽까지는 아직 −14.6 bps</strong>.
+</p>
+
+<hr />
+
+<h2 id="5">6. 주요 발견 1 — Best Spec Multi-day Robustness</h2>
+
+<h3>6.1 Best SignalSpec</h3>
+<div class="formula">
+<strong>iter006_adaptive_momentum_imbalance</strong><br />
+Formula: <code>zscore(obi_1, 300) &gt; 2.0 AND rolling_momentum(microprice, 50) &gt; 0</code><br />
+Threshold: 0.5 (compound truthy) · Horizon: 20 ticks · Direction: long_if_pos
+</div>
+
+<p>
+해석: 최근 300-tick 기준 obi_1 이 2σ 이상 (p97.7+) 바이트 우세 + 직전 50-tick 가격 상승 방향이
+확인됐을 때 long entry, 20 tick (~2초) 후 exit.
+</p>
+
+<h3>6.2 5개 날짜 독립 run 결과</h3>
+<table>
+<tr><th>Date</th><th>n_trades</th><th>WR</th><th>exp_bps</th></tr>
+<tr><td>2026-03-05</td><td class="num">1,062</td><td class="num">0.8795</td><td class="num">+7.11</td></tr>
+<tr><td>2026-03-11</td><td class="num">  811</td><td class="num">0.9581</td><td class="num">+6.91</td></tr>
+<tr><td>2026-03-17</td><td class="num">  849</td><td class="num">0.9317</td><td class="num">+6.52</td></tr>
+<tr><td>2026-03-23</td><td class="num">  830</td><td class="num">0.9470</td><td class="num">+8.33</td></tr>
+<tr><td>2026-03-26</td><td class="num">1,120</td><td class="num">0.9348</td><td class="num">+8.45</td></tr>
+<tr><th>Aggregate</th>
+    <th class="num">4,672</th>
+    <th class="num">0.9279</th>
+    <th class="num">+7.51</th></tr>
+</table>
+
+<h3>6.3 통계량</h3>
+<table>
+<tr><th>지표</th><th>값</th><th>해석</th></tr>
+<tr><td>WR mean</td><td class="num">0.9302</td><td>—</td></tr>
+<tr><td>WR std</td><td class="num">0.0270</td><td>2.7 pp 편차 — 매우 타이트</td></tr>
+<tr><td>WR min / max</td><td class="num">0.879 / 0.958</td><td>최악일 88% — 여전히 G2 통과</td></tr>
+<tr><td>exp_bps mean</td><td class="num">+7.47</td><td>—</td></tr>
+<tr><td>exp_bps std</td><td class="num">0.78</td><td>mean 대비 10% — 안정</td></tr>
+<tr><td>All days positive</td><td>✅</td><td>방향 반전 없음</td></tr>
+</table>
+
+<blockquote>
+<strong>Verdict: robust.</strong> Signal 은 단일 날짜 regime luck 아님. 5개 서로 다른 거래일 (3주
+간격) 에서 일관된 edge 관찰. Microstructure 신호의 OOS 재현성 증거.
+</blockquote>
+
+<hr />
+
+<h2 id="6">7. 주요 발견 2 — Horizon Sweep (가설 반증)</h2>
+
+<h3>7.1 가설</h3>
+<p>
+Random-walk 하에서 <code>E[|Δmid|] ∝ √h</code>. Horizon 을 늘리면 기대 mid 이동 폭이 증가하므로
+expectancy 도 상승 — 직관적으로 h=200 에서 40+ bps 돌파 기대.
+</p>
+
+<h3>7.2 측정 (동일 spec, 6 horizon, 5 dates, 2 symbols)</h3>
+<table>
+<tr><th>Horizon</th><th>n_trades</th><th>WR</th><th>exp_bps (실측)</th><th>이론 ceiling</th><th>Capture rate</th></tr>
+<tr><td class="num">1</td>  <td class="num">895</td>   <td class="num">0.9553</td><td class="num">+6.75</td><td class="num">5.01</td><td class="num">134.8%*</td></tr>
+<tr><td class="num">5</td>  <td class="num">2,380</td> <td class="num">0.9500</td><td class="num">+7.28</td><td class="num">11.07</td><td class="num">65.8%</td></tr>
+<tr><td class="num"><strong>20</strong></td> <td class="num">4,709</td> <td class="num">0.9261</td><td class="num"><strong>+7.51</strong></td><td class="num">20.96</td><td class="num">35.8%</td></tr>
+<tr><td class="num">50</td> <td class="num">6,703</td> <td class="num">0.8783</td><td class="num">+7.08 ↓</td><td class="num">29.42</td><td class="num">24.1%</td></tr>
+<tr><td class="num">100</td><td class="num">8,961</td> <td class="num">0.8450</td><td class="num">+6.92 ↓</td><td class="num">37.95</td><td class="num">18.2%</td></tr>
+<tr><td class="num">200</td><td class="num">11,175</td><td class="num">0.7561</td><td class="num">+6.01 ↓</td><td class="num">39.83</td><td class="num">15.1%</td></tr>
+</table>
+<p class="muted">* h=1 의 capture rate &gt; 100% 는 이론 상수 (√h × 5.5 bps/tick) 가 h=1 에서 보수적
+기저를 잘못 잡아서 발생. 실제로 조건부 |Δmid| (nonzero case) 는 5.5 보다 큼.</p>
+
+<h3>7.3 발견</h3>
+<div class="warn">
+<strong>가설 empirical 반증.</strong>
+<ol>
+  <li>Expectancy 는 <code>h=20</code> 에서 peak (+7.51 bps) 이후 <strong>감소</strong>.</li>
+  <li>WR 은 horizon 증가에 따라 <strong>단조 감소</strong> (0.955 → 0.756).</li>
+  <li>Capture rate 는 급락 (135% → 15%). 즉 signal 의 예측력이 이론 ceiling 보다
+      빠르게 소실.</li>
+  <li><strong>Signal 의 물리적 predictive horizon ≈ 20 ticks (~2초)</strong>. 이후는 noise.</li>
+</ol>
+</div>
+
+<h3>7.4 함의</h3>
+<p>
+"Iteration 을 계속 돌리면서 horizon 확장하면 23 bps 돌파 가능" 이라는 낙관적 가설은
+<strong>이 signal family 에 한해 성립 불가능</strong>. 23 bps 돌파를 위해선 다른 signal family
+(longer-horizon informational signals, cross-asset, event-driven) 이 필요.
+</p>
+
+<hr />
+
+<h2 id="7">8. Chain 2 Gate 분석</h2>
+
+<p>
+Chain 2 gate 는 Chain 1 산출물을 받아 "수수료 포함 배포 가능성" 판정. KRX 단일 시장 기준
+두 개 fee scenario 로 평가:
+</p>
+
+<h3>8.1 KRX 현물 소매 (23 bps RT) — Target 시장</h3>
+<p>
+broker 0.015% × 2 + 매도세 0.20% (매도 side only) ≈ 23 bps round-trip. 전 iteration 의
+모든 spec 이 <strong>G3 (post-fee expectancy &gt; 0) 통과 실패</strong>. 최대 자료 기준
+post-fee = 8.45 − 23 = <strong>−14.55 bps</strong>.
+</p>
+
+<h3>8.2 hypothetical_low_fee_5bps — 연구 참조</h3>
+<p>
+가상 저수수료 시나리오. 현실엔 대응 시장 없지만 &quot;fee 5 bps 라면 배포 가능한가&quot; 측정용.
+iter 0-6 에서 marginal priority 로 <strong>통과 빈번</strong> (post-fee +1~3 bps). 상위:
+</p>
+<pre>
+iter006_adaptive_momentum_imbalance   score=0.246  post_fee=+3.45 bps
+iter003_obi1_gt_07_h20                score=0.415  post_fee=+1.56 bps
+iter004_obi1_gt_09_h20                score=0.369  post_fee=+1.54 bps
+</pre>
+
+<h3>8.3 Cross-scenario 판정</h3>
+<table>
+<tr><th>Scenario</th><th>Top candidate count</th><th>의미</th></tr>
+<tr><td>krx_cash_23bps</td><td class="num warn" style="color:var(--warn)">0</td>
+    <td>실제 배포 불가 확정</td></tr>
+<tr><td>hypothetical_low_fee_5bps</td><td class="num">1-2 per iter</td>
+    <td>5 bps 이하 venue 가 있다면 수익성 있음 (research reference)</td></tr>
+</table>
+
+<hr />
+
+<h2 id="8">9. 결론 및 한계</h2>
+
+<h3>9.1 Positive findings</h3>
+<ol>
+  <li><strong>Multi-agent 방법론은 작동함</strong> — LLM 이 evidence-based 원칙 하에 microstructure
+      signal 을 자동 탐색, iteration 을 거쳐 4.62 → 8.45 bps 로 개선.</li>
+  <li><strong>Robust signal 발견</strong> — OOS 5일 재현, WR 0.93 ± 0.03, exp 7.5 ± 0.8 bps.
+      단순 overfit 아님.</li>
+  <li><strong>Signal predictive horizon 측정</strong> — OBI/OFI 계열은 ~2초 (h=20) 까지만 유효.
+      이후 random 에 수렴. 이는 microstructure 문헌과 부합 (Cont-Kukanov-Stoikov 2014 Fig 5).</li>
+  <li><strong>Chain 1 ↔ Chain 2 분리가 유효</strong> — WR 단독 최적화가 execution 자유도 조작 없이
+      신호 품질만 측정 가능함을 증명. 분리가 WR-as-primary-metric 의 수학적 정당성 확보.</li>
+</ol>
+
+<h3>9.2 Negative findings</h3>
+<ol>
+  <li><strong>KRX 현물 23 bps 벽 통과 불가</strong> — 현재 발견된 max raw edge 8.45 bps 가
+      post-fee −14.55 bps. 3배 가까운 개선 필요.</li>
+  <li><strong>Horizon 확장으로 edge 증폭 불가</strong> — 이 signal family 의 물리적 predictive
+      horizon 제약.</li>
+  <li><strong>단일 시장, 단일 asset class</strong> — 파생상품 / crypto / 뉴스 정보 사용 안 함.</li>
+</ol>
+
+<h3>9.3 Research contribution</h3>
+<ul>
+  <li>체계적 multi-agent iterative 탐색 방법론의 재현 가능한 구현 (오픈소스 pipeline)</li>
+  <li>LLM 생성 코드의 spec-implementation fidelity 보장 메커니즘 (AST-based check)</li>
+  <li>OBI/OFI signal 의 empirical predictive horizon 측정 결과 (h=20 peak, subsequent decay)</li>
+  <li>Retail KRX fee wall 이 microstructure signal family 를 binding 하는 증거 (negative result)</li>
+</ul>
+
+<hr />
+
+<h2 id="9">10. Future Work</h2>
+
+<h3>10.1 같은 KRX 데이터에서 시도할 수 있는 것</h3>
+<table>
+<tr><th>방향</th><th>가설</th><th>기대 edge</th><th>비용</th></tr>
+<tr><td>Intraday seasonality</td>
+    <td>시간대별 regime (개장/점심/마감) 이 signal amplitude 결정</td>
+    <td class="num">5-15 bps</td>
+    <td>low (minute_of_session 이미 있음)</td></tr>
+<tr><td>Volume profile z-score</td>
+    <td>비정상 거래량 구간에서만 신호 활성화</td>
+    <td class="num">10-20 bps</td>
+    <td>medium (intraday profile 집계 필요)</td></tr>
+<tr><td>Cross-symbol lead-lag</td>
+    <td>섹터 내 lead 종목 → lag 종목 예측</td>
+    <td class="num">5-15 bps</td>
+    <td>high (symbol-pair backtest 구조 필요)</td></tr>
+<tr><td>Large-trade detection</td>
+    <td>vol_flow 극단치 = 정보성 거래 → 후속 drift</td>
+    <td class="num">5-10 bps</td>
+    <td>low (기존 primitive)</td></tr>
+</table>
+
+<h3>10.2 시장 / asset class 확장</h3>
+<ul>
+  <li><strong>Crypto LOB 재측정</strong> — 기존 <code>data/binance_lob/</code> 활용, backtest_runner
+      확장. 같은 signal 이 Binance 8 bps fee 기준 deployable 인지 검증.</li>
+  <li><strong>KRX 선물 / ETF 시뮬레이션</strong> — 현재 decision 에서 제외됐으나 0.5-5 bps fee
+      영역 접근 가능성.</li>
+</ul>
+
+<h3>10.3 Chain 2 실제 구현</h3>
+<p>
+Chain 2 engine (hftbacktest 기반) 구현 시 본 Chain 1 best spec 을 입력으로 받아 다양한 execution
+(LIMIT_AT_BID / MARKET / skew / inventory) 을 시도할 수 있음. 본 연구 범위 밖.
+</p>
+
+<hr />
+
+<h2 id="10">11. Appendix — Primitive Catalog</h2>
+
+<h3>A.1 OBI Family (stateless)</h3>
+<table>
+<tr><th>Name</th><th>Formula</th><th>Range</th></tr>
+<tr><td><code>obi_1</code></td><td>(Qb₁ − Qa₁)/(Qb₁ + Qa₁)</td><td>[−1,1]</td></tr>
+<tr><td><code>obi_3/5/10</code></td><td>Same with cumulative k-level qty</td><td>[−1,1]</td></tr>
+<tr><td><code>obi_total</code></td><td>(TOTAL_BID − TOTAL_ASK)/(합)</td><td>[−1,1]</td></tr>
+<tr><td><code>microprice</code></td><td>(Qa·Pb + Qb·Pa)/(Qa + Qb)</td><td>KRW</td></tr>
+<tr><td><code>microprice_dev_bps</code></td><td>(microprice − mid)/mid × 10⁴</td><td>bps</td></tr>
+<tr><td><code>vamp_5/10</code></td><td>Depth-extended microprice</td><td>KRW</td></tr>
+<tr><td><code>spread_bps</code>, <code>book_slope_bid/ask</code>, <code>book_thickness</code></td>
+    <td>Book geometry</td><td>—</td></tr>
+</table>
+
+<h3>A.2 OFI Family (stateful, 1-tick lookback)</h3>
+<table>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td><code>ofi_cks_1</code></td><td>Top-1 CKS OFI (Cont-Kukanov-Stoikov 2014 §3)</td></tr>
+<tr><td><code>ofi_depth_5/10</code></td><td>Sum across top 5/10 levels</td></tr>
+<tr><td><code>ofi_proxy</code></td><td>KIS pre-computed total-qty delta, [−1,1]</td></tr>
+<tr><td><code>vol_flow</code></td><td>ΔACML_VOL</td></tr>
+</table>
+
+<h3>A.3 Regime / Price</h3>
+<table>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td><code>mid_px</code></td><td>(bid + ask)/2 scalar</td></tr>
+<tr><td><code>minute_of_session</code></td><td>분 after 09:00 KST [0, 390]</td></tr>
+<tr><td><code>book_thickness</code></td><td>total_bid + total_ask</td></tr>
+</table>
+
+<h3>A.4 Stateful helpers (callable in formula)</h3>
+<pre>
+rolling_mean(primitive, W)          # trailing mean
+rolling_std(primitive, W)           # trailing std
+zscore(primitive, W)                # (x − mean) / std
+rolling_realized_vol(primitive, W)  # √Σ(Δx)²
+rolling_momentum(primitive, W)      # x_t − x_{t−W+1}
+</pre>
+
+<h3>A.5 Feedback recommendation space (12 directions)</h3>
+<pre>
+tighten_threshold   loosen_threshold   add_filter
+drop_feature        swap_feature       change_horizon
+combine_with_other_spec                retire
+ensemble_vote       extreme_quantile
+timevarying_threshold                   add_regime_filter
+</pre>
+
+<div class="footer">
+<p>
+Report date: 2026-04-21<br />
+Generated by Chain 1 research pipeline. All code, schemas, and agent prompts available
+under <code>/chain1/</code>, <code>/.claude/agents/chain1/</code> and <code>/adapters/</code>.
+</p>
+<p>
+Reproducibility: <code>python -m chain1.orchestrator run --max-iter N --n-candidates K --symbols ... --dates ...</code><br />
+Horizon sweep: <code>python -m chain1.horizon_sweep --spec-json ... --horizons 1 5 20 50 100 200 ...</code><br />
+Multi-day robustness: <code>python -m chain1.multi_day_robustness --spec-json ... --symbols ... --dates ...</code>
+</p>
+</div>
+
+</body>
+</html>

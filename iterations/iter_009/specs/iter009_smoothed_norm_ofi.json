@@ -1,0 +1,25 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-25T13:00:00Z",
+  "iteration_idx": 9,
+  "spec_id": "iter009_smoothed_norm_ofi",
+  "name": "Smoothed & Normalized CKS OFI",
+  "hypothesis": "Previous OFI signals (iter002, iter006) failed due to inconsistency. The OFI cheatsheet suggests aggregation and normalization are critical. This signal uses a rolling mean to smooth the noisy raw ofi_cks_1 and a z-score to normalize it, which should produce a more robust flow-based signal.",
+  "formula": "zscore(rolling_mean(ofi_cks_1, 50), 300)",
+  "primitives_used": [
+    "ofi_cks_1"
+  ],
+  "threshold": 2.0,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 1,
+  "references": [
+    "_shared/references/papers/cont_kukanov_stoikov_2014_ofi.md",
+    "_shared/references/cheat_sheets/ofi_family_formulas.md"
+  ],
+  "parent_spec_id": "iter006_cks_ofi_zscore_opening_burst",
+  "mutation_note": "Prior OFI signals were inconsistent. This spec applies best practices from the OFI cheatsheet by first smoothing the raw OFI with a rolling mean and then standardizing it with a z-score to create a more robust feature.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

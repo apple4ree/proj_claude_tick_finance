@@ -1,1 +1,0 @@
-Figure 5: CRs over time for single-asset trading tasks. FINCON outperformed other comparative strategies,

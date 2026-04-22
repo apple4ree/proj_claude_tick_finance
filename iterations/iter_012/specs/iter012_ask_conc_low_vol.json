@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:46:15.123456Z",
+  "iteration_idx": 12,
+  "spec_id": "iter012_ask_conc_low_vol",
+  "name": "Filtered Ask Concentration (Low Volatility)",
+  "hypothesis": "The contra-directional signal from a high ask-side concentration (an 'ask wall') is most predictive in low-volatility regimes. This filter removes periods of high volatility where aggressive buying flow is more likely to break the wall, improving signal consistency as suggested by feedback on iter011_ask_conc_final_frontier.",
+  "formula": "zscore(ask_depth_concentration, 300) * (rolling_realized_vol(mid_px, 100) < 30)",
+  "primitives_used": [
+    "ask_depth_concentration",
+    "mid_px"
+  ],
+  "threshold": 5.0,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/regime_primitives.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md"
+  ],
+  "parent_spec_id": "iter011_ask_conc_final_frontier",
+  "mutation_note": "Based on feedback for iter011_ask_conc_final_frontier, which showed wins concentrated in low-volatility regimes. Added a volatility filter `rolling_realized_vol(mid_px, 100) < 30` to the best-performing parent `iter007_ask_conc_zscore_ultra` (threshold 5.0) to isolate the most favorable conditions.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

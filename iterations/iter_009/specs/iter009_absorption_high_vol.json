@@ -1,0 +1,29 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:00:00Z",
+  "iteration_idx": 9,
+  "spec_id": "iter009_absorption_high_vol",
+  "name": "Bid Wall Absorption (High Volatility Filter)",
+  "hypothesis": "The parent spec identifies rare moments where a large bid wall is being absorbed by aggressive selling. This signal should be purer during high-volatility regimes where such patterns are more meaningful. Adding a realized volatility filter will test if we can isolate a near-perfect subset of these events.",
+  "formula": "(obi_1 > 0.95 AND zscore(trade_imbalance_signed, 300) < -3.0) AND (rolling_realized_vol(mid_px, 100) > 40)",
+  "primitives_used": [
+    "obi_1",
+    "trade_imbalance_signed",
+    "mid_px"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/cheat_sheets/regime_primitives.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": "iter008_absorption_pinnacle",
+  "mutation_note": "Following feedback to `add_filter`, a volatility regime condition (`rolling_realized_vol > 40`) was added to the parent's logic to improve signal purity, even at the cost of trade frequency.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

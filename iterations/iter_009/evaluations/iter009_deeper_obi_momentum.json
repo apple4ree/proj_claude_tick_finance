@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-25T13:00:05.123456Z",
+  "iteration_idx": 9,
+  "spec_id": "iter009_deeper_obi_momentum",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passed all validity checks. All primitives ('obi_5', 'mid_px') and the helper function ('rolling_momentum') are whitelisted per 'obi_family_formulas.md' and 'regime_primitives.md'. The formula is well-formed and contains no lookahead. The spec ID and iteration index match. Measured fields are correctly null for a first run. No duplicate was found in the prior iterations index. The spec represents a novel combination of a deeper imbalance primitive with a momentum filter, directly addressing the failure of its parent 'iter007_deep_book_pressure' (which used obi_10 alone) and incorporating a successful pattern from 'iter006_strong_obi_momentum_ensemble'. This theoretically motivated approach merits a 'high' expected merit rating."
+}

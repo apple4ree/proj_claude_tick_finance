@@ -1,1 +1,0 @@
-Figure 6: Cross-run instability of gemini-3-pro-preview under different decoding temperatures.

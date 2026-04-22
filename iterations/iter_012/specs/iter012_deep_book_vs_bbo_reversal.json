@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:46:15.123456Z",
+  "iteration_idx": 12,
+  "spec_id": "iter012_deep_book_vs_bbo_reversal",
+  "name": "BBO vs Deep Book Divergence Reversal",
+  "hypothesis": "When BBO shows strong buying pressure (high obi_1) but the deeper book shows selling pressure (negative obi_ex_bbo), it signals a potential stall or reversal. The BBO imbalance is likely to be absorbed by the deeper liquidity, causing a price drop. This spec bets against the BBO signal during these divergent states.",
+  "formula": "obi_1 - obi_ex_bbo",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo"
+  ],
+  "threshold": 1.0,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md"
+  ],
+  "parent_spec_id": null,
+  "mutation_note": "This is a new spec designed to explore a specific microstructure phenomenon: the divergence between BBO and deeper book imbalance. It uses a simple but powerful formula to capture this divergence directly. A high positive value (e.g., obi_1=0.8, obi_ex_bbo=-0.2 => 1.0) signals a strong divergence, which we hypothesize predicts a reversal (short signal).",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

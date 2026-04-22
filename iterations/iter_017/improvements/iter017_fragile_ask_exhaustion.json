@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:00:00Z",
+  "iteration_idx": 17,
+  "parent_spec_id": "iter017_fragile_ask_exhaustion",
+  "proposed_mutations": [
+    "drop feature: ask_depth_concentration; new formula = zscore(trade_imbalance_signed, 300) > 3.0"
+  ],
+  "search_axes": [
+    "feature"
+  ],
+  "reasoning": "Parent spec (WR=67.0%) suffered from extreme instability and a 93% reduction in trade count. The feedback identified `ask_depth_concentration` as the cause. We propose dropping this feature to revert to the more stable parent signal."
+}

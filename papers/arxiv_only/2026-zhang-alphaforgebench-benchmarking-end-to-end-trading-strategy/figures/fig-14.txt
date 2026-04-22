@@ -1,1 +1,0 @@
-Figure 14: Cross-run instability of claude-sonnet-4.5 under different decoding temperatures.

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-21T18:00:22Z",
+  "iteration_idx": 4,
+  "spec_id": "iter004_bbo_reversal_on_tradeflow",
+  "valid": true,
+  "concerns": [
+    "The spec's `threshold` field is 0.5, but this value is not used in the boolean `formula` ('obi_1 > 0.7 AND zscore(trade_imbalance_signed, 300) < -1.5'). This is a non-fatal inconsistency."
+  ],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passes all hard-fail checks: primitives are whitelisted, there is no lookahead, and metadata is correctly formatted. The hypothesis is well-formed and novel, proposing a 'BBO stall' reversal by combining high BBO imbalance (obi_1) with opposing realized trade flow (zscore(trade_imbalance_signed)). This combination is a direct and intelligent response to prior iteration results (e.g., iter003_book_consensus_tradeflow_confirm) and aligns with smoke test findings on the contrarian nature of trade flow. The spec is not a duplicate of any prior iteration. A minor concern is the unused `threshold` field, but this does not invalidate the spec. Due to its novelty, strong theoretical grounding, and clear link to prior learnings, expected merit is high."
+}

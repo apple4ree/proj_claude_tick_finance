@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T08:30:05.123456Z",
+  "iteration_idx": 1,
+  "spec_id": "iter001_obi1_and_high_vol",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passed all validation checks. 1. The primitives 'obi_1' and 'mid_px', along with the helper 'rolling_realized_vol', are whitelisted. 2. The formula is well-formed and contains no lookahead. 3. The spec is not a duplicate of any prior iteration. 4. The hypothesis is well-articulated, citing parent spec iter000_obi1_gt_05 and proposing a novel combination with a regime filter, which justifies a 'high' expected merit. 5. All mechanical checks (spec_id, iteration_idx, measured fields) are correct. The spec is valid for backtesting."
+}

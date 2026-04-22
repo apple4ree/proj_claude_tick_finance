@@ -1,1 +1,0 @@
-Figure 2: Illustration of the transition kernel in a simplified robust RL setting using an ℓ8-norm

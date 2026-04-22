@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-14T12:05:01Z",
+  "iteration_idx": 5,
+  "spec_id": "iter005_full_consensus_bid_shape",
+  "name": "Full Consensus with Bid Shape Confirmation",
+  "hypothesis": "The 'full consensus' formula is strong but could be improved by filtering for book shape. A high bid concentration indicates a fragile, aggressive bid wall. By requiring low bid concentration (<0.2), we ensure the buying pressure is supported by a deep, patient book, which should make the signal more robust and improve expectancy.",
+  "formula": "((obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration) > 1.5 AND bid_depth_concentration < 0.2",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "ask_depth_concentration",
+    "bid_depth_concentration"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md"
+  ],
+  "parent_spec_id": "iter003_full_consensus_tight",
+  "mutation_note": "A new hypothesis based on the best-performing spec. Adds a book shape filter (`bid_depth_concentration`) to the 'full consensus' formula to ensure signals are only taken when the bid side shows deep, patient liquidity rather than a fragile BBO wall.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

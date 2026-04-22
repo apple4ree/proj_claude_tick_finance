@@ -1,0 +1,85 @@
+{
+  "agent_name": "backtest-runner",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T08:58:34.280782",
+  "iteration_idx": 9,
+  "spec_id": "iter009_obi1_closing_imbalance",
+  "per_symbol": [
+    {
+      "symbol": "005930",
+      "date": "20260317",
+      "n_ticks": 105487,
+      "n_trades": 192,
+      "n_wins": 158,
+      "n_losses": 34,
+      "wr": 0.8229166666666666,
+      "sum_win_bps": 1013.3959962940745,
+      "sum_loss_bps": 172.92548932981208,
+      "expectancy_bps": 4.377450557105534
+    },
+    {
+      "symbol": "005930",
+      "date": "20260323",
+      "n_ticks": 105278,
+      "n_trades": 187,
+      "n_wins": 183,
+      "n_losses": 4,
+      "wr": 0.9786096256684492,
+      "sum_win_bps": 1012.7675620640508,
+      "sum_loss_bps": 42.883945322969716,
+      "expectancy_bps": 5.18654340503252
+    },
+    {
+      "symbol": "005930",
+      "date": "20260326",
+      "n_ticks": 107777,
+      "n_trades": 299,
+      "n_wins": 299,
+      "n_losses": 0,
+      "wr": 1.0,
+      "sum_win_bps": 1823.9454505864162,
+      "sum_loss_bps": 0.0,
+      "expectancy_bps": 6.1001520086502214
+    },
+    {
+      "symbol": "000660",
+      "date": "20260317",
+      "n_ticks": 97436,
+      "n_trades": 84,
+      "n_wins": 79,
+      "n_losses": 5,
+      "wr": 0.9404761904761905,
+      "sum_win_bps": 844.3253229794725,
+      "sum_loss_bps": 51.287518905065966,
+      "expectancy_bps": 9.44092623898103
+    },
+    {
+      "symbol": "000660",
+      "date": "20260323",
+      "n_ticks": 102012,
+      "n_trades": 123,
+      "n_wins": 123,
+      "n_losses": 0,
+      "wr": 1.0,
+      "sum_win_bps": 1280.120896134348,
+      "sum_loss_bps": 0.0,
+      "expectancy_bps": 10.407486960441853
+    },
+    {
+      "symbol": "000660",
+      "date": "20260326",
+      "n_ticks": 106148,
+      "n_trades": 91,
+      "n_wins": 91,
+      "n_losses": 0,
+      "wr": 1.0,
+      "sum_win_bps": 970.3778163203307,
+      "sum_loss_bps": 0.0,
+      "expectancy_bps": 10.663492487036601
+    }
+  ],
+  "aggregate_n_trades": 976,
+  "aggregate_wr": 0.9559426229508197,
+  "aggregate_expectancy_bps": 6.842045175021358,
+  "trace_path": "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_009/traces/iter009_obi1_closing_imbalance.trace.json"
+}

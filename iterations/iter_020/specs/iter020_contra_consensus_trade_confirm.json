@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-23T11:20:01.123456Z",
+  "iteration_idx": 20,
+  "spec_id": "iter020_contra_consensus_trade_confirm",
+  "name": "Contra Consensus with Trade Flow Confirmation",
+  "hypothesis": "A high concentration of liquidity at the ask BBO, supported by deep-book selling pressure, indicates strong resistance. Requiring confirmation from negative realized trade flow (seller-initiated volume) should filter out 'absorption' events and increase signal precision, predicting a downward price move.",
+  "formula": "(ask_depth_concentration > 0.4 AND obi_ex_bbo > 0.4) AND (zscore(trade_imbalance_signed, 300) < -1.0)",
+  "primitives_used": [
+    "ask_depth_concentration",
+    "obi_ex_bbo",
+    "trade_imbalance_signed"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": "iter019_contra_consensus_tight_obi",
+  "mutation_note": "Based on feedback for the parent spec, this mutation adds a trade flow confirmation filter (zscore < -1.0) to the existing book-shape and deep-book imbalance conditions, aiming to improve robustness and filter out absorption events.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

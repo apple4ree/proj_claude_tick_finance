@@ -1,0 +1,48 @@
+{
+  "iteration_idx": 13,
+  "started_at": "2026-04-22T01:51:55.034457",
+  "finished_at": "2026-04-22T02:00:43.705714",
+  "signal_specs": [
+    "iter013_ask_conc_low_vol_h50",
+    "iter013_mega_consensus_loosened",
+    "iter013_book_divergence_inverted",
+    "iter013_tradeflow_into_favorable_shape"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_013/evaluations/iter013_ask_conc_low_vol_h50.json",
+    "iterations/iter_013/evaluations/iter013_mega_consensus_loosened.json",
+    "iterations/iter_013/evaluations/iter013_book_divergence_inverted.json",
+    "iterations/iter_013/evaluations/iter013_tradeflow_into_favorable_shape.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_013/code/iter013_ask_conc_low_vol_h50.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_013/code/iter013_mega_consensus_loosened.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_013/code/iter013_book_divergence_inverted.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_013/code/iter013_tradeflow_into_favorable_shape.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_013/fidelity/iter013_ask_conc_low_vol_h50.json",
+    "iterations/iter_013/fidelity/iter013_mega_consensus_loosened.json",
+    "iterations/iter_013/fidelity/iter013_book_divergence_inverted.json",
+    "iterations/iter_013/fidelity/iter013_tradeflow_into_favorable_shape.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_013/results/iter013_ask_conc_low_vol_h50.json",
+    "iterations/iter_013/results/iter013_mega_consensus_loosened.json",
+    "iterations/iter_013/results/iter013_book_divergence_inverted.json",
+    "iterations/iter_013/results/iter013_tradeflow_into_favorable_shape.json"
+  ],
+  "feedback": [
+    "iterations/iter_013/feedback/iter013_ask_conc_low_vol_h50.json",
+    "iterations/iter_013/feedback/iter013_mega_consensus_loosened.json",
+    "iterations/iter_013/feedback/iter013_book_divergence_inverted.json",
+    "iterations/iter_013/feedback/iter013_tradeflow_into_favorable_shape.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_013/improvements/iter013_ask_conc_low_vol_h50.json",
+    "iterations/iter_013/improvements/iter013_mega_consensus_loosened.json",
+    "iterations/iter_013/improvements/iter013_book_divergence_inverted.json",
+    "iterations/iter_013/improvements/iter013_tradeflow_into_favorable_shape.json"
+  ],
+  "stop_reason": null
+}

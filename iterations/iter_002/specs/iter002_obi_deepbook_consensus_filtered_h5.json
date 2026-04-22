@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-16T12:05:01Z",
+  "iteration_idx": 2,
+  "spec_id": "iter002_obi_deepbook_consensus_filtered_h5",
+  "name": "OBI/Deep-Book Consensus with Spread Filter",
+  "hypothesis": "The strong consensus signal from BBO (obi_1) and deep-book (obi_ex_bbo) imbalance is most reliable in liquid, stable markets. Filtering out periods of wide spreads (spread_bps >= 10) will remove trades during potential liquidity shocks, improving the already high win rate.",
+  "formula": "(obi_1 > 0.7 AND obi_ex_bbo > 0.3) AND (spread_bps < 10)",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "spread_bps"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 5,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md"
+  ],
+  "parent_spec_id": "iter001_obi_deepbook_consensus_tight_h5",
+  "mutation_note": "Based on feedback that losses occurred during spread widening, a `spread_bps < 10` filter was added to the parent's high-conviction formula to enhance its robustness by gating for liquid market conditions.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:23:45.123456Z",
+  "iteration_idx": 3,
+  "spec_id": "iter003_book_consensus_tradeflow_confirm",
+  "name": "Book Consensus with Trade Flow Confirmation",
+  "hypothesis": "A strong book imbalance signal (`obi_1` and `obi_ex_bbo` consensus) is more reliable when confirmed by actual buyer-initiated trades (`trade_imbalance_signed`). This trifecta should filter out spoofing attempts and increase win rate over the book-only signal.",
+  "formula": "(obi_1 > 0.7 AND obi_ex_bbo > 0.3) AND (zscore(trade_imbalance_signed, 300) > 1.5)",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "trade_imbalance_signed"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 5,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": "iter002_obi_deepbook_consensus_filtered_h5",
+  "mutation_note": "Per feedback, dropped the inconsistent `spread_bps` filter and replaced it with a `zscore(trade_imbalance_signed)` filter to confirm book state with actual trade flow, aiming to improve robustness.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

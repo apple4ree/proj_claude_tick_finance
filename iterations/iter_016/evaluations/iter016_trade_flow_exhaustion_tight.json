@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:22:15.845111Z",
+  "iteration_idx": 16,
+  "spec_id": "iter016_trade_flow_exhaustion_tight",
+  "valid": true,
+  "concerns": [
+    "The z-score threshold of 3.0 represents an extreme quantile (approx. upper 0.13%), which may significantly reduce the number of trades compared to its parent (iter015_trade_flow_exhaustion_short), potentially impacting statistical significance."
+  ],
+  "duplicate_of": null,
+  "expected_merit": "medium",
+  "reasoning": "The spec passed all hard-fail checks. The primitive `trade_imbalance_signed` is whitelisted, the formula is well-formed, and the `iteration_idx` is correct. The `long_if_neg` direction is appropriate for an exhaustion hypothesis using this primitive, as documented in prior smoke tests. The mutation is a logical tightening of the threshold from 2.5 to 3.0 based on the parent spec's (`iter015_trade_flow_exhaustion_short`) feedback. No duplicates were found in the prior iterations index. The expected merit is 'medium' as it is a standard incremental improvement on a signal with a modest initial edge. A concern was noted about the potentially low trade count due to the high z-score threshold."
+}

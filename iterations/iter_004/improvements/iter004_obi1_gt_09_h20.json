@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:00:00Z",
+  "iteration_idx": 4,
+  "parent_spec_id": "iter004_obi1_gt_09_h20",
+  "proposed_mutations": [
+    "horizon 20 -> 50 ticks"
+  ],
+  "search_axes": [
+    "horizon"
+  ],
+  "reasoning": "The parent signal shows an exceptionally high WR of 93.5% at a 20-tick horizon. The feedback analyst recommended exploring longer horizons to map the signal's decay profile. This proposal tests the next step in the standard horizon sequence {1, 5, 20, 50, 100}."
+}

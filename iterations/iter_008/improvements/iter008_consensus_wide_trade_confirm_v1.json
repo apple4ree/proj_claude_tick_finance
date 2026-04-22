@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-21T12:00:00Z",
+  "iteration_idx": 8,
+  "parent_spec_id": "iter008_consensus_wide_trade_confirm",
+  "proposed_mutations": [
+    "add filter: AND rolling_realized_vol(mid_px, 100) > 40"
+  ],
+  "search_axes": [
+    "filter"
+  ],
+  "reasoning": "As an alternative to a time-varying threshold for the high-performing parent (WR=96.2%), this mutation explores whether the signal's edge is concentrated in high-volatility regimes. Adding a volatility filter can confirm this hypothesis and potentially increase expectancy by focusing on the most favorable market conditions."
+}

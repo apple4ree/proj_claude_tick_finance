@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-21T18:00:03Z",
+  "iteration_idx": 4,
+  "spec_id": "iter004_deep_book_reversal",
+  "name": "Deep Book Reversal Signal",
+  "hypothesis": "When the top of the book (BBO) shows strong directional pressure (high obi_1) but the deeper, more 'patient' liquidity disagrees (negative obi_ex_bbo), the BBO pressure is likely transient and will fail. This divergence is a strong signal for a reversal against the direction indicated by obi_1.",
+  "formula": "obi_1 > 0.5 AND obi_ex_bbo < -0.3",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md"
+  ],
+  "parent_spec_id": "iter000_deepbook_reversal_h20",
+  "mutation_note": "The original spec (iter000) was tested with long_if_pos and had a <10% WR, invalidating it as a momentum signal. This resubmission corrects the direction to long_if_neg to properly test the hypothesis that this setup is a reversal signal, as suggested by microstructure theory.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

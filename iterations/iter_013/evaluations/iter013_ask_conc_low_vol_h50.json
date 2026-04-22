@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-29T15:00:00Z",
+  "iteration_idx": 13,
+  "spec_id": "iter013_ask_conc_low_vol_h50",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passes all mechanical checks. Its hypothesis is a direct and logical follow-up to the parent spec `iter012_ask_conc_low_vol`, which achieved a perfect 1.0 win rate and had a 'change_horizon' feedback tag, as cited in `prior_iterations_index.md`. The primitives and helpers are whitelisted, the formula is well-formed, and the `long_if_neg` direction is consistent with the documented contra-indicator nature of `ask_depth_concentration`. The spec is not a duplicate, as its prediction horizon (50 ticks) differs from its parent (20 ticks). Due to its strong grounding in prior results, it is assigned high expected merit."
+}

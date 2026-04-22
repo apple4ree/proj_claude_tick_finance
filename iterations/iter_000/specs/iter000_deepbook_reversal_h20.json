@@ -1,0 +1,26 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T09:00:03Z",
+  "iteration_idx": 0,
+  "spec_id": "iter000_deepbook_reversal_h20",
+  "name": "Deep Book Reversal Signal",
+  "hypothesis": "When the BBO shows strong imbalance (e.g., obi_1 > 0.5) but the deeper book shows imbalance in the opposite direction (obi_ex_bbo < -0.3), the BBO signal is likely a 'head fake' or about to be exhausted. This disagreement signals a reversal against the BBO's direction.",
+  "formula": "obi_1 > 0.5 AND obi_ex_bbo < -0.3",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md"
+  ],
+  "parent_spec_id": null,
+  "mutation_note": null,
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

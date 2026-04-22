@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T10:00:00Z",
+  "iteration_idx": 2,
+  "parent_spec_id": "iter002_ask_concentration_zscore_contra_h20",
+  "proposed_mutations": [
+    "threshold 2.5 -> 3.0"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent spec is strong and robust (WR=90.5%, Exp=+6.69bps). Following feedback to tighten the z-score threshold from 2.5 to 3.0, this mutation aims to find a higher-conviction subset of trades in the extreme tail of the signal distribution."
+}

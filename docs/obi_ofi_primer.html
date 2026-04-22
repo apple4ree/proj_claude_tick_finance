@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>OBI / OFI Primer — 호가 불균형 신호와 실제 수익 구조</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --fg: #1a1a1a;
+    --muted: #6b6b6b;
+    --accent: #0b6623;
+    --accent-soft: #e8f4ea;
+    --warn: #b03a2e;
+    --warn-soft: #fbebea;
+    --code-bg: #f0f0f0;
+    --border: #d0d0d0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.7;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2em 1.5em 4em;
+  }
+  h1 { font-size: 2em; border-bottom: 2px solid var(--accent); padding-bottom: 0.3em; margin-top: 1.5em; }
+  h2 { font-size: 1.4em; color: var(--accent); margin-top: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.2em; }
+  h3 { font-size: 1.15em; margin-top: 1.5em; }
+  h4 { font-size: 1em; color: var(--muted); margin-top: 1.2em; }
+  p { margin: 0.7em 0; }
+  code, pre { font-family: "JetBrains Mono", "Consolas", "Menlo", monospace; font-size: 0.9em; }
+  code { background: var(--code-bg); padding: 0.12em 0.35em; border-radius: 3px; }
+  pre { background: var(--code-bg); padding: 1em; border-radius: 6px; overflow-x: auto; border-left: 3px solid var(--accent); }
+  blockquote {
+    border-left: 4px solid var(--accent);
+    background: var(--accent-soft);
+    margin: 1em 0; padding: 0.7em 1em;
+    color: #333;
+  }
+  .warn { border-left: 4px solid var(--warn); background: var(--warn-soft); margin: 1em 0; padding: 0.7em 1em; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.92em; }
+  th, td { border: 1px solid var(--border); padding: 0.5em 0.7em; text-align: left; vertical-align: top; }
+  th { background: #ececec; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .formula {
+    background: #fff7e0;
+    padding: 0.8em 1em;
+    border-left: 3px solid #d4a300;
+    margin: 1em 0; border-radius: 4px;
+    font-family: "JetBrains Mono", "Consolas", monospace;
+    font-size: 1em;
+  }
+  .toc { background: #fff; border: 1px solid var(--border); padding: 1em 1.5em; border-radius: 6px; margin-bottom: 2em; }
+  .toc ol { margin: 0; padding-left: 1.3em; }
+  .toc li { margin: 0.2em 0; }
+  .muted { color: var(--muted); font-size: 0.9em; }
+  .kv { display: flex; gap: 1em; margin: 0.3em 0; }
+  .kv .k { min-width: 9em; color: var(--muted); }
+  .book-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5em;
+    margin: 1em 0;
+  }
+  .book-layout .col { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 0.8em 1em; }
+  .book-layout table { margin: 0; }
+  .book-layout .label { font-weight: 600; text-align: center; padding-bottom: 0.3em; }
+  .ask { color: #b03a2e; }
+  .bid { color: #0b6623; }
+  hr { border: none; border-top: 1px dashed var(--border); margin: 2em 0; }
+  .footer { margin-top: 4em; padding-top: 1em; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.85em; }
+</style>
+</head>
+<body>
+
+<h1>OBI / OFI — 호가 불균형 신호와 실제 수익 구조</h1>
+
+<p class="muted">
+KRX tick-level 호가 데이터 (H0STASP0, 10-level depth, 100ms 주기) 기반.<br />
+본 프로젝트 (Chain 1 Signal 체인) 의 핵심 입력 · 출력 이해를 위한 1차 참조 문서.
+</p>
+
+<div class="toc">
+<strong>목차</strong>
+<ol>
+  <li><a href="#0">왜 OBI / OFI를 다루는가</a></li>
+  <li><a href="#1">OBI — Order Book Imbalance (레벨 상태)</a></li>
+  <li><a href="#2">OFI — Order Flow Imbalance (흐름 변화)</a></li>
+  <li><a href="#3">두 신호의 차이 — 한 줄 요약과 예측력 비교</a></li>
+  <li><a href="#4">"신호가 있다"에서 "수익이 난다"까지 — 비용 벽 분해</a></li>
+  <li><a href="#5">실제로 돈을 버는 4가지 구조</a></li>
+  <li><a href="#6">본 프로젝트의 위치 — Chain 1 (신호) vs Chain 2 (수익화)</a></li>
+  <li><a href="#7">참고 문헌</a></li>
+</ol>
+</div>
+
+<h2 id="0">1. 왜 OBI / OFI를 다루는가</h2>
+
+<p>
+주가는 궁극적으로 <strong>매수/매도 주문의 흐름</strong>이 결정한다. 하지만 "누가 더 사고 싶어 하는가"를 직접 관찰할 수는 없고,
+우리가 보는 건 거래소가 공개하는 <strong>호가창 (Limit Order Book, LOB)</strong>의 스냅샷뿐이다.
+</p>
+
+<p>
+이 LOB 상태에서 "지금 시장이 어느 방향으로 기울어져 있는가"를 <em>수치 하나</em>로 요약하는 것이 OBI · OFI 계열 신호의 목적이다.
+두 신호는 KRX · NYSE · Binance 등 다양한 시장에서 <strong>초 단위 이하 가격 방향</strong>을 예측하는 데 실증적 유의미성이 확인된 몇 안 되는 microstructure 신호다.
+</p>
+
+<p>
+본 프로젝트의 Chain 1 전체가 "OBI · OFI 변형을 어떻게 조합해야 다음 tick의 방향 (up/down) 을 잘 맞히는가"를 자가 개선하는 파이프라인이다.
+</p>
+
+<hr />
+
+<h2 id="1">2. OBI — Order Book Imbalance (레벨 상태)</h2>
+
+<h3>2.1. 직관</h3>
+<p>
+Bid(매수 호가) 쪽에 쌓여 있는 잔량과 Ask(매도 호가) 쪽에 쌓여 있는 잔량의 <strong>상대 비율</strong>. "누가 더 줄 서 있는가"를 0 ~ 1 범위에서 읽는다.
+</p>
+<p>
+<strong>Bid-heavy</strong> 일수록 "사려는 사람이 더 많다 → 가격이 올라갈 확률이 높다"는 약한 통계적 신호가 된다 (뒤에서 반례 포함 해설).
+</p>
+
+<h3>2.2. 공식 (Top-of-book 1 level)</h3>
+<div class="formula">
+OBI<sub>1</sub> = (Q<sup>bid</sup><sub>1</sub> &minus; Q<sup>ask</sup><sub>1</sub>) / (Q<sup>bid</sup><sub>1</sub> + Q<sup>ask</sup><sub>1</sub>)
+</div>
+<ul>
+  <li>Q<sup>bid</sup><sub>1</sub> = 최우선 매수호가(BIDP1) 의 잔량</li>
+  <li>Q<sup>ask</sup><sub>1</sub> = 최우선 매도호가(ASKP1) 의 잔량</li>
+  <li>범위: [&minus;1, +1]. +1 이면 ask 쪽 잔량 0 (사려는 사람만 있음), &minus;1 이면 반대</li>
+</ul>
+
+<h3>2.3. 예시 스냅샷 (삼성전자 2026-03-26 09:00:16 실측)</h3>
+<div class="book-layout">
+  <div class="col">
+    <div class="label ask">Ask (매도)</div>
+    <table>
+      <tr><th>Level</th><th>Price</th><th class="num">Qty</th></tr>
+      <tr><td>A10</td><td>219,000</td><td class="num">24,622</td></tr>
+      <tr><td>A5</td><td>216,500</td><td class="num">9,002</td></tr>
+      <tr><td><strong>A1</strong></td><td><strong>214,500</strong></td><td class="num"><strong>17,800</strong></td></tr>
+    </table>
+  </div>
+  <div class="col">
+    <div class="label bid">Bid (매수)</div>
+    <table>
+      <tr><th>Level</th><th>Price</th><th class="num">Qty</th></tr>
+      <tr><td><strong>B1</strong></td><td><strong>214,000</strong></td><td class="num"><strong>69,659</strong></td></tr>
+      <tr><td>B5</td><td>212,000</td><td class="num">102,744</td></tr>
+      <tr><td>B10</td><td>209,500</td><td class="num">8,556</td></tr>
+    </table>
+  </div>
+</div>
+<p>
+여기서 OBI<sub>1</sub> = (69,659 &minus; 17,800) / (69,659 + 17,800) = <code>+0.593</code>.
+매수 쪽이 매도의 약 4배 잔량이라 "단기적으로 위로 튀어오를 확률이 비대칭"이라는 해석.
+</p>
+
+<h3>2.4. 확장형</h3>
+<ul>
+  <li><strong>OBI<sub>k</sub></strong> (k=3, 5, 10): 상위 k 레벨 누적 잔량 기준. 더 깊은 북까지 반영 → 스냅샷 노이즈에 강함</li>
+  <li><strong>OBI<sub>total</sub></strong>: TOTAL_BIDP_RSQN / TOTAL_ASKP_RSQN 전체 잔량 비율</li>
+  <li><strong>Microprice (Stoikov 2018)</strong>: OBI<sub>1</sub>을 bps 가격 편차로 환산한 값. 수학적으로 <code>microprice &minus; mid = (spread/2) &times; OBI<sub>1</sub></code> 로 동등 (단, 스프레드 규모로 가중됨)</li>
+</ul>
+
+<blockquote>
+<strong>OBI의 성격</strong>: "지금 이 순간의 북 상태(state)"를 요약. slow-moving, noise 포함, <em>누가 뭘 했는지</em>는 모름.
+</blockquote>
+
+<hr />
+
+<h2 id="2">3. OFI — Order Flow Imbalance (흐름 변화)</h2>
+
+<h3>3.1. 직관</h3>
+<p>
+OBI 가 "<em>지금의 상태</em>" 라면, OFI 는 "<em>최근 tick 동안 어느 쪽으로 주문이 유입됐는가</em>".
+<br />Bid 쪽에 주문이 새로 쌓이거나 Ask 쪽에서 주문이 취소되면 → "매수 압력 증가" 로 읽어 <strong>양수</strong> OFI.
+</p>
+
+<h3>3.2. 공식 (Cont-Kukanov-Stoikov 2014 정식 정의, top-of-book)</h3>
+<p>매 스냅샷 t 마다 이전 스냅샷 t&minus;1 과 비교:</p>
+<div class="formula">
+bid_contrib =<br />
+&nbsp;&nbsp;&nbsp;if P<sup>bid</sup><sub>t</sub> &gt; P<sup>bid</sup><sub>t&minus;1</sub>:&nbsp;&nbsp; +Q<sup>bid</sup><sub>t</sub>&nbsp;&nbsp;&nbsp;&nbsp;(bid 가격이 올라왔다 = 새로운 높은 매수 등장)<br />
+&nbsp;&nbsp;&nbsp;if P<sup>bid</sup><sub>t</sub> = P<sup>bid</sup><sub>t&minus;1</sub>:&nbsp;&nbsp; Q<sup>bid</sup><sub>t</sub> &minus; Q<sup>bid</sup><sub>t&minus;1</sub>&nbsp;&nbsp;&nbsp;&nbsp;(같은 가격의 잔량 변화)<br />
+&nbsp;&nbsp;&nbsp;if P<sup>bid</sup><sub>t</sub> &lt; P<sup>bid</sup><sub>t&minus;1</sub>:&nbsp;&nbsp; &minus;Q<sup>bid</sup><sub>t&minus;1</sub>&nbsp;&nbsp;&nbsp;&nbsp;(bid 레벨이 빠졌다 = 매수 취소)<br /><br />
+ask_contrib 도 대칭 (ask 가격이 내려오면 +, 올라가면 &minus;)<br /><br />
+<strong>OFI<sub>1</sub> = bid_contrib &minus; ask_contrib</strong>
+</div>
+<p class="muted">
+"bid가 올라왔다" 와 "ask가 내려왔다" 는 <em>둘 다 매수 우세</em> 신호라 양수로 취합. 반대는 음수.
+</p>
+
+<h3>3.3. 변형</h3>
+<ul>
+  <li><strong>OFI proxy</strong>: KIS H0STASP0 에서 이미 제공하는 <code>TOTAL_BIDP_RSQN_ICDC</code> / <code>TOTAL_ASKP_RSQN_ICDC</code> 델타 필드를 이용. <br />
+    <code>ofi_proxy = (Δbid &minus; Δask) / (|Δbid| + |Δask|)</code> → [&minus;1, +1] 로 정규화된 근사치. 계산 비용 0.
+  </li>
+  <li><strong>Rolling OFI</strong>: <code>rolling_mean(ofi, W=50)</code> 같이 최근 W 틱 평균. 단일 tick 노이즈 제거용.</li>
+  <li><strong>vol_flow</strong>: ΔACML_VOL, 즉 체결 물량 증가분. OFI 와 짝 짓는 공격적 체결 흐름 지표.</li>
+</ul>
+
+<h3>3.4. 왜 OFI가 OBI보다 예측력 강한가</h3>
+<blockquote>
+OBI 는 <em>과거 누적 + 현재</em> 가 섞인 <strong>정적 상태</strong>. 하루 전부터 앉아 있던 잔량도 그대로 포함.<br />
+OFI 는 <em>새로 도달한 정보</em> 자체를 포착. 정보 유입이 → 가격 반영을 선행.
+</blockquote>
+<p>
+Cont-Kukanov-Stoikov (2014) 논문: NYSE 데이터에서 <strong>OFI가 10초 mid 변동 분산의 약 65%를 설명</strong>. OBI 단독으로는 약 30% 수준.
+</p>
+
+<hr />
+
+<h2 id="3">4. 두 신호의 차이 — 한 줄 요약과 예측력 비교</h2>
+
+<table>
+  <tr><th>항목</th><th>OBI</th><th>OFI</th></tr>
+  <tr><td>유형</td><td>상태 (level)</td><td>변화 (delta)</td></tr>
+  <tr><td>Stateful?</td><td>No — 단일 스냅샷</td><td>Yes — 이전 스냅샷 필요</td></tr>
+  <tr><td>범위</td><td>[&minus;1, +1]</td><td>(정식) 무한 / (proxy) [&minus;1, +1]</td></tr>
+  <tr><td>해석</td><td>"지금 북이 어느 쪽으로 기울어져 있나"</td><td>"최근 어느 쪽으로 주문이 쏟아졌나"</td></tr>
+  <tr><td>10초 mid R²</td><td>~0.30</td><td>~0.65</td></tr>
+  <tr><td>단독 수익화 가능성 (fee 이후)</td><td>거의 불가</td><td>극단치 조건부 가능</td></tr>
+</table>
+
+<p>
+<strong>우리 프로젝트 실측 (KRX 삼성전자 2026-03-26):</strong>
+</p>
+<ul>
+  <li>OBI<sub>1</sub> &gt; 0.2 → 다음 tick mid 상승 확률: <strong>92.4%</strong> (2,430 trades)</li>
+  <li>OFI proxy 의 top-decile 평균 다음-tick mid 이동: +0.4 ~ +0.5 bps (신호가 약하지만 통계적으로 양수)</li>
+  <li>Microprice deviation (OBI와 수학적 동형) IC: 0.21 ~ 0.31 (h=10~200 ticks)</li>
+</ul>
+
+<hr />
+
+<h2 id="4">5. "신호가 있다"에서 "수익이 난다"까지 — 비용 벽 분해</h2>
+
+<p>
+"OBI<sub>1</sub> &gt; 0.2 이면 92% 확률로 오른다" 는 말이 <strong>수익을 보장하지 않는다</strong>는 것이 이 섹션의 핵심.
+한 번의 왕복 거래 PnL 은 다음 방정식으로 결정된다:
+</p>
+
+<div class="formula">
+<strong>net_pnl_per_rt</strong> = signal_edge &nbsp;&minus;&nbsp; spread_cost &nbsp;&minus;&nbsp; fees &nbsp;&minus;&nbsp; taxes &nbsp;&plusmn;&nbsp; slippage &nbsp;&plusmn;&nbsp; adverse_selection
+</div>
+
+<h3>5.1. 각 항의 크기 (KRX 삼성전자 기준, bps)</h3>
+<table>
+  <tr><th>항목</th><th>Taker 경로</th><th>Maker 경로 (LIMIT_AT_BID)</th></tr>
+  <tr><td>신호 edge (raw)</td><td class="num">+5.0</td><td class="num">+5.0</td></tr>
+  <tr><td>Entry spread cross</td><td class="num">&minus;2.5</td><td class="num">0 (절약)</td></tr>
+  <tr><td>Exit spread cross</td><td class="num">&minus;2.5</td><td class="num">0 (절약)</td></tr>
+  <tr><td>Entry fee</td><td class="num">&minus;1.5</td><td class="num">&minus;1.5</td></tr>
+  <tr><td>Exit fee</td><td class="num">&minus;1.5</td><td class="num">&minus;1.5</td></tr>
+  <tr><td>증권거래세 (매도세)</td><td class="num">&minus;20.0</td><td class="num">&minus;20.0</td></tr>
+  <tr><td>Adverse selection</td><td class="num">~0</td><td class="num">&minus;5 ~ &minus;10 (숨은 비용)</td></tr>
+  <tr><th>Net per trade</th><th class="num warn">&minus;23.0 bps</th><th class="num warn">&minus;23.0 ~ &minus;28.0 bps</th></tr>
+</table>
+
+<div class="warn">
+<strong>KRX 현물 소매 직거래는 수학적으로 불가능</strong>. 5 bps 신호가 23 bps 비용을 뚫으려면 신호가 4배 이상 강해져야 하는데, microstructure 신호는 그런 영역에 존재하지 않는다 (논문 상 top decile 극단치에서만 5~30 bps 관측).
+</div>
+
+<h3>5.2. 시장별 비용 비교 (왕복 기준)</h3>
+<table>
+  <tr><th>시장</th><th>Taker RT (bps)</th><th>Maker RT (bps)</th><th>수익화 가능성</th></tr>
+  <tr><td>KRX 현물 소매</td><td class="num">~23</td><td class="num">~23</td><td>사실상 불가 (매도세 0.2%)</td></tr>
+  <tr><td>Crypto Binance spot (retail)</td><td class="num">~8</td><td class="num">~0 (rebate 가능)</td><td>경계 — maker 경로만</td></tr>
+  <tr><td>프롭 MM (리베이트 수령자)</td><td class="num">~5</td><td class="num"><strong>&minus;1 ~ 0 (순수익)</strong></td><td>구조적으로만 가능</td></tr>
+</table>
+
+<p>
+요컨대 <strong>OBI/OFI의 raw edge 크기 5 bps가 fee 벽을 자연스럽게 넘는 시장은 존재하지 않는다</strong>.
+그럼에도 불구하고 이 신호로 돈을 버는 주체들이 있다는 사실이 다음 섹션의 핵심 질문이다.
+</p>
+
+<hr />
+
+<h2 id="5">6. 실제로 돈을 버는 4가지 구조</h2>
+
+<h3>6.1. MM 호가 skew — 가장 광범위</h3>
+<p>
+프롭 MM (Jump, Citadel Securities, Optiver, HRT, Jane Street 등) 은 매 tick 양쪽에 LIMIT 호가를 깔아두고 대기한다. 이때 OBI/OFI 는 <strong>호가를 어느 쪽으로 기울일지</strong>를 결정한다.
+</p>
+<ul>
+  <li>OFI 강한 + → ask 호가를 1 tick 올림 (팔기 덜 원함, 더 비싸게만 팜), bid는 그대로</li>
+  <li>OFI 강한 &minus; → bid 호가를 1 tick 낮춤 (사기 덜 원함), ask는 그대로</li>
+</ul>
+<blockquote>
+수익원은 <strong>스프레드 × 거래량</strong>. OBI/OFI 는 <em>불리한 체결(adverse selection) 회피</em> 필터로 작동. 실제 PnL 기여는 "불리 체결 감소 → 평균 체결 수익 + 수십 bps-trades".
+</blockquote>
+
+<h3>6.2. Multi-factor stat-arb의 한 축 (Two Sigma, DE Shaw 류)</h3>
+<p>
+Short-horizon 퀀트 펀드는 OFI 를 독립적 수익원으로 쓰지 않고, <strong>수십~수백 개 factor의 ensemble</strong> 중 하나로 사용한다.
+</p>
+<div class="formula">
+alpha<sub>t</sub> = w<sub>1</sub>·OFI + w<sub>2</sub>·MomentumReversal_5m + w<sub>3</sub>·NewsSentiment + ... + w<sub>N</sub>·MicropriceDev<br />
+if alpha<sub>t</sub> &gt; threshold: enter
+</div>
+<p>
+OFI 단독 0.4 bps edge 는 fee 벽을 못 넘지만, 여러 약한 신호의 가중합이 예: 10 bps 를 내면 fee 벽(8 bps)을 넘는다. <strong>"약한 신호 많이 vs 강한 신호 하나"의 수학적 해법.</strong>
+</p>
+
+<h3>6.3. Execution algo 타이밍 결정 (Buy-side 기관)</h3>
+<p>
+대형 기관이 몇 십만 주 매수해야 할 때 VWAP / TWAP / POV 알고리즘이 잘게 쪼개 집행한다. 이때 OFI 가 "<strong>언제 slice 를 내보낼지</strong>" 결정.
+</p>
+<ul>
+  <li>사야 함 + OFI 강한 &minus; → 잠깐 대기 (어차피 가격 내려올 예정)</li>
+  <li>사야 함 + OFI 강한 + → 즉시 체결 (가격 올라가기 전)</li>
+</ul>
+<p>
+수익이 아니라 <strong>비용 절감</strong> 형태의 PnL. Buy-side 는 "매수 집행 평균가 개선" 을 성과로 잡는다.
+</p>
+
+<h3>6.4. 극단치 event-driven taker (학술적으로 보고된 사례)</h3>
+<p>
+OFI 상위 1% 극단치 (top 0.1%) 시점에서는 raw edge 가 5 ~ 30 bps 로 점프한다 (Cont-Jain 2017 등). 이 구간은 하루 몇 번뿐이지만 크기가 커서 taker 로도 수익 가능.
+</p>
+<ul>
+  <li>조건: 낮은 fee 시장 (선물 · 옵션 · 저수수료 ETF) + 빠른 latency</li>
+  <li>거래 빈도: <em>하루 수 회</em> 수준. 고빈도가 아니라 "선택적 고품질 신호 taker"</li>
+  <li>본 프로젝트가 도달 가능한 가장 현실적인 형태 중 하나 (개인 레벨에서도 가능성 있음)</li>
+</ul>
+
+<hr />
+
+<h2 id="6">7. 본 프로젝트의 위치 — Chain 1 (신호) vs Chain 2 (수익화)</h2>
+
+<p>
+이 프로젝트는 다음 두 체인으로 명확히 분리돼 있다:
+</p>
+
+<table>
+  <tr><th></th><th>Chain 1 (현재 활성)</th><th>Chain 2 (deferred)</th></tr>
+  <tr><th>질문</th><td>"OBI/OFI 변형 중 어느 것이 다음 tick 방향을 가장 잘 맞히는가?"</td><td>"그 신호를 실제 거래 (fee · spread · queue) 에서 수익으로 바꿀 수 있는가?"</td></tr>
+  <tr><th>측정</th><td>WR (win rate) + expectancy in bps (mid-to-mid)</td><td>net PnL after costs + Sharpe + MDD</td></tr>
+  <tr><th>Execution</th><td>상수 1 (entry=signal, exit=next tick, size=1)</td><td>full execution 자유도 (MARKET/LIMIT, TTL, PT/SL, skew, inventory 등)</td></tr>
+  <tr><th>엔진</th><td>자체 구현 <code>chain1/backtest_runner.py</code> (순수 pandas/numpy)</td><td>hftbacktest (nkaz001) wrapping 예정</td></tr>
+  <tr><th>비용 모델</th><td>❌ 없음 (신호 예측력만 측정)</td><td>✅ 시장별 fee + spread + tax + slippage + adverse selection</td></tr>
+  <tr><th>적용 구조 (§6 중)</th><td>§6.4 "극단치 event-driven taker" 경로 조사 용이</td><td>§6.1 "MM skew" / §6.3 "execution algo" 까지 확장 가능</td></tr>
+</table>
+
+<h3>7.1. Chain 1의 역할</h3>
+<ul>
+  <li>Whitelisted 프리미티브 (obi_1, obi_5, microprice_dev_bps, ofi_proxy, ofi_cks_1, vol_flow, rolling_*, zscore_* 등) 조합해서 <strong>SignalSpec</strong> 생성</li>
+  <li>매 iteration 마다 signal-generator → signal-evaluator → code-generator → fidelity-checker → backtest-runner → feedback-analyst → signal-improver 루프</li>
+  <li>목표: WR 55% 이상 · n_trades/day 50+ · 3일 이상 재현성 확보된 SignalSpec 을 최소 1개 산출 → Chain 2 게이트 통과</li>
+</ul>
+
+<h3>7.2. Chain 2의 역할 (미구현 · 설계만 완료)</h3>
+<ul>
+  <li>Chain 1 이 넘겨준 SignalSpec 을 받아 ExecutionSpec 을 설계</li>
+  <li>hftbacktest 로 실제 체결 시뮬 (queue position, latency, multi-level fill, fee 실반영)</li>
+  <li>"이 신호 + 이 execution 조합에서 net PnL 이 실제로 양수인가?" 측정</li>
+  <li>무수익 시 SignalSpec 을 Chain 1 에 <code>execution_infeasible=true</code> 태그와 함께 reject</li>
+</ul>
+
+<blockquote>
+<strong>왜 분리했나:</strong> WR 만으로 execution 을 자유롭게 움직이면 "tiny PT · huge SL" 류로 WR 을 100%에 수렴시킬 수 있지만 expectancy 는 음수. Execution 을 상수로 고정하면 WR 이 수학적으로 기대값을 결정 (<code>E[return] ≈ (2·WR &minus; 1) × E[|Δmid|]</code>) 해서 조작 불가. Chain 1 의 WR 이 정직한 측정임을 보장하는 장치.
+</blockquote>
+
+<hr />
+
+<h2 id="7">8. 참고 문헌</h2>
+<ul>
+  <li><strong>Cont, Kukanov, Stoikov (2014)</strong> — "The Price Impact of Order Book Events" — OFI 의 정식 정의</li>
+  <li><strong>Stoikov (2018)</strong> — "The Micro-Price: A High-Frequency Estimator of Future Prices" — microprice / OBI 의 수학적 동등성</li>
+  <li><strong>Cartea &amp; Jaimungal (2015~)</strong> — <em>Algorithmic and High-Frequency Trading</em> — OBI/OFI 기반 MM 교과서</li>
+  <li><strong>Guéant, Lehalle, Fernandez-Tapia (2013)</strong> — GLFT market making 모형 (Chain 2 확장 시 참조)</li>
+  <li>nkaz001/hftbacktest — <a href="https://github.com/nkaz001/hftbacktest" target="_blank">github.com/nkaz001/hftbacktest</a> — Chain 2 엔진 기반</li>
+  <li>본 프로젝트 CLAUDE.md §참조 자료 및 <code>.claude/agents/chain1/_shared/references/</code> 내 cheat sheets · paper 요약</li>
+</ul>
+
+<div class="footer">
+Last updated: 2026-04-21<br />
+Scope: Chain 1 Signal 체인 문서. Chain 2 Execution 체인 활성화 시 별도 문서 추가 예정.
+</div>
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-22T14:00:03Z",
+  "iteration_idx": 21,
+  "spec_id": "iter021_bbo_divergence_low_vol",
+  "name": "BBO vs Deep Book Divergence in Low Volatility",
+  "hypothesis": "A divergence between BBO imbalance and deep-book imbalance (`obi_1 - obi_ex_bbo`) signals a potential BBO stall or reversal. This signal is hypothesized to be stronger and less noisy in a low-volatility regime, where such stalls are more meaningful.",
+  "formula": "(obi_1 - obi_ex_bbo) * (rolling_realized_vol(mid_px, 100) < 30)",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "mid_px"
+  ],
+  "threshold": 1.2,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 1,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/regime_primitives.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md"
+  ],
+  "parent_spec_id": "iter014_book_divergence_short_horizon",
+  "mutation_note": "Follows `add_regime_filter` feedback on the high-performing parent. Adds a low volatility filter (`rolling_realized_vol < 30`) to isolate the signal to quieter market conditions, aiming to improve its already high WR.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

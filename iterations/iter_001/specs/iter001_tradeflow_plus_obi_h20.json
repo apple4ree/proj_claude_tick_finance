@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:30:03.345678Z",
+  "iteration_idx": 1,
+  "spec_id": "iter001_tradeflow_plus_obi_h20",
+  "name": "Trade Flow and OBI Compound",
+  "hypothesis": "Combining realized trade flow (signed trade imbalance) with resting order flow (OBI) creates a more robust signal than either alone. The z-scored trade imbalance captures momentum from executed trades, while OBI captures latent pressure. This combination should yield high-quality signals.",
+  "formula": "zscore(trade_imbalance_signed, 300) + 3 * obi_1",
+  "primitives_used": [
+    "trade_imbalance_signed",
+    "obi_1"
+  ],
+  "threshold": 2.0,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md"
+  ],
+  "parent_spec_id": null,
+  "mutation_note": "New spec inspired by smoke test results in prior_iterations_index.md, aiming to create a diverse, high-expectancy signal by combining primitives from different families (trade-flow and book-state).",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

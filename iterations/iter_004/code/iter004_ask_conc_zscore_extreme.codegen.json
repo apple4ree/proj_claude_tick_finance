@@ -1,0 +1,10 @@
+{
+  "agent_name": "code-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T10:15:02.943316",
+  "iteration_idx": 4,
+  "spec_id": "iter004_ask_conc_zscore_extreme",
+  "code_path": "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_004/code/iter004_ask_conc_zscore_extreme.py",
+  "entry_function": "signal",
+  "template_used": "v0.1.0_basic"
+}

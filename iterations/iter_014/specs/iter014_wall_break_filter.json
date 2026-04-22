@@ -1,0 +1,29 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T12:00:00Z",
+  "iteration_idx": 14,
+  "spec_id": "iter014_wall_break_filter",
+  "name": "Ask Wall with Trade Flow Veto",
+  "hypothesis": "A large ask wall in a low-volatility regime (parent spec iter013_ask_conc_low_vol_h50, WR=96.3%) predicts a price drop. The primary failure mode is 'wall-breaking' from strong buying pressure. This spec adds a veto filter, blocking entries if concurrent signed trade flow is positive, which should specifically target and remove these failure cases, increasing win rate.",
+  "formula": "(zscore(ask_depth_concentration, 300) * (rolling_realized_vol(mid_px, 100) < 30)) * (zscore(trade_imbalance_signed, 300) < 1.0)",
+  "primitives_used": [
+    "ask_depth_concentration",
+    "mid_px",
+    "trade_imbalance_signed"
+  ],
+  "threshold": 5.0,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 50,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/regime_primitives.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": "iter013_ask_conc_low_vol_h50",
+  "mutation_note": "Based on feedback that all losses on the parent spec were due to 'wall-breaking' events. Added a filter using 'zscore(trade_imbalance_signed, 300) < 1.0' to explicitly veto trades when there is strong buying pressure that could absorb the ask wall.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

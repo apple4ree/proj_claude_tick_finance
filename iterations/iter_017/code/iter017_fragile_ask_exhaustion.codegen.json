@@ -1,0 +1,10 @@
+{
+  "agent_name": "code-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:28:55.233358",
+  "iteration_idx": 17,
+  "spec_id": "iter017_fragile_ask_exhaustion",
+  "code_path": "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_017/code/iter017_fragile_ask_exhaustion.py",
+  "entry_function": "signal",
+  "template_used": "v0.1.0_basic"
+}

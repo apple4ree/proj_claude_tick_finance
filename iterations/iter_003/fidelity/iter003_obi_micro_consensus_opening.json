@@ -1,0 +1,40 @@
+{
+  "agent_name": "fidelity-checker",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T08:35:07.223916",
+  "iteration_idx": 3,
+  "spec_id": "iter003_obi_micro_consensus_opening",
+  "overall_passed": true,
+  "checks": [
+    {
+      "name": "1_formula_match",
+      "passed": true,
+      "detail": "canonical match: `(microprice_dev_bps(snap) > 1.0 and obi_1(snap) > 0.5) and minute_of_session(snap) < 15`"
+    },
+    {
+      "name": "2_threshold_horizon",
+      "passed": true,
+      "detail": "THRESHOLD=0.5 HORIZON=1 DIRECTION='long_if_pos'"
+    },
+    {
+      "name": "3_signal_returns_scalar",
+      "passed": true,
+      "detail": "return expression node: BoolOp"
+    },
+    {
+      "name": "4_execution_equal_1",
+      "passed": true,
+      "detail": "no banned execution identifiers"
+    },
+    {
+      "name": "5_no_lookahead",
+      "passed": true,
+      "detail": "no lookahead patterns found"
+    },
+    {
+      "name": "6_no_side_effects",
+      "passed": true,
+      "detail": "no banned imports/calls/mutations"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-21T12:00:00Z",
+  "iteration_idx": 8,
+  "parent_spec_id": "iter008_consensus_wide_trade_confirm",
+  "proposed_mutations": [
+    "timevarying: F > 2 * rolling_std(F, 300)"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent spec is exceptional (WR=96.2%, n=2249), but feedback notes performance variance across sessions, suggesting a static threshold is suboptimal. This mutation implements a time-varying threshold based on the signal's rolling standard deviation (where F is the complex formula) to adapt to changing market volatility."
+}

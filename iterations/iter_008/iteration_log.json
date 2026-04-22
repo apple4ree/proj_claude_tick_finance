@@ -1,0 +1,44 @@
+{
+  "iteration_idx": 8,
+  "started_at": "2026-04-22T01:17:31.155241",
+  "finished_at": "2026-04-22T01:23:01.418549",
+  "signal_specs": [
+    "iter008_ask_conc_final_push",
+    "iter008_absorption_pinnacle",
+    "iter008_consensus_wide_trade_confirm",
+    "iter008_divergence_long_reversion"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_008/evaluations/iter008_ask_conc_final_push.json",
+    "iterations/iter_008/evaluations/iter008_absorption_pinnacle.json",
+    "iterations/iter_008/evaluations/iter008_consensus_wide_trade_confirm.json",
+    "iterations/iter_008/evaluations/iter008_divergence_long_reversion.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_008/code/iter008_ask_conc_final_push.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_008/code/iter008_absorption_pinnacle.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_008/code/iter008_consensus_wide_trade_confirm.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_008/fidelity/iter008_ask_conc_final_push.json",
+    "iterations/iter_008/fidelity/iter008_absorption_pinnacle.json",
+    "iterations/iter_008/fidelity/iter008_consensus_wide_trade_confirm.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_008/results/iter008_ask_conc_final_push.json",
+    "iterations/iter_008/results/iter008_absorption_pinnacle.json",
+    "iterations/iter_008/results/iter008_consensus_wide_trade_confirm.json"
+  ],
+  "feedback": [
+    "iterations/iter_008/feedback/iter008_ask_conc_final_push.json",
+    "iterations/iter_008/feedback/iter008_absorption_pinnacle.json",
+    "iterations/iter_008/feedback/iter008_consensus_wide_trade_confirm.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_008/improvements/iter008_ask_conc_final_push.json",
+    "iterations/iter_008/improvements/iter008_absorption_pinnacle.json",
+    "iterations/iter_008/improvements/iter008_consensus_wide_trade_confirm.json",
+    "iterations/iter_008/improvements/iter008_consensus_wide_trade_confirm_v1.json"
+  ],
+  "stop_reason": null
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-15T10:00:00Z",
+  "iteration_idx": 0,
+  "parent_spec_id": "iter000_obi_deepbook_consensus_h5",
+  "proposed_mutations": [
+    "change formula: 'obi_1 > 0.5' to 'obi_1 > 0.7'"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent has outstanding WR (93.1%) and expectancy (+6.33 bps). Feedback recommends tightening thresholds to confirm robustness. This proposal atomizes the suggestion by tightening only the BBO imbalance component (obi_1) to isolate its impact on conviction."
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-22T12:00:00Z",
+  "iteration_idx": 20,
+  "parent_spec_id": "iter020_exhaustion_into_stable_book",
+  "proposed_mutations": [
+    "tighten filter: bid_depth_concentration < 0.15 -> 0.10"
+  ],
+  "search_axes": [
+    "filter"
+  ],
+  "reasoning": "To address the parent spec's inconsistency (WR=59.9%), this mutation tightens one of the book shape filters. Requiring a less concentrated bid-side book may filter for more stable market regimes, improving signal quality as recommended by the `tighten_threshold` feedback."
+}

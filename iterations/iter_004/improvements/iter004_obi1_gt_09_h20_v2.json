@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:00:00Z",
+  "iteration_idx": 4,
+  "parent_spec_id": "iter004_obi1_gt_09_h20",
+  "proposed_mutations": [
+    "add filter: AND spread_bps < 10"
+  ],
+  "search_axes": [
+    "filter"
+  ],
+  "reasoning": "As a complementary exploration to changing the horizon, this proposal tests the signal's robustness under a different constraint. By adding a spread filter, we investigate if the near-perfect WR (93.5%) is concentrated in specific liquidity conditions, potentially improving expectancy by reducing trading costs."
+}

@@ -1,1 +1,0 @@
-Figure 2. (Left) Single model responses. (Middle) Heterogeneous and homogeneous round robin responses. (Right) Heterogeneous MAS

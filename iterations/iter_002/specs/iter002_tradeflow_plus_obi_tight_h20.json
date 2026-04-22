@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-16T12:05:01Z",
+  "iteration_idx": 2,
+  "spec_id": "iter002_tradeflow_plus_obi_tight_h20",
+  "name": "Trade Flow + OBI Consensus (Tightened)",
+  "hypothesis": "The combined signal of realized trade flow (trade_imbalance_signed) and resting BBO imbalance (obi_1) is extremely powerful. Tightening the threshold will isolate the highest-conviction events, leading to an even higher win rate at the cost of trade frequency.",
+  "formula": "zscore(trade_imbalance_signed, 300) + 3 * obi_1",
+  "primitives_used": [
+    "trade_imbalance_signed",
+    "obi_1"
+  ],
+  "threshold": 3.0,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md"
+  ],
+  "parent_spec_id": "iter001_tradeflow_plus_obi_h20",
+  "mutation_note": "Following the recommendation to tighten the threshold, the trigger value was increased from 2.0 to 3.0 to confirm the signal's robustness and isolate a subset of trades with potentially higher predictive power.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

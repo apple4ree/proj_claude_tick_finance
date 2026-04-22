@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T12:00:00Z",
+  "iteration_idx": 13,
+  "parent_spec_id": "iter013_ask_conc_low_vol_h50",
+  "proposed_mutations": [
+    "timevarying: zscore(ask_depth_concentration, 300) > 2.0 * rolling_std(zscore(ask_depth_concentration, 300), 300)"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent spec (WR=96.3%, exp=+9.83 bps) is a top performer but may be overfit to a static threshold. As suggested by feedback, performance variation across symbols points to a need for an adaptive threshold. This proposal replaces the high fixed threshold (5.0) with a 2-sigma dynamic threshold on the core signal primitive to adapt to symbol-specific dynamics and market regimes."
+}

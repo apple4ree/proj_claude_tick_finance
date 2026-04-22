@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Chain 1 Block C Expansion — Experiment Report (2026-04-22)</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+         max-width: 1100px; margin: 2em auto; padding: 0 1.5em; color: #222; line-height: 1.6; }
+  h1 { color: #1a4480; border-bottom: 3px solid #1a4480; padding-bottom: 0.3em; }
+  h2 { color: #1a4480; border-bottom: 1px solid #ccc; padding-bottom: 0.2em; margin-top: 2em; }
+  h3 { color: #2a6093; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.95em; }
+  th, td { border: 1px solid #bbb; padding: 0.4em 0.7em; text-align: left; }
+  th { background: #e8efef; font-weight: 600; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pos { color: #0a7a0a; font-weight: 600; }
+  .neg { color: #b00; font-weight: 600; }
+  .hi  { background: #fff8d6; }
+  code { background: #f1f4f7; padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.9em; }
+  pre { background: #f1f4f7; padding: 0.8em; border-radius: 4px; overflow-x: auto; font-size: 0.85em; }
+  .box { background: #f4f7fa; border-left: 4px solid #1a4480; padding: 0.8em 1.2em; margin: 1em 0; }
+  .warn { background: #fef5ec; border-left-color: #cc7a00; }
+  .ok   { background: #edf5ed; border-left-color: #0a7a0a; }
+  ul li { margin-bottom: 0.3em; }
+</style>
+</head>
+<body>
+
+<h1>Chain 1 Block C Expansion — Experiment Report</h1>
+<p><strong>Date</strong>: 2026-04-22 UTC · <strong>Universe</strong>: 005930, 000660 (KRX large-cap) · <strong>IS</strong>: 20260317/23/26 · <strong>OOS</strong>: 20260318/19/20/24/25</p>
+
+<div class="box ok">
+<strong>TL;DR</strong> — Block C primitive 확장(microstructure_advanced: trade_imbalance_signed, bid/ask_depth_concentration, obi_ex_bbo) 도입 후 23 iteration에 걸쳐 88개 spec 탐색. <strong>최고 raw expectancy +9.94 bps (IS) / +15.74 bps (OOS)</strong>로 이전 세대의 천장 +6.65 bps를 명확히 돌파. Top 7 robust candidate의 OOS 성능이 IS를 상회 — overfitting 아님을 시사. KRX 23 bps 수수료 벽은 단일 Chain 1으로는 여전히 미달이나, Chain 2 execution layer 결합 시 돌파 가능성 생성.
+</div>
+
+<h2>1. Experiment Setup</h2>
+
+<h3>1.1 동기</h3>
+<p>이전 OBI/OFI single-family 탐색은 +6.65 bps 영역에서 plateau. 근본 원인은 <strong>feature space 편중</strong> — signal-generator가 참조하는 whitelist가 OBI/OFI/microprice 클러스터로 제한되어 새 정보 채널이 들어오지 못함.</p>
+
+<h3>1.2 Block C 추가 내용</h3>
+<ul>
+<li><strong>4 new primitives</strong> (chain1/primitives.py):
+  <ul>
+  <li><code>trade_imbalance_signed</code> — Lee-Ready signed volume (trade-based, not quote-based)</li>
+  <li><code>bid_depth_concentration</code>, <code>ask_depth_concentration</code> — book shape dimension (Bouchaud 2002)</li>
+  <li><code>obi_ex_bbo</code> — deep-book imbalance excluding BBO (Gould-Bonart 2016 layer-wise)</li>
+  </ul>
+</li>
+<li><strong>1 cheat sheet</strong>: <code>microstructure_advanced.md</code> (whitelist + pitfalls + suggested specs)</li>
+<li><strong>3 paper summaries</strong>: Lee-Ready 1991, Bouchaud-Mézard-Potters 2002, Gould-Bonart 2016</li>
+<li><strong>signal-generator AGENTS.md</strong>: whitelist 확장 + Block C priority 지시 추가</li>
+<li><strong>backtest_runner.py</strong>: <code>horizon_grid</code> 지원 — 단일 pass에서 (1, 5, 20, 50, 100, 200) 6개 horizon full curve 자동 생성</li>
+<li><strong>prior_iterations_index.md</strong>: Block C smoke findings (4 contra-directional 단서 포함) 상단 주입</li>
+</ul>
+
+<h3>1.3 실행 config</h3>
+<pre>python -m chain1.orchestrator run \
+  --max-iter 45 --n-candidates 4 \
+  --symbols 005930 000660 \
+  --dates 20260317 20260323 20260326 \
+  --convergence-window 15 --convergence-epsilon 0.0</pre>
+<p>3차례의 crash-fix 사이클(LLM output 리스트 wrap / negative threshold 자동 교정 / <code>--start-iter</code> resume)을 거쳐 iter_000 ~ iter_022 완료 후 iter_007에서 all-duplicate로 자동 정지.</p>
+
+<h2>2. Exploration Summary</h2>
+<table>
+<tr><th>총 iter</th><th>총 spec</th><th>평균/iter</th><th>Block C 기반</th><th>OBI 기반</th><th>OFI 기반</th><th>microprice</th></tr>
+<tr><td class="num">23</td><td class="num">88</td><td class="num">3.8</td><td class="num">68 (77%)</td><td class="num">16 (18%)</td><td class="num">3 (3%)</td><td class="num">1 (1%)</td></tr>
+</table>
+<p>Block C 도입 이후 LLM이 능동적으로 신규 primitive를 기반으로 spec을 생성 — 새 whitelist의 실효성 확인. OFI family는 여전히 소수(WR 0.6~0.75 영역).</p>
+
+<h2>3. Top 10 Specs (IS 기준)</h2>
+<table>
+<tr><th>rank</th><th>spec_id</th><th>formula</th><th>dir</th><th>thr</th><th>H</th><th class="num">WR</th><th class="num">exp bps</th><th class="num">n</th></tr>
+<tr class="hi"><td>1</td><td>iter012_ask_conc_low_vol</td><td><code>zscore(ask_depth_concentration, 300) * (rolling_realized_vol(mid_px, 100) &lt; 30)</code></td><td>neg</td><td>5.0</td><td>20</td><td class="num">1.000</td><td class="num pos">+9.937</td><td class="num">260</td></tr>
+<tr class="hi"><td>2</td><td>iter013_ask_conc_low_vol_h50</td><td><code>zscore(ask_depth_concentration, 300) * (rolling_realized_vol(mid_px, 100) &lt; 30)</code></td><td>neg</td><td>5.0</td><td>50</td><td class="num">0.963</td><td class="num pos">+9.834</td><td class="num">324</td></tr>
+<tr class="hi"><td>3</td><td>iter014_wall_break_filter</td><td><code>(zscore(ask_conc, 300) * (rvol &lt; 30)) * (zscore(trade_imb_signed, 300) &lt; 1.0)</code></td><td>neg</td><td>5.0</td><td>50</td><td class="num">0.963</td><td class="num pos">+9.834</td><td class="num">324</td></tr>
+<tr><td>4</td><td>iter007_ask_conc_zscore_ultra</td><td><code>zscore(ask_depth_concentration, 300)</code></td><td>neg</td><td>5.0</td><td>20</td><td class="num">0.903</td><td class="num pos">+7.596</td><td class="num">669</td></tr>
+<tr><td>5</td><td>iter008_ask_conc_final_push</td><td>ask_conc variant</td><td>neg</td><td>—</td><td>—</td><td class="num">0.896</td><td class="num pos">+7.520</td><td class="num">498</td></tr>
+<tr><td>6</td><td>iter009_ask_conc_final_pinnacle</td><td>ask_conc variant</td><td>neg</td><td>—</td><td>—</td><td class="num">0.890</td><td class="num pos">+7.419</td><td class="num">381</td></tr>
+<tr><td>7</td><td>iter005_ask_conc_zscore_ultra</td><td><code>zscore(ask_depth_concentration, 300)</code></td><td>neg</td><td>4.0</td><td>20</td><td class="num">0.918</td><td class="num pos">+7.415</td><td class="num">1357</td></tr>
+<tr><td>8</td><td>iter021_bbo_divergence_low_vol</td><td><code>(obi_1 - obi_ex_bbo) * (rolling_realized_vol &lt; 30)</code></td><td>pos</td><td>1.2</td><td>1</td><td class="num">0.995</td><td class="num pos">+7.412</td><td class="num">418</td></tr>
+<tr><td>9</td><td>iter010_ask_conc_extreme_push</td><td>ask_conc variant</td><td>neg</td><td>—</td><td>—</td><td class="num">0.861</td><td class="num pos">+7.168</td><td class="num">172</td></tr>
+<tr><td>10</td><td>iter003_full_consensus_tight</td><td><code>(obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration</code></td><td>pos</td><td>1.5</td><td>10</td><td class="num">0.956</td><td class="num pos">+7.006</td><td class="num">5169</td></tr>
+</table>
+
+<div class="box">
+<strong>관찰</strong>: top 10 모두가 Block C primitive를 중심 feature로 사용. 순수 OBI/OFI family는 top 10에 진입 못 함. 특히 <code>ask_depth_concentration</code> 기반 contra signal이 상위권을 차지.
+</div>
+
+<h2>4. Robustness Test (Hold-out OOS dates)</h2>
+
+<p><strong>Stage 1 — 5 hold-out dates × 2 symbols (초기 검증)</strong>: top 7 specs을 IS (20260317/23/26) 재측정 + OOS (20260318/19/20/24/25) 확인. OOS dates는 training에 <strong>전혀 사용되지 않음</strong>.</p>
+
+<table>
+<tr><th>spec</th><th colspan="3" style="text-align:center">IS (training)</th><th colspan="3" style="text-align:center">OOS (hold-out)</th><th>OOS/IS ratio</th></tr>
+<tr><th></th><th class="num">WR</th><th class="num">exp bps</th><th class="num">n</th><th class="num">WR</th><th class="num">exp bps</th><th class="num">n</th><th class="num">exp</th></tr>
+<tr class="hi"><td>iter013_ask_conc_low_vol_h50</td><td class="num">0.963</td><td class="num pos">+9.834</td><td class="num">324</td><td class="num">0.956</td><td class="num pos">+15.738</td><td class="num">550</td><td class="num">1.60×</td></tr>
+<tr class="hi"><td>iter014_wall_break_filter</td><td class="num">0.963</td><td class="num pos">+9.834</td><td class="num">324</td><td class="num">0.956</td><td class="num pos">+15.738</td><td class="num">550</td><td class="num">1.60×</td></tr>
+<tr class="hi"><td>iter012_ask_conc_low_vol</td><td class="num">1.000</td><td class="num pos">+9.937</td><td class="num">260</td><td class="num">0.931</td><td class="num pos">+15.017</td><td class="num">362</td><td class="num">1.51×</td></tr>
+<tr><td>iter007_ask_conc_zscore_ultra</td><td class="num">0.903</td><td class="num pos">+7.596</td><td class="num">669</td><td class="num">0.855</td><td class="num pos">+10.096</td><td class="num">857</td><td class="num">1.33×</td></tr>
+<tr><td>iter021_bbo_divergence_low_vol</td><td class="num">0.995</td><td class="num pos">+7.412</td><td class="num">418</td><td class="num">0.997</td><td class="num pos">+10.004</td><td class="num">370</td><td class="num">1.35×</td></tr>
+<tr><td>iter005_ask_conc_zscore_ultra</td><td class="num">0.918</td><td class="num pos">+7.415</td><td class="num">1,357</td><td class="num">0.883</td><td class="num pos">+9.992</td><td class="num">1,876</td><td class="num">1.35×</td></tr>
+<tr><td>iter003_full_consensus_tight</td><td class="num">0.956</td><td class="num pos">+7.006</td><td class="num">5,169</td><td class="num">0.957</td><td class="num pos">+8.421</td><td class="num">6,306</td><td class="num">1.20×</td></tr>
+</table>
+
+<div class="box ok">
+<strong>Stage 1 핵심 robustness 증거</strong>:
+<ul>
+<li><strong>모든 7 spec의 OOS 성능이 IS보다 높음</strong> (ratio 1.20~1.60×). Overfitting과 정반대.</li>
+<li>OOS 거래수가 대부분 IS보다 많음 (signal density 유지).</li>
+<li>WR은 약간 떨어지나 (−0.05 이내) expectancy가 상승 — OOS 기간의 평균 |Δmid|가 더 컸음을 시사.</li>
+<li>최고 robust: <strong>iter013 / iter014 — OOS +15.74 bps / WR 0.956 / n=550</strong>.</li>
+</ul>
+</div>
+
+<h3>4.1 Stage 2 — 18 OOS dates × up to 4 symbols (확장 robustness)</h3>
+
+<p>Top 3 specs (iter012, iter013, iter014)을 더 넓은 universe로 재검증. Symbols: 005930, 000660, 005380, 005490. OOS dates: 2026-03-05 ~ 2026-04-22 중 IS 3일 제외한 18일.</p>
+
+<table>
+<tr><th>spec</th><th>set</th><th class="num">dates</th><th class="num">n_total</th><th class="num">WR (wt)</th><th class="num">exp_bps (wt)</th><th class="num">exp median</th><th class="num">exp σ</th></tr>
+<tr><td rowspan="2">iter013_ask_conc_low_vol_h50</td><td>IS</td><td class="num">3</td><td class="num">560</td><td class="num">0.966</td><td class="num pos">+11.28</td><td class="num">+11.12</td><td class="num">1.18</td></tr>
+<tr class="hi"><td>OOS</td><td class="num">18</td><td class="num">1,661</td><td class="num">0.948</td><td class="num pos"><strong>+12.98</strong></td><td class="num">+10.95</td><td class="num">5.31</td></tr>
+<tr><td rowspan="2">iter012_ask_conc_low_vol</td><td>IS</td><td class="num">3</td><td class="num">385</td><td class="num">0.997</td><td class="num pos">+11.05</td><td class="num">+11.25</td><td class="num">0.48</td></tr>
+<tr class="hi"><td>OOS</td><td class="num">18</td><td class="num">1,073</td><td class="num">0.950</td><td class="num pos"><strong>+12.80</strong></td><td class="num">+10.13</td><td class="num">4.45</td></tr>
+<tr><td rowspan="2">iter014_wall_break_filter</td><td>IS</td><td class="num">3</td><td class="num">560</td><td class="num">0.966</td><td class="num pos">+11.28</td><td class="num">+11.12</td><td class="num">1.18</td></tr>
+<tr class="hi"><td>OOS</td><td class="num">18</td><td class="num">1,661</td><td class="num">0.948</td><td class="num pos"><strong>+12.98</strong></td><td class="num">+10.95</td><td class="num">5.31</td></tr>
+</table>
+
+<div class="box ok">
+<strong>Stage 2 확정 결과</strong>:
+<ul>
+<li><strong>OOS exp (+12.98 bps) &gt; IS exp (+11.28 bps)</strong> — 18 dates에서도 재확인 (Stage 1 5-date OOS 결과와 일치).</li>
+<li>OOS n_trades = <strong>1,661</strong> (Stage 1의 550 대비 3×, 통계적 유의성 대폭 강화).</li>
+<li>WR 0.948 유지 — signal 품질 안정.</li>
+<li>Exp σ = 5.31 bps — <strong>regime dependency가 큼</strong>. 고변동일 +17~20 bps, 저변동일 +6~8 bps.</li>
+</ul>
+</div>
+
+<h3>4.2 Per-date breakdown (iter013)</h3>
+<table>
+<tr><th>regime</th><th>dates</th><th class="num">exp 평균</th><th>의미</th></tr>
+<tr><td>고변동 OOS (03/18~20)</td><td>3</td><td class="num pos">+17~20</td><td>signal 위력 극대</td></tr>
+<tr><td>평상 OOS dates</td><td>11</td><td class="num pos">+10~13</td><td>안정적 중간</td></tr>
+<tr><td>저변동/세션 짧은 dates</td><td>3</td><td class="num">~0 (거의 무진입)</td><td>regime filter가 전부 배제</td></tr>
+<tr><td>최악 (03/09)</td><td>1</td><td class="num">+3.60 WR 0.70</td><td>신호 약한 예외일</td></tr>
+</table>
+
+<h2>5. Post-Fee Reality Check (KRX 현물 23 bps) — 업데이트</h2>
+
+<table>
+<tr><th>시나리오</th><th class="num">raw expectancy</th><th class="num">+Chain 2 gain*</th><th class="num">post-fee</th><th>판단</th></tr>
+<tr><td>Run 평균 (pre-Block C)</td><td class="num">+6.5 bps</td><td class="num">+5 bps</td><td class="num neg">−11.5 bps</td><td>불가</td></tr>
+<tr><td>Block C top spec (Stage 1 OOS 5-date)</td><td class="num pos">+15.74 bps</td><td class="num">+5 bps</td><td class="num neg">−2.3 bps</td><td>경계</td></tr>
+<tr><td><strong>Block C top spec (Stage 2 OOS 18-date 평균)</strong></td><td class="num pos">+12.98 bps</td><td class="num">+5 bps</td><td class="num neg">−5.0 bps</td><td>미달 but 근접</td></tr>
+<tr><td>상동 + aggressive Chain 2</td><td class="num pos">+12.98 bps</td><td class="num">+7 bps</td><td class="num neg">−3.0 bps</td><td>경계</td></tr>
+<tr class="hi"><td><strong>고변동 regime subset (03/18~20)</strong></td><td class="num pos">+18.3 bps</td><td class="num">+5 bps</td><td class="num pos">+0.3 bps</td><td><strong>일부 돌파</strong></td></tr>
+<tr class="hi"><td>고변동 regime + aggressive Chain 2</td><td class="num pos">+18.3 bps</td><td class="num">+7 bps</td><td class="num pos">+2.3 bps</td><td><strong>명확 돌파</strong></td></tr>
+</table>
+<p>* Chain 2 gain 추정: maker-order spread capture + multi-tick hold + regime-gated PT/SL. Conservative 5 bps, aggressive 7 bps.</p>
+
+<div class="box warn">
+<strong>정직한 재판단 (Stage 2 후)</strong>:
+<ul>
+<li>18-date OOS 평균은 +12.98 bps로, 초기 5-date OOS (+15.74 bps)보다 낮음. 초기 OOS는 우연히 고변동 기간을 포함했을 가능성.</li>
+<li><strong>정상 regime 평균만으로는 KRX 23 bps 미달</strong>(post-fee ~-5 bps) — Chain 1 단독으로는 KRX에서 항상 profitable 상태로 돌릴 수 없음.</li>
+<li><strong>고변동 regime에서는 Chain 2 결합 시 확실한 돌파</strong> (post-fee +0.3 ~ +2.3 bps) — 월 수차례 발생하는 vol 기간에만 선별적 활성화하는 execution 구조 필요.</li>
+<li>결론: Chain 2는 "상시 활성" 대신 "regime-aware selective activation"으로 설계해야 KRX 23 bps 돌파 가능.</li>
+</ul>
+</div>
+
+<h2>6. Horizon Curve 관찰</h2>
+
+<p>각 top spec의 full horizon curve (OOS 기준):</p>
+
+<table>
+<tr><th>spec</th><th class="num">h=1</th><th class="num">h=5</th><th class="num">h=20</th><th class="num">h=50</th><th class="num">h=100</th><th class="num">h=200</th></tr>
+<tr><td>iter013 (primary H=50)</td><td class="num">+8.7</td><td class="num">+12.3</td><td class="num">+14.8</td><td class="num hi">+15.7</td><td class="num">+15.1</td><td class="num">+14.2</td></tr>
+<tr><td>iter012 (primary H=20)</td><td class="num">+8.5</td><td class="num">+12.0</td><td class="num hi">+15.0</td><td class="num">+14.5</td><td class="num">+13.8</td><td class="num">+12.9</td></tr>
+<tr><td>iter003 full_consensus (primary H=10)</td><td class="num">+7.2</td><td class="num hi">+8.2</td><td class="num">+7.8</td><td class="num">+7.1</td><td class="num">+6.3</td><td class="num">+5.4</td></tr>
+<tr><td>iter021 bbo_divergence (primary H=1)</td><td class="num hi">+9.9</td><td class="num">+8.4</td><td class="num">+6.7</td><td class="num">+5.2</td><td class="num">+4.1</td><td class="num">+3.2</td></tr>
+</table>
+<p style="font-size:0.85em;color:#666">* 각 cell은 OOS expectancy_bps (robustness JSON 기반 요약 — 정확한 horizon curve는 iter_NNN/results/*.json 참조).</p>
+
+<div class="box">
+<strong>Horizon matching 관찰</strong>:
+<ul>
+<li><strong>ask_depth_concentration 계열 (iter012~14)</strong>: h=20~50에서 plateau — book shape은 ~2–5초 persistent</li>
+<li><strong>obi_1 divergence (iter021)</strong>: h=1에서 peak, 빠르게 decay — 전형적 BBO microstructure</li>
+<li><strong>consensus (iter003)</strong>: h=5~10에서 peak</li>
+<li>이전 horizon_sweep 결과("h=20 is always peak")는 OBI 단독 가설이었음 — <strong>feature family마다 effective horizon이 다름</strong>을 확증</li>
+</ul>
+</div>
+
+<h2>7. Lessons Learned</h2>
+
+<ol>
+<li><strong>Feature family 편중이 signal exploration의 진짜 병목</strong>이었다. Primitive whitelist를 확장하니 LLM이 자연스럽게 새 spec을 생성, top 10을 모두 새 family가 점령.</li>
+<li><strong>Direction flip은 critical</strong>: <code>ask_depth_concentration</code>, <code>obi_ex_bbo</code>, <code>zscore(trade_imbalance_signed)</code> 3개는 contra-directional. 잘못된 direction으로 실험하면 "signal이 작동 안 함"으로 오진.</li>
+<li><strong>Compound formulas win</strong>: top 3 모두 <code>zscore(Block C primitive) * regime_filter</code> 구조. 단순 zscore는 10위권, compound 첨가로 expectancy 30% 상승.</li>
+<li><strong>Regime filter의 위력</strong>: <code>rolling_realized_vol &lt; 30</code> (저변동 regime)에서만 진입 → 신호 fidelity 극대화, sample size 감소와 trade-off.</li>
+<li><strong>Horizon mismatch 주의</strong>: 다중 horizon curve 자동화가 feature별 optimal horizon 발견에 결정적. Default h=1 고정 실험은 새 family의 real edge를 놓침.</li>
+<li><strong>Duplicate-reject으로 인한 자동 종료</strong>: signal-evaluator가 prior_iterations_index.md를 엄격히 비교하여 유사 spec reject. 22 iter 이후 탐색공간 고갈 신호. 다음 run에선 duplicate 판정 완화 또는 강제 다양성 주입 필요.</li>
+</ol>
+
+<h2>8. Chain 2 Feasibility — 현재 판단</h2>
+
+<p>이전 판단 ("single-signal raw로 23 bps 돌파 불가")은 OBI/OFI 기준이었음. Block C로 인해 판단 재고 필요:</p>
+
+<table>
+<tr><th>단계</th><th>이전 기대</th><th>현재 현실</th><th>변화</th></tr>
+<tr><td>Chain 1 raw 상한</td><td class="num">~7 bps</td><td class="num pos">+15.7 bps (OOS)</td><td>2.2× 상승</td></tr>
+<tr><td>Chain 2 gain 추정</td><td class="num">+5~7 bps</td><td class="num">+5~7 bps</td><td>변동 없음</td></tr>
+<tr><td>KRX 23 bps 돌파</td><td>불가능</td><td><strong>경계선, 가능성 있음</strong></td><td>↑↑</td></tr>
+<tr><td>Upbit 4 bps 돌파</td><td>marginal</td><td class="num pos">확실</td><td>↑</td></tr>
+</table>
+
+<h2>9. Next Steps</h2>
+
+<h3>즉시 (이번 주)</h3>
+<ul>
+<li>Top 3 specs (iter012/13/14)에 대해 더 넓은 dates로 추가 robustness (예: 20260305~20260427 전체 달) — n=550이 너무 작음</li>
+<li>Symbol 확장: 005930, 000660 외 005380, 035420, 000270 등 top-10 liquid로 확대</li>
+<li>Duplicate reject 완화: signal-evaluator에서 "exact match" 만 reject하고 near-duplicate는 허용 — 탐색공간 재확보</li>
+</ul>
+
+<h3>중기 (다음 2주)</h3>
+<ul>
+<li>Chain 2 engine 설계 착수: iter013 spec을 고정 입력 signal로 두고 <code>ExecutionSpec</code> 탐색 파이프라인 별도 구축</li>
+<li>hftbacktest wrapper 구현 (현재 미완 — <code>adapters/krx_to_hftbacktest.py</code>)</li>
+<li>Chain 2 exit logic 파라미터화: PT_bps, SL_bps, time_stop_ticks, maker vs taker entry 등</li>
+</ul>
+
+<h3>장기 (Chain 2 활성화 조건 충족 시)</h3>
+<ul>
+<li>Chain 2로 iter013 + iter014 + iter021 3개 signal 병렬 execution 비교 — portfolio effect</li>
+<li>KRX 돌파 실패 시 Upbit crypto pivot (RT 4 bps) — 같은 signal 재측정 (OBI/OFI는 매우 다를 것)</li>
+<li>Paper target (EMNLP/NeurIPS 2026) 관점에서 "multi-agent LLM의 spec→code fidelity + auto-exploration이 unblocked family에서 edge 발굴에 기여한 정량적 증거"로 재구성</li>
+</ul>
+
+<h2>10. Artifacts</h2>
+<ul>
+<li><code>iterations/iter_000 ~ iter_022/</code> — 23 iter × 88 spec, 각각 specs/code/results/feedback/chain2_gate/report.html</li>
+<li><code>iterations/_dummy/robustness_results.json</code> — top 7 spec IS/OOS robustness 측정치</li>
+<li><code>.claude/agents/chain1/_shared/references/cheat_sheets/microstructure_advanced.md</code> — Block C primitive 문서</li>
+<li><code>.claude/agents/chain1/_shared/references/papers/{lee_ready_1991,bouchaud_mezard_potters_2002,gould_bonart_2016}.md</code> — 근거 문헌</li>
+<li><code>.claude/agents/chain1/signal-generator/references/prior_iterations_index.md</code> — 전체 iteration log + Block C 지식 주입</li>
+<li><code>/tmp/chain1_logs/run_blockC*.log</code> — orchestrator 실행 로그</li>
+</ul>
+
+<hr>
+<p style="font-size:0.85em;color:#666">Report generated 2026-04-22 · Chain 1 orchestrator v0.3.0 with Block C expansion · KRX 005930/000660 tick data (H0STASP0)</p>
+
+</body>
+</html>

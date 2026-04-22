@@ -1,0 +1,40 @@
+{
+  "iteration_idx": 19,
+  "started_at": "2026-04-22T02:40:19.201085",
+  "finished_at": "2026-04-22T02:44:32.277540",
+  "signal_specs": [
+    "iter019_bbo_divergence_extreme",
+    "iter019_contra_consensus_tight_obi",
+    "iter019_tradeflow_momentum_confirm",
+    "iter019_ultra_consensus"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_019/evaluations/iter019_bbo_divergence_extreme.json",
+    "iterations/iter_019/evaluations/iter019_contra_consensus_tight_obi.json",
+    "iterations/iter_019/evaluations/iter019_tradeflow_momentum_confirm.json",
+    "iterations/iter_019/evaluations/iter019_ultra_consensus.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_019/code/iter019_contra_consensus_tight_obi.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_019/code/iter019_ultra_consensus.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_019/fidelity/iter019_contra_consensus_tight_obi.json",
+    "iterations/iter_019/fidelity/iter019_ultra_consensus.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_019/results/iter019_contra_consensus_tight_obi.json",
+    "iterations/iter_019/results/iter019_ultra_consensus.json"
+  ],
+  "feedback": [
+    "iterations/iter_019/feedback/iter019_contra_consensus_tight_obi.json",
+    "iterations/iter_019/feedback/iter019_ultra_consensus.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_019/improvements/iter019_contra_consensus_tight_obi.json",
+    "iterations/iter_019/improvements/iter019_ultra_consensus.json",
+    "iterations/iter_019/improvements/iter019_contra_consensus_tight_obi_v1.json",
+    "iterations/iter_019/improvements/iter019_contra_consensus_tight_obi_v2.json"
+  ],
+  "stop_reason": null
+}

@@ -1,1 +1,0 @@
-Figure 10: The Prompt for new-instance generation during Level-2 interpretation abstraction in

@@ -1,0 +1,26 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-25T13:00:00Z",
+  "iteration_idx": 9,
+  "spec_id": "iter009_deeper_obi_momentum",
+  "name": "Deeper Book Imbalance with Momentum Filter",
+  "hypothesis": "While obi_1 is extremely powerful, deeper book pressure might offer a complementary signal. iter007_deep_book_pressure (obi_10) failed on its own. This spec hypothesizes that a deeper imbalance (obi_5) is predictive, but only when confirmed by positive short-term price momentum, filtering out non-trending states.",
+  "formula": "obi_5 > 0.5 AND rolling_momentum(mid_px, 50) > 0",
+  "primitives_used": [
+    "obi_5",
+    "mid_px"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 1,
+  "references": [
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/cheat_sheets/regime_primitives.md"
+  ],
+  "parent_spec_id": "iter007_deep_book_pressure",
+  "mutation_note": "iter007_deep_book_pressure, which used obi_10 alone, failed. This spec swaps the feature to a less deep but still significant obi_5 and adds the successful momentum filter from iter006_strong_obi_momentum_ensemble to improve precision.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

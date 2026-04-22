@@ -1,0 +1,25 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:27:01.314159Z",
+  "iteration_idx": 17,
+  "spec_id": "iter017_exhaustion_extreme",
+  "name": "Trade Flow Exhaustion (Extreme Threshold)",
+  "hypothesis": "An extremely high buyer-initiated trade flow (z-score > 3.5) represents a high-probability exhaustion point where liquidity providers absorb the aggressive flow, leading to a mean reversion (price drop) over the next 20 ticks. This is a direct test of the parent spec's conviction limit.",
+  "formula": "zscore(trade_imbalance_signed, 300)",
+  "primitives_used": [
+    "trade_imbalance_signed"
+  ],
+  "threshold": 3.5,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": "iter016_trade_flow_exhaustion_tight",
+  "mutation_note": "Based on feedback to 'tighten_threshold'. Tightened threshold from 3.0 to 3.5 to test if a more extreme Z-score isolates a higher-conviction subset of trades and finds the signal's performance peak.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

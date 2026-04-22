@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-21T12:00:00Z",
+  "iteration_idx": 8,
+  "parent_spec_id": "iter008_absorption_pinnacle",
+  "proposed_mutations": [
+    "add filter: AND spread_bps < 10"
+  ],
+  "search_axes": [
+    "filter"
+  ],
+  "reasoning": "Parent spec has a high WR (89.5%) but a low trade count (57). Following the 'add_filter' recommendation, this mutation tests if we can further improve signal purity by restricting entries to low-cost, high-quality ticks, creating a specialized, near-perfect signal subset."
+}

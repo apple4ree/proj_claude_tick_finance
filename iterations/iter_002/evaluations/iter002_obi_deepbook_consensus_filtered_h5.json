@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-16T12:05:01Z",
+  "iteration_idx": 2,
+  "spec_id": "iter002_obi_deepbook_consensus_filtered_h5",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passes all deterministic checks. Primitives ['obi_1', 'obi_ex_bbo', 'spread_bps'] are whitelisted. The formula is well-formed, contains no lookahead, and the spec_id/iteration_idx match. The hypothesis is well-articulated and provides a clear mechanism: adding a liquidity filter (`spread_bps`) to a known high-performing parent spec (`iter001_obi_deepbook_consensus_tight_h5`, WR=95.0%). A duplicate check against the prior iterations index confirms this specific formula is novel. Due to its strong theoretical grounding and incremental improvement on a proven signal, expected merit is high."
+}

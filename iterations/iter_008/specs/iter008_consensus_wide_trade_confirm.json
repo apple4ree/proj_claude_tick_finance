@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:00:00Z",
+  "iteration_idx": 8,
+  "spec_id": "iter008_consensus_wide_trade_confirm",
+  "name": "Consensus Signal with Widened Trade Flow Filter",
+  "hypothesis": "The parent spec suffered from a statistically insignificant sample size. To address this, the `zscore(trade_imbalance_signed)` filter is loosened dramatically from `> 0.5` to `> 0.1`, effectively requiring only a minimal positive trade flow confirmation. This will generate a larger sample to properly evaluate the core consensus hypothesis.",
+  "formula": "((obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration) > 1.5 AND zscore(trade_imbalance_signed, 300) > 0.1",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "ask_depth_concentration",
+    "trade_imbalance_signed"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md"
+  ],
+  "parent_spec_id": "iter007_consensus_loosened_trade_confirm",
+  "mutation_note": "Aggressively loosened the trade imbalance z-score threshold from 0.5 to 0.1 to increase sample size, as per feedback.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

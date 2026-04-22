@@ -1,1 +1,0 @@
-Figure 36: Grouped bar chart comparing all models across core metrics. Each metric is normalized to facilitate cross-metric

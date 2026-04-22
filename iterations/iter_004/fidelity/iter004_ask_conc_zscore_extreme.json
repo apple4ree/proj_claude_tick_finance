@@ -1,0 +1,40 @@
+{
+  "agent_name": "fidelity-checker",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T10:15:02.947635",
+  "iteration_idx": 4,
+  "spec_id": "iter004_ask_conc_zscore_extreme",
+  "overall_passed": true,
+  "checks": [
+    {
+      "name": "1_formula_match",
+      "passed": true,
+      "detail": "canonical match: `_HELPER_zscore_ask_depth_concentration_300.update(ask_depth_concentration(snap))`"
+    },
+    {
+      "name": "2_threshold_horizon",
+      "passed": true,
+      "detail": "THRESHOLD=3.5 HORIZON=20 DIRECTION='long_if_neg'"
+    },
+    {
+      "name": "3_signal_returns_scalar",
+      "passed": true,
+      "detail": "return expression node: Call"
+    },
+    {
+      "name": "4_execution_equal_1",
+      "passed": true,
+      "detail": "no banned execution identifiers"
+    },
+    {
+      "name": "5_no_lookahead",
+      "passed": true,
+      "detail": "no lookahead patterns found"
+    },
+    {
+      "name": "6_no_side_effects",
+      "passed": true,
+      "detail": "no banned imports/calls/mutations"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-14T12:00:01Z",
+  "iteration_idx": 6,
+  "spec_id": "iter006_deep_book_vs_bbo_divergence",
+  "valid": false,
+  "concerns": [
+    "Duplicate of a previously retired spec 'iter006_deep_book_vs_bbo_divergence' with identical formula, horizon, and direction."
+  ],
+  "duplicate_of": "iter006_deep_book_vs_bbo_divergence",
+  "expected_merit": "low",
+  "reasoning": "1. All metadata and parameter checks pass. 2. The hypothesis is well-formed and non-trivial. 3. All primitives ('obi_1', 'obi_ex_bbo') are whitelisted. 4. The formula is syntactically valid and has no lookahead. 5. First-submission checks pass (measured fields are null). 6. Duplicate check: The provided prior iterations index contains an entry for 'iter006_deep_book_vs_bbo_divergence' with an identical formula ('obi_1 > 0.7 AND obi_ex_bbo < -0.3') and horizon (10 ticks). The provided direction 'long_if_neg' is contra-directional, consistent with a reversal/short hypothesis. The prior entry showed a WR of 5.3%, conclusively invalidating the hypothesis. The spec is therefore a duplicate of a failed experiment. The spec is marked invalid."
+}

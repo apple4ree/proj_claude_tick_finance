@@ -1,0 +1,48 @@
+{
+  "iteration_idx": 2,
+  "started_at": "2026-04-21T09:55:55.748744",
+  "finished_at": "2026-04-21T10:03:47.113195",
+  "signal_specs": [
+    "iter002_ask_concentration_zscore_contra_h20",
+    "iter002_obi_deepbook_consensus_filtered_h5",
+    "iter002_tradeflow_plus_obi_tight_h20",
+    "iter002_full_consensus_contra_ask_h10"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_002/evaluations/iter002_ask_concentration_zscore_contra_h20.json",
+    "iterations/iter_002/evaluations/iter002_obi_deepbook_consensus_filtered_h5.json",
+    "iterations/iter_002/evaluations/iter002_tradeflow_plus_obi_tight_h20.json",
+    "iterations/iter_002/evaluations/iter002_full_consensus_contra_ask_h10.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_002/code/iter002_ask_concentration_zscore_contra_h20.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_002/code/iter002_obi_deepbook_consensus_filtered_h5.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_002/code/iter002_tradeflow_plus_obi_tight_h20.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_002/code/iter002_full_consensus_contra_ask_h10.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_002/fidelity/iter002_ask_concentration_zscore_contra_h20.json",
+    "iterations/iter_002/fidelity/iter002_obi_deepbook_consensus_filtered_h5.json",
+    "iterations/iter_002/fidelity/iter002_tradeflow_plus_obi_tight_h20.json",
+    "iterations/iter_002/fidelity/iter002_full_consensus_contra_ask_h10.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_002/results/iter002_ask_concentration_zscore_contra_h20.json",
+    "iterations/iter_002/results/iter002_obi_deepbook_consensus_filtered_h5.json",
+    "iterations/iter_002/results/iter002_tradeflow_plus_obi_tight_h20.json",
+    "iterations/iter_002/results/iter002_full_consensus_contra_ask_h10.json"
+  ],
+  "feedback": [
+    "iterations/iter_002/feedback/iter002_ask_concentration_zscore_contra_h20.json",
+    "iterations/iter_002/feedback/iter002_obi_deepbook_consensus_filtered_h5.json",
+    "iterations/iter_002/feedback/iter002_tradeflow_plus_obi_tight_h20.json",
+    "iterations/iter_002/feedback/iter002_full_consensus_contra_ask_h10.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_002/improvements/iter002_full_consensus_contra_ask_h10.json",
+    "iterations/iter_002/improvements/iter002_ask_concentration_zscore_contra_h20.json",
+    "iterations/iter_002/improvements/iter002_tradeflow_plus_obi_tight_h20.json",
+    "iterations/iter_002/improvements/iter001_obi_deepbook_consensus_tight_h5.json"
+  ],
+  "stop_reason": null
+}

@@ -1,0 +1,44 @@
+{
+  "iteration_idx": 1,
+  "started_at": "2026-04-21T09:49:33.069502",
+  "finished_at": "2026-04-21T09:55:21.761587",
+  "signal_specs": [
+    "iter001_ask_concentration_contra_t04_h20",
+    "iter001_obi_deepbook_consensus_tight_h5",
+    "iter001_tradeflow_plus_obi_h20",
+    "iter001_deepbook_reversal_h100"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_001/evaluations/iter001_ask_concentration_contra_t04_h20.json",
+    "iterations/iter_001/evaluations/iter001_obi_deepbook_consensus_tight_h5.json",
+    "iterations/iter_001/evaluations/iter001_tradeflow_plus_obi_h20.json",
+    "iterations/iter_001/evaluations/iter001_deepbook_reversal_h100.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_001/code/iter001_ask_concentration_contra_t04_h20.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_001/code/iter001_obi_deepbook_consensus_tight_h5.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_001/code/iter001_tradeflow_plus_obi_h20.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_001/fidelity/iter001_ask_concentration_contra_t04_h20.json",
+    "iterations/iter_001/fidelity/iter001_obi_deepbook_consensus_tight_h5.json",
+    "iterations/iter_001/fidelity/iter001_tradeflow_plus_obi_h20.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_001/results/iter001_ask_concentration_contra_t04_h20.json",
+    "iterations/iter_001/results/iter001_obi_deepbook_consensus_tight_h5.json",
+    "iterations/iter_001/results/iter001_tradeflow_plus_obi_h20.json"
+  ],
+  "feedback": [
+    "iterations/iter_001/feedback/iter001_ask_concentration_contra_t04_h20.json",
+    "iterations/iter_001/feedback/iter001_obi_deepbook_consensus_tight_h5.json",
+    "iterations/iter_001/feedback/iter001_tradeflow_plus_obi_h20.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_001/improvements/iter001_ask_concentration_contra_t04_h20.json",
+    "iterations/iter_001/improvements/iter001_obi_deepbook_consensus_tight_h5.json",
+    "iterations/iter_001/improvements/iter001_obi_deepbook_consensus_tight_h5_v1.json",
+    "iterations/iter_001/improvements/iter001_tradeflow_plus_obi_h20.json"
+  ],
+  "stop_reason": null
+}

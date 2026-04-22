@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-14T12:00:10Z",
+  "iteration_idx": 6,
+  "spec_id": "iter006_bbo_deep_book_consensus",
+  "valid": false,
+  "concerns": [
+    "The spec is a duplicate of a previously backtested iteration `iter000_obi_deepbook_consensus_h5`."
+  ],
+  "duplicate_of": "iter000_obi_deepbook_consensus_h5",
+  "expected_merit": "high",
+  "reasoning": "The spec passes all mechanical validity checks: primitives are whitelisted, formula is well-formed, and the hypothesis is sound. The combination of BBO imbalance (`obi_1`) with deeper book imbalance (`obi_ex_bbo`) is a theoretically strong approach to confirming market intent, justifying a 'high' expected merit. However, the duplicate detection check found an exact match in the prior iterations index. The spec with `spec_id: iter000_obi_deepbook_consensus_h5` has an identical formula (`obi_1 > 0.5 AND obi_ex_bbo > 0.2`) and prediction horizon (5 ticks). Therefore, the spec must be rejected as a duplicate to avoid re-running a completed backtest."
+}

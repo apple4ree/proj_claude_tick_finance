@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:30:03.235568Z",
+  "iteration_idx": 1,
+  "spec_id": "iter001_obi_deepbook_consensus_tight_h5",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passes all hard-fail and soft-fail checks. 1. The primitives `obi_1` and `obi_ex_bbo` are whitelisted. 2. The formula is well-formed and has no lookahead. 3. The spec is a logical mutation (`tighten_threshold`) of a high-performing parent spec `iter000_obi_deepbook_consensus_h5` (WR=93.1%, Expectancy=+6.33 bps). 4. It is not a duplicate as the core formula's thresholds have been changed. 5. The hypothesis is well-reasoned, cites relevant materials, and proposes a testable improvement. Based on this, the spec is valid with high expected merit."
+}

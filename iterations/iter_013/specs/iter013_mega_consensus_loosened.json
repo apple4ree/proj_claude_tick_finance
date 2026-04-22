@@ -1,0 +1,30 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:58:33.123456Z",
+  "iteration_idx": 13,
+  "spec_id": "iter013_mega_consensus_loosened",
+  "name": "Loosened Mega Consensus (Book + Trade Flow)",
+  "hypothesis": "The parent spec ('iter012_mega_consensus') failed to generate trades due to overly strict conditions. This spec loosens the thresholds on both the book imbalance and trade flow components to generate a statistically significant sample and test if combining these two strong, but distinct, signals yields a superior result.",
+  "formula": "(((obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration) > 1.2) AND (zscore(trade_imbalance_signed, 300) > 1.5)",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "ask_depth_concentration",
+    "trade_imbalance_signed"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "signal-generator/references/prior_iterations_index.md",
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md"
+  ],
+  "parent_spec_id": "iter012_mega_consensus",
+  "mutation_note": "Based on feedback for parent spec 'iter012_mega_consensus' (0 trades), loosening thresholds on both components of the AND clause to generate a trade sample. Dropped redundant ask_conc check.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

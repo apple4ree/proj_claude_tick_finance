@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:27:01.314159Z",
+  "iteration_idx": 17,
+  "spec_id": "iter017_fragile_ask_exhaustion",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passes all deterministic checks: spec_id format is valid, iteration_idx matches, no lookahead detected, measured fields are null for a new submission, all primitives (`trade_imbalance_signed`, `ask_depth_concentration`) and helpers (`zscore`) are whitelisted, and reference paths appear valid. A thorough check against `prior_iterations_index.md` confirms this is not a duplicate. The hypothesis is well-formed, exceeds 50 characters, and proposes a clear causal mechanism. The spec combines two distinct primitives (trade flow and book shape) from the new Block C set in a novel way, cites relevant references, and builds logically on its parent (`iter016_trade_flow_exhaustion_tight`). The `long_if_neg` direction is consistent with the documented contra-directional nature of both `zscore(trade_imbalance_signed)` and `ask_depth_concentration` in the `prior_iterations_index.md` smoke tests. The combination is theoretically motivated and represents a high-merit exploration."
+}

@@ -1,1 +1,0 @@
-Figure 26: Radar chart of normalized model performance on the Stage 2 benchmark across five metrics at both temperature

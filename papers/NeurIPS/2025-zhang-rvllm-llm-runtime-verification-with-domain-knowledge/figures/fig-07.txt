@@ -1,1 +1,0 @@
-Figure 7: The query prompt for the **inferred** knowledge used in case study 1. [[Context]] is

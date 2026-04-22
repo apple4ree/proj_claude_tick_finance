@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-14T12:06:01Z",
+  "iteration_idx": 5,
+  "spec_id": "iter005_full_consensus_bid_shape",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passes all validation checks. Primitives are whitelisted per `prior_iterations_index.md` guidance on Block C primitives. The formula is a logical and well-justified extension of a top-performing parent spec (`iter003_full_consensus_tight`, WR=95.6%, Exp=+7.01bps) by adding a novel book-shape filter (`bid_depth_concentration`). This modification is directly supported by the provided hypothesis. The spec is not a duplicate of any prior iteration. Due to its strong theoretical motivation, novel combination of high-performing primitives, and direct link to a successful parent, the expected merit is rated high."
+}

@@ -1,0 +1,44 @@
+{
+  "iteration_idx": 21,
+  "started_at": "2026-04-22T02:50:08.468939",
+  "finished_at": "2026-04-22T02:57:28.115721",
+  "signal_specs": [
+    "iter021_contra_consensus_reversion",
+    "iter021_tighter_trade_flow_exhaustion",
+    "iter021_bbo_divergence_low_vol",
+    "iter021_tradeflow_into_ask_wall"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_021/evaluations/iter021_contra_consensus_reversion.json",
+    "iterations/iter_021/evaluations/iter021_tighter_trade_flow_exhaustion.json",
+    "iterations/iter_021/evaluations/iter021_bbo_divergence_low_vol.json",
+    "iterations/iter_021/evaluations/iter021_tradeflow_into_ask_wall.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_021/code/iter021_tighter_trade_flow_exhaustion.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_021/code/iter021_bbo_divergence_low_vol.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_021/code/iter021_tradeflow_into_ask_wall.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_021/fidelity/iter021_tighter_trade_flow_exhaustion.json",
+    "iterations/iter_021/fidelity/iter021_bbo_divergence_low_vol.json",
+    "iterations/iter_021/fidelity/iter021_tradeflow_into_ask_wall.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_021/results/iter021_tighter_trade_flow_exhaustion.json",
+    "iterations/iter_021/results/iter021_bbo_divergence_low_vol.json",
+    "iterations/iter_021/results/iter021_tradeflow_into_ask_wall.json"
+  ],
+  "feedback": [
+    "iterations/iter_021/feedback/iter021_tighter_trade_flow_exhaustion.json",
+    "iterations/iter_021/feedback/iter021_bbo_divergence_low_vol.json",
+    "iterations/iter_021/feedback/iter021_tradeflow_into_ask_wall.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_021/improvements/iter021_tighter_trade_flow_exhaustion.json",
+    "iterations/iter_021/improvements/iter021_bbo_divergence_low_vol.json",
+    "iterations/iter_021/improvements/iter021_tradeflow_into_ask_wall.json",
+    "iterations/iter_021/improvements/iter021_tradeflow_into_ask_wall_v1.json"
+  ],
+  "stop_reason": null
+}

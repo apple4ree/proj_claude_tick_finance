@@ -1,1 +1,0 @@
-Figure 17: Decision instability across decoding temperatures (gpt-

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-21T12:00:00Z",
+  "iteration_idx": 21,
+  "parent_spec_id": "iter021_tradeflow_into_ask_wall",
+  "proposed_mutations": [
+    "drop primitive ask_depth_concentration; new formula = zscore(trade_imbalance_signed, 300) > 2.0"
+  ],
+  "search_axes": [
+    "feature"
+  ],
+  "reasoning": "Parent WR=68.2%, n=66. Feedback cited 'extreme performance inconsistency' and recommended dropping a feature. This proposal explores the alternative simplification path by dropping the `ask_depth_concentration` primitive. It tests the hypothesis that the trade flow signal is valid on its own and that the book shape feature was the source of noise."
+}

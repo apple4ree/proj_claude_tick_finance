@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:00:05.123456Z",
+  "iteration_idx": 8,
+  "spec_id": "iter008_consensus_wide_trade_confirm",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "1. All hard-fail checks passed. The spec_id and iteration_idx (8) match. Primitives ['obi_1', 'obi_ex_bbo', 'ask_depth_concentration', 'trade_imbalance_signed'] and the helper `zscore` are whitelisted. Measured fields are null. No lookahead detected.\n2. The spec is not a duplicate. It is a logical successor to 'iter007_consensus_loosened_trade_confirm', modifying the formula's trade flow z-score threshold from `> 0.5` to `> 0.1`.\n3. The hypothesis is well-formed, directly addressing the low sample size (27 trades) noted in the parent spec's feedback.\n4. The formula construction is a sound combination of a high-performing book consensus signal with a trade flow confirmation filter.\n5. The change is a direct and reasonable response to prior experimental results and feedback.\n6. References are valid. No new concerns identified."
+}

@@ -1,0 +1,40 @@
+{
+  "agent_name": "fidelity-checker",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T08:41:39.196059",
+  "iteration_idx": 5,
+  "spec_id": "iter005_obi_momentum_ensemble",
+  "overall_passed": true,
+  "checks": [
+    {
+      "name": "1_formula_match",
+      "passed": true,
+      "detail": "canonical match: `(_HELPER_rolling_momentum_mid_px_50.update(mid_px(snap)) > 0) * obi_1(snap)`"
+    },
+    {
+      "name": "2_threshold_horizon",
+      "passed": true,
+      "detail": "THRESHOLD=0.5 HORIZON=1 DIRECTION='long_if_pos'"
+    },
+    {
+      "name": "3_signal_returns_scalar",
+      "passed": true,
+      "detail": "return expression node: BinOp"
+    },
+    {
+      "name": "4_execution_equal_1",
+      "passed": true,
+      "detail": "no banned execution identifiers"
+    },
+    {
+      "name": "5_no_lookahead",
+      "passed": true,
+      "detail": "no lookahead patterns found"
+    },
+    {
+      "name": "6_no_side_effects",
+      "passed": true,
+      "detail": "no banned imports/calls/mutations"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:00:05.123456Z",
+  "iteration_idx": 9,
+  "spec_id": "iter009_bbo_deep_disagreement",
+  "valid": false,
+  "concerns": [
+    "The spec is a direct re-test of an identical formula from a previously retired spec (`iter006_deep_book_vs_bbo_divergence`) which failed conclusively with a 5.3% Win Rate."
+  ],
+  "duplicate_of": "iter006_deep_book_vs_bbo_divergence",
+  "expected_merit": "low",
+  "reasoning": "The spec passed all initial mechanical and syntactic checks. However, a duplicate check against `prior_iterations_index.md` revealed it is a near-identical re-test of a previously failed spec. Specifically, `iter006_deep_book_vs_bbo_divergence` used the exact same formula (`obi_1 > 0.7 AND obi_ex_bbo < -0.3`), primitives, and threshold. While the current spec changes the horizon from 10 to 20 ticks and explicitly sets the direction to `long_if_neg`, the prior spec failed so catastrophically (WR 5.3%) that a simple horizon change is insufficient justification to re-run. The spec is therefore marked as invalid due to being a duplicate of a retired, conclusively failed concept."
+}

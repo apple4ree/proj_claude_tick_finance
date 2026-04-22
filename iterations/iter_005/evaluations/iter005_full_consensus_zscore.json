@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T10:20:51.646925",
+  "iteration_idx": 5,
+  "spec_id": "iter005_full_consensus_zscore",
+  "valid": false,
+  "concerns": [
+    "formula_parse_error:zscore() first arg must be a whitelisted primitive name, got BinOp(left=BinOp(left=Name(id='obi_1', ctx=Load()), op=Add(), right=Name(id='obi_ex_bbo', ctx=Load())), op=Sub(), right=BinOp(left=Constant(value=2), op=Mult(), right=Name(id='ask_depth_concentration', ctx=Load())))"
+  ],
+  "duplicate_of": null,
+  "expected_merit": "low",
+  "reasoning": "Deterministic-only evaluation. hard_valid=False. 1 concern(s) recorded: [\"formula_parse_error:zscore() first arg must be a whitelisted primitive name, got BinOp(left=BinOp(left=Name(id='obi_1', ctx=Load()), op=Add(), right=Name(id='obi_ex_bbo', ctx=Load())), op=Sub(), right=BinOp(left=Constant(value=2), op=Mult(), right=Name(id='ask_depth_concentration', ctx=Load())))\"]"
+}

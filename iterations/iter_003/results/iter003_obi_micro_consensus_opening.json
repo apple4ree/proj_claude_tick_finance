@@ -1,0 +1,85 @@
+{
+  "agent_name": "backtest-runner",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T08:35:37.029690",
+  "iteration_idx": 3,
+  "spec_id": "iter003_obi_micro_consensus_opening",
+  "per_symbol": [
+    {
+      "symbol": "005930",
+      "date": "20260317",
+      "n_ticks": 105487,
+      "n_trades": 95,
+      "n_wins": 82,
+      "n_losses": 13,
+      "wr": 0.8631578947368421,
+      "sum_win_bps": 399.14158342433143,
+      "sum_loss_bps": 58.4321382857062,
+      "expectancy_bps": 3.586415211985529
+    },
+    {
+      "symbol": "005930",
+      "date": "20260323",
+      "n_ticks": 105278,
+      "n_trades": 105,
+      "n_wins": 101,
+      "n_losses": 4,
+      "wr": 0.9619047619047619,
+      "sum_win_bps": 566.6893116571208,
+      "sum_loss_bps": 21.030652963710626,
+      "expectancy_bps": 5.196749130413431
+    },
+    {
+      "symbol": "005930",
+      "date": "20260326",
+      "n_ticks": 107777,
+      "n_trades": 83,
+      "n_wins": 78,
+      "n_losses": 5,
+      "wr": 0.9397590361445783,
+      "sum_win_bps": 406.24447284281956,
+      "sum_loss_bps": 18.929381223126164,
+      "expectancy_bps": 4.666446886984258
+    },
+    {
+      "symbol": "000660",
+      "date": "20260317",
+      "n_ticks": 97436,
+      "n_trades": 126,
+      "n_wins": 120,
+      "n_losses": 6,
+      "wr": 0.9523809523809523,
+      "sum_win_bps": 1087.4857096111957,
+      "sum_loss_bps": 44.77383265660156,
+      "expectancy_bps": 8.275491086941223
+    },
+    {
+      "symbol": "000660",
+      "date": "20260323",
+      "n_ticks": 102012,
+      "n_trades": 39,
+      "n_wins": 34,
+      "n_losses": 5,
+      "wr": 0.8717948717948718,
+      "sum_win_bps": 352.948467539881,
+      "sum_loss_bps": 62.71268862359368,
+      "expectancy_bps": 7.441943049135572
+    },
+    {
+      "symbol": "000660",
+      "date": "20260326",
+      "n_ticks": 106148,
+      "n_trades": 114,
+      "n_wins": 104,
+      "n_losses": 10,
+      "wr": 0.9122807017543859,
+      "sum_win_bps": 959.678481659474,
+      "sum_loss_bps": 62.32197509834334,
+      "expectancy_bps": 7.871548303167812
+    }
+  ],
+  "aggregate_n_trades": 562,
+  "aggregate_wr": 0.9234875444839857,
+  "aggregate_expectancy_bps": 6.23485294997107,
+  "trace_path": "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_003/traces/iter003_obi_micro_consensus_opening.trace.json"
+}

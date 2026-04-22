@@ -2,6 +2,7 @@
   "enabledPlugins": {
     "ouroboros@ouroboros": true,
     "superpowers@claude-plugins-official": true,
-    "data-processing@ai-research-skills": true
+    "data-processing@ai-research-skills": true,
+    "research-diary-plugin@skill_lab_diary": true
   }
 }

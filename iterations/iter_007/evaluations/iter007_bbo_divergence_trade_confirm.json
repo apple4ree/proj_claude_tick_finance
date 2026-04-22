@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-22T15:00:03.141592Z",
+  "iteration_idx": 7,
+  "spec_id": "iter007_bbo_divergence_trade_confirm",
+  "valid": false,
+  "concerns": [
+    "The spec is an exact duplicate of a previously backtested spec, iter017_bbo_divergence_trade_confirm."
+  ],
+  "duplicate_of": "iter017_bbo_divergence_trade_confirm",
+  "expected_merit": "high",
+  "reasoning": "The spec passes all mechanical checks: primitives are whitelisted, the formula is well-formed, and there is no lookahead. The hypothesis is theoretically sound, combining book divergence with trade flow confirmation, and cites relevant literature. However, a search of the prior iterations index reveals this exact spec was already run. The spec iter017_bbo_divergence_trade_confirm has an identical formula, primitives list, threshold (1.2), direction (long_if_pos), and prediction horizon (5 ticks). Therefore, this submission is marked as invalid to prevent re-running an identical experiment."
+}

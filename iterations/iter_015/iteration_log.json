@@ -1,0 +1,40 @@
+{
+  "iteration_idx": 15,
+  "started_at": "2026-04-22T02:09:41.264590",
+  "finished_at": "2026-04-22T02:15:27.426149",
+  "signal_specs": [
+    "iter015_wall_break_closing_filter",
+    "iter015_book_divergence_spread_filter",
+    "iter015_trade_flow_exhaustion_short",
+    "iter015_deep_book_vs_tradeflow_divergence"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_015/evaluations/iter015_wall_break_closing_filter.json",
+    "iterations/iter_015/evaluations/iter015_book_divergence_spread_filter.json",
+    "iterations/iter_015/evaluations/iter015_trade_flow_exhaustion_short.json",
+    "iterations/iter_015/evaluations/iter015_deep_book_vs_tradeflow_divergence.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_015/code/iter015_trade_flow_exhaustion_short.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_015/code/iter015_deep_book_vs_tradeflow_divergence.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_015/fidelity/iter015_trade_flow_exhaustion_short.json",
+    "iterations/iter_015/fidelity/iter015_deep_book_vs_tradeflow_divergence.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_015/results/iter015_trade_flow_exhaustion_short.json",
+    "iterations/iter_015/results/iter015_deep_book_vs_tradeflow_divergence.json"
+  ],
+  "feedback": [
+    "iterations/iter_015/feedback/iter015_trade_flow_exhaustion_short.json",
+    "iterations/iter_015/feedback/iter015_deep_book_vs_tradeflow_divergence.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_015/improvements/iter015_trade_flow_exhaustion_short.json",
+    "iterations/iter_015/improvements/iter015_deep_book_vs_tradeflow_divergence.json",
+    "iterations/iter_015/improvements/iter015_deep_book_vs_tradeflow_divergence_v1.json",
+    "iterations/iter_015/improvements/iter015_deep_book_vs_tradeflow_divergence_v2.json"
+  ],
+  "stop_reason": null
+}

@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:58:34.987654Z",
+  "iteration_idx": 13,
+  "spec_id": "iter013_mega_consensus_loosened",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "1-6. All hard-fail checks passed. Primitives are whitelisted, the spec ID and iteration index are correct, there is no lookahead, and measured fields are null. 7. No duplicate was found in the prior iterations index. The formula is a novel combination of thresholds compared to previous attempts. 8. The hypothesis is well-formed, directly addressing the zero-trade failure of its parent `iter012_mega_consensus` by loosening internal thresholds. It combines multiple primitives with demonstrated high performance. 9. Expected merit is 'high' due to the strong theoretical motivation, combination of multiple powerful signals, and direct, evidence-based response to prior feedback. The spec is valid for backtesting."
+}

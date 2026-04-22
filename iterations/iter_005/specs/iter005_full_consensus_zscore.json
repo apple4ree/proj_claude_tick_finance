@@ -1,0 +1,29 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-14T12:05:01Z",
+  "iteration_idx": 5,
+  "spec_id": "iter005_full_consensus_zscore",
+  "name": "Z-Scored Full Consensus",
+  "hypothesis": "The 'full consensus' formula from iter003 is powerful (WR 95.6%, Exp +7.01 bps). By standardizing this value with a z-score and triggering only on extreme readings (>2.5), we can isolate the highest-conviction signals, potentially increasing both win rate and expectancy beyond the previous peak.",
+  "formula": "zscore((obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration, 300)",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "ask_depth_concentration"
+  ],
+  "threshold": 2.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md"
+  ],
+  "parent_spec_id": "iter003_full_consensus_tight",
+  "mutation_note": "Based on feedback for iter004_full_consensus_high_vol and proposal from signal-improver. Replaced the static threshold of the parent formula with a dynamic z-score to implement the 'extreme_quantile' strategy.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

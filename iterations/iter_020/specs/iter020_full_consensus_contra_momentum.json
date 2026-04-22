@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-23T11:20:01.123456Z",
+  "iteration_idx": 20,
+  "spec_id": "iter020_full_consensus_contra_momentum",
+  "name": "Full Consensus Contra with Momentum Filter",
+  "hypothesis": "The powerful 'full consensus' formula, which combines BBO pressure, deep book pressure, and ask wall size, is a strong predictor of price drops. By adding a filter to only take trades when recent price momentum is also negative, we can screen out trades fighting a strong local uptrend, increasing win rate.",
+  "formula": "((obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration) > 1.5 AND rolling_momentum(mid_px, 50) < 0",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "ask_depth_concentration",
+    "mid_px"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/regime_primitives.md"
+  ],
+  "parent_spec_id": "iter004_full_consensus_high_vol",
+  "mutation_note": "Revisits the high-performing 'full consensus' spec family. Instead of a volatility filter, this version adds a momentum filter, requiring the signal to align with the recent price trend to avoid trading against strong short-term momentum.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

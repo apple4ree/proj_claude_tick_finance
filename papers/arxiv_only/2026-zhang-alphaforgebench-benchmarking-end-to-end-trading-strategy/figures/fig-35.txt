@@ -1,1 +1,0 @@
-Figure 35: Model performance ranking visualization. Bar heights represent aggregate performance scores computed across all

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T12:00:00Z",
+  "iteration_idx": 13,
+  "parent_spec_id": "iter013_mega_consensus_loosened",
+  "proposed_mutations": [
+    "drop primitive: remove zscore(trade_imbalance_signed, 300) component"
+  ],
+  "search_axes": [
+    "feature"
+  ],
+  "reasoning": "Parent spec (WR=68.4%) showed high performance inconsistency across sessions, indicating feature instability. Feedback recommended dropping a feature to isolate a more robust signal. This proposal removes the `trade_imbalance_signed` component, leaving the core book pressure formula, to test if this simplification improves cross-symbol consistency."
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-20T12:00:00Z",
+  "iteration_idx": 19,
+  "parent_spec_id": "iter019_ultra_consensus",
+  "proposed_mutations": [
+    "drop primitive: (obi_1 - obi_ex_bbo) > 1.5 AND zscore(trade_imbalance_signed, 300) > 1.0"
+  ],
+  "search_axes": [
+    "feature"
+  ],
+  "reasoning": "Parent spec generated 0 trades, making it untestable. Feedback notes the entry criteria are likely contradictory. Instead of merely loosening thresholds, this proposal takes a more direct approach by dropping one of the two conflicting consensus clauses. This directly addresses the 'contradictory logic' weakness and is more likely to generate trades than a simple threshold change."
+}

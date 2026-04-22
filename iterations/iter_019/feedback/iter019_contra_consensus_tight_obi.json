@@ -1,0 +1,22 @@
+{
+  "agent_name": "feedback-analyst",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:42:01.088649",
+  "iteration_idx": 19,
+  "spec_id": "iter019_contra_consensus_tight_obi",
+  "strengths": [
+    "The spec confirms an exceptionally strong contra-signal with an aggregate Win Rate of 93.2% over a large sample of 4,146 trades.",
+    "The signal is highly profitable, yielding a robust aggregate expectancy of +6.40 bps per trade.",
+    "The signal's predictive power is persistent, with the horizon curve showing a strong Win Rate of 89.5% even at 50 ticks."
+  ],
+  "weaknesses": [
+    "The tightening mutation from the parent spec (iter018_contra_consensus) failed to improve performance; the WR slightly decreased from 93.4% to 93.2% and expectancy remained flat, indicating diminishing returns from this specific threshold adjustment.",
+    "The signal's profitability is symbol-dependent, with the average expectancy for symbol 000660 (+8.86 bps) being over 75% higher than for 005930 (+5.04 bps).",
+    "The per-symbol average Win Rates vary by 3.5 percentage points (94.3% for 005930 vs. 90.8% for 000660), suggesting symbol-specific dynamics influence the signal's accuracy."
+  ],
+  "win_bucket_insight": "Winning trades (93.2%) correctly identify moments of multi-layered resistance where a dense ask wall at the BBO (ask_depth_concentration > 0.4) is supported by deep-book selling pressure (obi_ex_bbo > 0.4). This consensus of selling liquidity reliably predicts a downward price move within the 20-tick horizon.",
+  "loss_bucket_insight": "Losing trades (6.8%) likely represent 'absorption' events where a highly aggressive buying trend is powerful enough to break through both the BBO liquidity wall and the deeper sell-side imbalance. The signal misinterprets this momentary absorption as a reversal point, leading to a loss when the upward momentum resumes.",
+  "cross_symbol_consistency": "mixed",
+  "recommended_next_direction": "ensemble_vote",
+  "recommended_direction_reasoning": "The spec has an outstanding WR of 93.2% on 4,146 trades. However, the latest tightening step showed diminishing returns, suggesting the performance limit for this simple two-feature combination has been reached. To improve robustness and confirm conviction, the next logical step is to require a consensus from a third, independent signal, such as trade flow, before entering a trade."
+}

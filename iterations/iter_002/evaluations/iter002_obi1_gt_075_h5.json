@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T10:00:01.234567Z",
+  "iteration_idx": 2,
+  "spec_id": "iter002_obi1_gt_075_h5",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "medium",
+  "reasoning": "The spec passed all mechanical checks: spec_id format is correct, primitive 'obi_1' is whitelisted, no lookahead patterns were found, measured fields are null for a first run, and it is not a duplicate of any prior iteration. The hypothesis is well-formed and directly follows up on the parent spec 'iter001_obi1_gt_05_h5' as suggested by the 'tighten_threshold' feedback. Expected merit is 'medium' as it is a logical, incremental improvement rather than a novel combination."
+}

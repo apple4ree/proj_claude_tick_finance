@@ -1,1 +1,0 @@
-Fig. 1: TradingAgents Overall Framework Organization. I. ANALYSTS TEAM: Four analysts concurrently

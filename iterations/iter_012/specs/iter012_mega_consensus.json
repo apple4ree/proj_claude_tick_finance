@@ -1,0 +1,31 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:46:15.123456Z",
+  "iteration_idx": 12,
+  "spec_id": "iter012_mega_consensus",
+  "name": "Mega Consensus (Book Consensus + Tradeflow Exhaustion)",
+  "hypothesis": "This signal combines two elite, non-correlated signals as recommended by feedback. The first component is the book consensus signal from iter011_consensus_opening_gate. The second is the tradeflow exhaustion signal from iter011_tradeflow_plus_shape. Requiring both to be true should identify extremely high-conviction entries.",
+  "formula": "(((obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration) > 1.5 AND minute_of_session > 15) AND (zscore(trade_imbalance_signed, 300) > 2.0 AND ask_depth_concentration > 0.3)",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "ask_depth_concentration",
+    "minute_of_session",
+    "trade_imbalance_signed"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/cheat_sheets/regime_primitives.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": "iter011_consensus_opening_gate",
+  "mutation_note": "Following feedback to combine iter011_consensus_opening_gate (elite, WR=97.3%) with a non-correlated signal. This implements the specific `signal-improver` proposal, combining it with iter011_tradeflow_plus_shape (WR=88.2%) to create a 'best-of-both-worlds' ensemble. The direction is long_if_pos because the parent spec is directional and the exhaustion signal is contra-directional; combining them via AND is complex. Testing `long_if_pos` based on the dominant parent.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

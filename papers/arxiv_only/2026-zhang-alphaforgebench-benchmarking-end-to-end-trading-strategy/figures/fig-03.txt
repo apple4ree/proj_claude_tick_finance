@@ -1,1 +1,0 @@
-Figure 3: Sharpe Ratio by difficulty level on LLM-augmented

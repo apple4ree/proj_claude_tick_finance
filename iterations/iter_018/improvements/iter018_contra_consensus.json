@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-15T12:00:00Z",
+  "iteration_idx": 18,
+  "parent_spec_id": "iter018_contra_consensus",
+  "proposed_mutations": [
+    "tighten ask_depth_concentration threshold 0.4 -> 0.5"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent spec (WR=93.4%, n=4298) is a strong candidate for refinement. Feedback recommended tightening thresholds to isolate a higher-conviction subset. This proposal tightens the first primitive, `ask_depth_concentration`, from 0.4 to 0.5, as an atomic test of this hypothesis."
+}

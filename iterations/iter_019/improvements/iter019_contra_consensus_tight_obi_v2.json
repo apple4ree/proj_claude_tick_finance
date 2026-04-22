@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-20T12:00:00Z",
+  "iteration_idx": 19,
+  "parent_spec_id": "iter019_contra_consensus_tight_obi",
+  "proposed_mutations": [
+    "timevarying: ask_depth_concentration > 1.5 * rolling_std(ask_depth_concentration, 300) AND obi_ex_bbo > 1.5 * rolling_std(obi_ex_bbo, 300)"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent spec is strong but may be overfit to a specific volatility regime with its static thresholds (0.4). Feedback noted diminishing returns from simple tightening. This proposal replaces the static thresholds with adaptive, time-varying ones based on rolling standard deviation, aiming to improve robustness across different market conditions."
+}

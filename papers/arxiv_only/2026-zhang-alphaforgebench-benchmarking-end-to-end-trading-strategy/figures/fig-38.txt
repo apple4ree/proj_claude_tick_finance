@@ -1,1 +1,0 @@
-Figure 38: Robustness analysis showing performance stability across multiple runs.

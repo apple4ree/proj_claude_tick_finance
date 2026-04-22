@@ -1,0 +1,48 @@
+{
+  "iteration_idx": 10,
+  "started_at": "2026-04-22T01:29:50.604479",
+  "finished_at": "2026-04-22T01:37:17.531687",
+  "signal_specs": [
+    "iter010_ask_conc_extreme_push",
+    "iter010_absorption_spread_filter",
+    "iter010_consensus_plus_bid_shape",
+    "iter010_tradeflow_exhaustion_into_wall"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_010/evaluations/iter010_ask_conc_extreme_push.json",
+    "iterations/iter_010/evaluations/iter010_absorption_spread_filter.json",
+    "iterations/iter_010/evaluations/iter010_consensus_plus_bid_shape.json",
+    "iterations/iter_010/evaluations/iter010_tradeflow_exhaustion_into_wall.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_010/code/iter010_ask_conc_extreme_push.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_010/code/iter010_absorption_spread_filter.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_010/code/iter010_consensus_plus_bid_shape.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_010/code/iter010_tradeflow_exhaustion_into_wall.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_010/fidelity/iter010_ask_conc_extreme_push.json",
+    "iterations/iter_010/fidelity/iter010_absorption_spread_filter.json",
+    "iterations/iter_010/fidelity/iter010_consensus_plus_bid_shape.json",
+    "iterations/iter_010/fidelity/iter010_tradeflow_exhaustion_into_wall.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_010/results/iter010_ask_conc_extreme_push.json",
+    "iterations/iter_010/results/iter010_absorption_spread_filter.json",
+    "iterations/iter_010/results/iter010_consensus_plus_bid_shape.json",
+    "iterations/iter_010/results/iter010_tradeflow_exhaustion_into_wall.json"
+  ],
+  "feedback": [
+    "iterations/iter_010/feedback/iter010_ask_conc_extreme_push.json",
+    "iterations/iter_010/feedback/iter010_absorption_spread_filter.json",
+    "iterations/iter_010/feedback/iter010_consensus_plus_bid_shape.json",
+    "iterations/iter_010/feedback/iter010_tradeflow_exhaustion_into_wall.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_010/improvements/iter010_ask_conc_extreme_push.json",
+    "iterations/iter_010/improvements/iter010_ask_conc_extreme_push_v1.json",
+    "iterations/iter_010/improvements/iter010_consensus_plus_bid_shape.json",
+    "iterations/iter_010/improvements/iter010_consensus_plus_bid_shape_v1.json"
+  ],
+  "stop_reason": null
+}

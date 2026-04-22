@@ -1,1 +1,0 @@
-Figure 27: Heatmap of Sharpe Ratio across models and difficulty levels on the Stage 2 benchmark. Darker colors indicate

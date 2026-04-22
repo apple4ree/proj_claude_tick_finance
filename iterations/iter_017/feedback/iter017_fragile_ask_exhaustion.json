@@ -1,0 +1,21 @@
+{
+  "agent_name": "feedback-analyst",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:30:18.406870",
+  "iteration_idx": 17,
+  "spec_id": "iter017_fragile_ask_exhaustion",
+  "strengths": [
+    "The added filter improved aggregate performance over its parent (`iter016_trade_flow_exhaustion_tight`), increasing the Win Rate from 59.6% to 67.0% and expectancy from +1.52 bps to +3.07 bps.",
+    "The signal demonstrates a candidate edge with a 67.0% Win Rate over 115 trades, which is statistically more meaningful than a sample under 100 trades."
+  ],
+  "weaknesses": [
+    "The addition of the `ask_depth_concentration` filter introduced significant performance instability across sessions. For symbol 000660, the Win Rate swung from a perfect 1.0 (on only 3 trades) on one day to 0.625 on another, indicating the filter's effect is highly context-dependent and unreliable.",
+    "The filter drastically reduced the number of trading opportunities from 1,649 in the parent spec to just 115, a 93% reduction, suggesting the conditions for the signal are too restrictive.",
+    "Signal frequency is erratic, varying from just 3 trades on one day to 47 on another, making it difficult to rely on for consistent signal generation."
+  ],
+  "win_bucket_insight": "Winning trades (67.0%) correctly identify moments where an extreme buyer-initiated flow (z-score > 3.0) coincides with a shallow ask book (concentration > 0.3), leading to an absorption and subsequent price reversal as the buying pressure fails to break through the concentrated top-level resistance.",
+  "loss_bucket_insight": "Losing trades (33.0%) occur when the concentrated ask liquidity is actually a precursor to a larger hidden sell order or is 'spoofed' and pulled. In these cases, the aggressive buying breaks through the fragile BBO and initiates a strong upward momentum trend, stopping out the contra-signal.",
+  "cross_symbol_consistency": "inconsistent",
+  "recommended_next_direction": "drop_feature",
+  "recommended_direction_reasoning": "The added feature, `ask_depth_concentration`, introduced extreme performance instability across sessions, with Win Rates for symbol 000660 varying from 1.0 down to 0.625. While the aggregate WR improved, the 93% reduction in trade count and erratic signal frequency suggest the filter is not robust. The feature should be dropped to restore the parent spec's trade volume and stability."
+}

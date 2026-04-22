@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:00:00Z",
+  "iteration_idx": 17,
+  "parent_spec_id": "iter017_deep_book_absorption_extreme",
+  "proposed_mutations": [
+    "drop feature: zscore(trade_imbalance_signed, 300); new formula = obi_ex_bbo > 0.5"
+  ],
+  "search_axes": [
+    "feature"
+  ],
+  "reasoning": "Parent spec (WR=64.4%) is highly inconsistent across symbols, indicating one feature adds noise. Following the `drop_feature` recommendation, we remove the `zscore(trade_imbalance_signed)` primitive to test if `obi_ex_bbo` provides a more robust signal on its own."
+}

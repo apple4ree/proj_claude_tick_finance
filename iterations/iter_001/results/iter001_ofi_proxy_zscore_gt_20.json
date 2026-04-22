@@ -1,0 +1,85 @@
+{
+  "agent_name": "backtest-runner",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T08:24:42.416651",
+  "iteration_idx": 1,
+  "spec_id": "iter001_ofi_proxy_zscore_gt_20",
+  "per_symbol": [
+    {
+      "symbol": "005930",
+      "date": "20260317",
+      "n_ticks": 105487,
+      "n_trades": 0,
+      "n_wins": 0,
+      "n_losses": 0,
+      "wr": 0.5,
+      "sum_win_bps": 0.0,
+      "sum_loss_bps": 0.0,
+      "expectancy_bps": 0.0
+    },
+    {
+      "symbol": "005930",
+      "date": "20260323",
+      "n_ticks": 105278,
+      "n_trades": 29,
+      "n_wins": 21,
+      "n_losses": 8,
+      "wr": 0.7241379310344828,
+      "sum_win_bps": 115.71856991905848,
+      "sum_loss_bps": 39.53724772694959,
+      "expectancy_bps": 2.6269421445554793
+    },
+    {
+      "symbol": "005930",
+      "date": "20260326",
+      "n_ticks": 107777,
+      "n_trades": 46,
+      "n_wins": 31,
+      "n_losses": 15,
+      "wr": 0.6739130434782609,
+      "sum_win_bps": 155.25115884250218,
+      "sum_loss_bps": 65.16325673869126,
+      "expectancy_bps": 1.958432654430672
+    },
+    {
+      "symbol": "000660",
+      "date": "20260317",
+      "n_ticks": 97436,
+      "n_trades": 23,
+      "n_wins": 16,
+      "n_losses": 7,
+      "wr": 0.6956521739130435,
+      "sum_win_bps": 138.8965306445037,
+      "sum_loss_bps": 79.3948202833476,
+      "expectancy_bps": 2.5870308852676573
+    },
+    {
+      "symbol": "000660",
+      "date": "20260323",
+      "n_ticks": 102012,
+      "n_trades": 37,
+      "n_wins": 29,
+      "n_losses": 8,
+      "wr": 0.7837837837837838,
+      "sum_win_bps": 367.5783141108943,
+      "sum_loss_bps": 94.46292614485607,
+      "expectancy_bps": 7.381496972055088
+    },
+    {
+      "symbol": "000660",
+      "date": "20260326",
+      "n_ticks": 106148,
+      "n_trades": 20,
+      "n_wins": 15,
+      "n_losses": 5,
+      "wr": 0.75,
+      "sum_win_bps": 129.45815952340246,
+      "sum_loss_bps": 46.88318031269195,
+      "expectancy_bps": 4.128748960535526
+    }
+  ],
+  "aggregate_n_trades": 155,
+  "aggregate_wr": 0.7225806451612903,
+  "aggregate_expectancy_bps": 3.7513632376375794,
+  "trace_path": "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_001/traces/iter001_ofi_proxy_zscore_gt_20.trace.json"
+}

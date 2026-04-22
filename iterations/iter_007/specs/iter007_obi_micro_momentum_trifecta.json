@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T10:00:00Z",
+  "iteration_idx": 7,
+  "spec_id": "iter007_obi_micro_momentum_trifecta",
+  "name": "OBI, Microprice, and Momentum Consensus",
+  "hypothesis": "Requiring simultaneous confirmation from static imbalance (OBI), spread-weighted imbalance (microprice), and short-term price trend (momentum) will create an extremely high-conviction signal that is more robust than any single component.",
+  "formula": "obi_1 > 0.7 AND microprice_dev_bps > 1.0 AND rolling_momentum(mid_px, 50) > 0",
+  "primitives_used": [
+    "obi_1",
+    "microprice_dev_bps",
+    "mid_px"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 1,
+  "references": [
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/papers/stoikov_2018_microprice.md",
+    "_shared/references/cheat_sheets/regime_primitives.md"
+  ],
+  "parent_spec_id": "iter006_strong_obi_momentum_ensemble",
+  "mutation_note": "Implemented 'ensemble_vote' feedback by adding a third confirming signal (microprice_dev_bps > 1.0) to the parent's two-factor model to test for enhanced robustness and precision.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

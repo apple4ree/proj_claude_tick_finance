@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-20T17:00:00Z",
+  "iteration_idx": 12,
+  "spec_id": "iter012_deep_book_vs_bbo_reversal",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "1. All metadata and format checks passed. 2. Hypothesis is well-formed, describes a plausible mechanism, and aligns with the formula. 3. Primitives `obi_1` and `obi_ex_bbo` are whitelisted. 4. The formula `obi_1 - obi_ex_bbo` is a valid arithmetic combination. 5. The threshold of 1.0 is within the plausible range of the formula's output ([-2, 2]). 6. The `long_if_neg` direction correctly implements the contra-BBO hypothesis where a high positive value predicts a price drop. 7. The 20-tick horizon is reasonable. 8. A comprehensive duplicate check against the `prior_iterations_index.md` was performed; no prior spec matched the combination of formula, threshold, horizon, and direction. Notably, similar but distinct specs like `iter006_deep_book_vs_bbo_divergence` used a boolean `AND` formulation rather than the proposed continuous arithmetic difference. 9. Given the novel combination of primitives and strong theoretical motivation, the expected merit is rated high. The spec is valid for backtesting."
+}

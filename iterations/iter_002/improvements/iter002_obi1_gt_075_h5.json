@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-15T15:30:00.000001Z",
+  "iteration_idx": 2,
+  "parent_spec_id": "iter002_obi1_gt_075_h5",
+  "proposed_mutations": [
+    "horizon 5 -> 20 ticks"
+  ],
+  "search_axes": [
+    "horizon"
+  ],
+  "reasoning": "Parent spec had exceptional WR=95.0% over 17k trades at a 5-tick horizon. The feedback correctly recommends probing for signal decay. This proposal follows the `change_horizon` heuristic by extending the prediction horizon to the next step in the sequence (20 ticks) to assess the signal's persistence."
+}

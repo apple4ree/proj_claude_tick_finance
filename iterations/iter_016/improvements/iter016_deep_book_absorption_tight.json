@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:20:58.062824Z",
+  "iteration_idx": 16,
+  "parent_spec_id": "iter016_deep_book_absorption_tight",
+  "proposed_mutations": [
+    "tighten threshold in formula: obi_ex_bbo > 0.4 → obi_ex_bbo > 0.6"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Based on feedback to 'tighten_threshold'. Parent spec (WR=64.4%, n=343) showed improved performance upon tightening. This atomic mutation isolates the effect of requiring a stronger deep-book imbalance, testing the hypothesis that more extreme events are more predictive along this axis."
+}

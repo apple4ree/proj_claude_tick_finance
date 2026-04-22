@@ -1,0 +1,36 @@
+{
+  "iteration_idx": 6,
+  "started_at": "2026-04-22T03:59:51.847767",
+  "finished_at": "2026-04-22T04:04:02.663071",
+  "signal_specs": [
+    "iter006_ask_wall_contra",
+    "iter006_bbo_deep_book_consensus",
+    "iter006_trade_flow_obi_compound",
+    "iter006_deep_book_vs_bbo_divergence"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_006/evaluations/iter006_ask_wall_contra.json",
+    "iterations/iter_006/evaluations/iter006_bbo_deep_book_consensus.json",
+    "iterations/iter_006/evaluations/iter006_trade_flow_obi_compound.json",
+    "iterations/iter_006/evaluations/iter006_deep_book_vs_bbo_divergence.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_006/code/iter006_trade_flow_obi_compound.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_006/fidelity/iter006_trade_flow_obi_compound.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_006/results/iter006_trade_flow_obi_compound.json"
+  ],
+  "feedback": [
+    "iterations/iter_006/feedback/iter006_trade_flow_obi_compound.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_006/improvements/iter006_trade_flow_obi_compound.json",
+    "iterations/iter_006/improvements/iter006_trade_flow_obi_compound_v1.json",
+    "iterations/iter_006/improvements/iter006_trade_flow_obi_compound_v2.json",
+    "iterations/iter_006/improvements/iter006_trade_flow_obi_compound_v3.json"
+  ],
+  "stop_reason": null
+}

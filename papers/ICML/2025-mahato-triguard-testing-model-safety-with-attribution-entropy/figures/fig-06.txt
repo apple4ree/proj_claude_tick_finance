@@ -1,1 +1,0 @@
-Figure 6. Faithfulness evaluation via Deletion/Insertion curves for SimpleCNN (with vs. without entropy regularization). Regularized

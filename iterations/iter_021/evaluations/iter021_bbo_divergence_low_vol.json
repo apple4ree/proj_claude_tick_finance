@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-22T14:00:28.123456Z",
+  "iteration_idx": 21,
+  "spec_id": "iter021_bbo_divergence_low_vol",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passed all deterministic checks. The primitives `obi_1`, `obi_ex_bbo`, and `mid_px`, along with the helper `rolling_realized_vol`, are whitelisted. The formula is well-formed and contains no lookahead. The spec is a direct and logical mutation based on the parent spec `iter014_book_divergence_short_horizon`, which had a WR of 94.9% and explicit feedback to `add_regime_filter`. This spec implements that by adding a low-volatility filter, which is well-justified by the hypothesis. The spec is not a duplicate of any prior iteration. Due to the strong parent performance and well-motivated mutation, the expected merit is rated as 'high'."
+}

@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-16T12:05:01Z",
+  "iteration_idx": 2,
+  "spec_id": "iter002_ask_concentration_zscore_contra_h20",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passed all validity checks. 1. Metadata and format are correct. 2. No duplicate was found in the prior iterations index; the formula `zscore(ask_depth_concentration, 300)` is novel. 3. The primitive `ask_depth_concentration` and the helper function `zscore` are both on the whitelist. 4. The formula is well-formed and contains no lookahead. 5. The hypothesis is clear, testable, and cites a mechanism. 6. The `long_if_neg` direction is consistent with prior findings for this primitive, as noted in the `prior_iterations_index.md` smoke tests ('ask wall = resistance -> price drops'). 7. The use of a z-score is a logical evolution from its parent spec (`iter001_ask_concentration_contra_t04_h20`), which used a static threshold. The spec is well-referenced and theoretically motivated, thus meriting a 'high' expectation."
+}

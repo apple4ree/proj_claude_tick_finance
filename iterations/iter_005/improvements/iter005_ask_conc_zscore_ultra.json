@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T12:00:00Z",
+  "iteration_idx": 5,
+  "parent_spec_id": "iter005_ask_conc_zscore_ultra",
+  "proposed_mutations": [
+    "threshold 4.0 -> 5.0"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent spec achieved WR=91.8% and expectancy=+7.41 bps. Following feedback to perform a final extreme tightening, this proposal tests a 5.0 z-score threshold to find the peak of the conviction curve, as the signal has responded positively to all prior tightening steps."
+}

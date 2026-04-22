@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:22:37.972112",
+  "iteration_idx": 8,
+  "spec_id": "iter008_divergence_long_reversion",
+  "valid": false,
+  "concerns": [
+    "horizon_out_of_range:200"
+  ],
+  "duplicate_of": null,
+  "expected_merit": "low",
+  "reasoning": "Deterministic-only evaluation. hard_valid=False. 1 concern(s) recorded: ['horizon_out_of_range:200']"
+}

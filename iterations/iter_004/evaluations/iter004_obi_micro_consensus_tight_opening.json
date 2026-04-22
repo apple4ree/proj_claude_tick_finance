@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T08:38:29.571158",
+  "iteration_idx": 4,
+  "spec_id": "iter004_obi_micro_consensus_tight_opening",
+  "valid": false,
+  "concerns": [
+    "formula_parse_error:Disallowed AST node: IfExp"
+  ],
+  "duplicate_of": null,
+  "expected_merit": "low",
+  "reasoning": "Deterministic-only evaluation. hard_valid=False. 1 concern(s) recorded: ['formula_parse_error:Disallowed AST node: IfExp']"
+}

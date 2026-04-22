@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:05:01Z",
+  "iteration_idx": 5,
+  "spec_id": "iter005_obi_momentum_ensemble",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passes all validation checks. Primitives `obi_1` and `mid_px` are whitelisted, and the `rolling_momentum` helper is used correctly per `obi_family_formulas.md` and `regime_primitives.md`. There is no lookahead, and metadata fields are well-formed. The formula `obi_1 * (rolling_momentum(mid_px, 50) > 0) > 0.5` is a novel combination not present in the prior iterations index, hence it is not a duplicate. The hypothesis is theoretically sound, combining a known strong signal (OBI) with a sensible regime filter (momentum), and cites relevant references, justifying a 'high' expected merit."
+}

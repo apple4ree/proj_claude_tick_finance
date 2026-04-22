@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-15T10:05:01.123456Z",
+  "iteration_idx": 15,
+  "spec_id": "iter015_wall_break_closing_filter",
+  "name": "Ask Wall Contra Signal (Closing Session Filter)",
+  "hypothesis": "The high ask_depth_concentration signal, indicating a likely price drop, is particularly effective during the volatile closing session (last 40 mins) as participants adjust final positions, making large resting orders more meaningful and less likely to be ephemeral noise. This time filter should improve on the parent's already high WR by focusing on a specific, high-conviction regime.",
+  "formula": "(zscore(ask_depth_concentration, 300) * (rolling_realized_vol(mid_px, 100) < 30)) * (minute_of_session > 350)",
+  "primitives_used": [
+    "ask_depth_concentration",
+    "mid_px",
+    "minute_of_session"
+  ],
+  "threshold": 5.0,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 50,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/regime_primitives.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md"
+  ],
+  "parent_spec_id": "iter014_wall_break_filter",
+  "mutation_note": "Based on feedback to 'add_regime_filter' on a high-performing spec, this adds a time-of-day filter for the closing session (>350 mins) as suggested by the signal-improver's proposal to concentrate on a different market phase.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

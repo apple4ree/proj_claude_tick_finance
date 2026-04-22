@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-20T12:00:00Z",
+  "iteration_idx": 11,
+  "spec_id": "iter011_consensus_opening_gate",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passes all hard-fail checks. All primitives (`obi_1`, `obi_ex_bbo`, `ask_depth_concentration`, `minute_of_session`) are whitelisted, and the formula is well-formed without lookahead. Measured fields are null as required. It is not a duplicate; while it builds on the formula from `iter003_full_consensus_tight`, the addition of the `minute_of_session > 15` filter makes it novel. The spec directly addresses the 'add_regime_filter' feedback on its high-performing parent, citing a clear, evidence-based hypothesis from both `prior_iterations_index.md` (instability in opening session from `iter009_consensus_opening_burst`) and `regime_primitives.md` (which characterizes the opening 0-15 minutes as having maximum volatility). This represents a logical, well-referenced attempt to improve a top-tier signal, meriting a 'high' expected merit."
+}

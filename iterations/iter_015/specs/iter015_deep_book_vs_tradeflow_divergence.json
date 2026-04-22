@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-15T10:05:01.123456Z",
+  "iteration_idx": 15,
+  "spec_id": "iter015_deep_book_vs_tradeflow_divergence",
+  "name": "Deep Book vs Trade Flow Divergence",
+  "hypothesis": "A strong predictive signal emerges when the patient, deep-book liquidity and the immediate realized trade flow are in opposition. Specifically, if the deep book is bid-heavy (obi_ex_bbo > 0.3) suggesting underlying support, but recent trade flow has been strongly negative (zscore < -2.0), it may indicate a 'bear trap' or absorption event where sellers are exhausted into a wall of buyers. This divergence should precede a short-term price rebound.",
+  "formula": "obi_ex_bbo > 0.3 AND zscore(trade_imbalance_signed, 300) < -2.0",
+  "primitives_used": [
+    "obi_ex_bbo",
+    "trade_imbalance_signed"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": null,
+  "mutation_note": "New spec exploring the interaction between two orthogonal Block C primitives. Inspired by the success of 'bid wall absorption' signals from prior iterations (e.g., iter006_bid_wall_absorption_tight), but using the more stable deep-book imbalance (obi_ex_bbo) instead of the noisy BBO (obi_1).",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

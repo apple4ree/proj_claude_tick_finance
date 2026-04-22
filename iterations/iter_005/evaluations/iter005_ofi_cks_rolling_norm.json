@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:05:03.123456Z",
+  "iteration_idx": 5,
+  "spec_id": "iter005_ofi_cks_rolling_norm",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passes all deterministic checks: spec_id and iteration_idx are valid, it is a fresh submission, and all primitives ('ofi_cks_1') and helper functions ('rolling_mean', 'rolling_std') are whitelisted. The formula is well-formed, contains no lookahead, and represents a z-score like calculation, which is a sound method for normalizing a noisy series as recommended in 'ofi_family_formulas.md'. The hypothesis is clear and testable. The threshold of 1.0 is reasonable for a normalized signal. A duplicate check against the prior iterations index confirms this is a novel signal, as it uses 'ofi_cks_1' for the first time, distinguishing it from prior 'ofi_proxy' based attempts. Given the strong theoretical motivation from the CKS paper and the novel formulation, expected merit is high."
+}

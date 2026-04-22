@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-15T12:00:10Z",
+  "iteration_idx": 19,
+  "spec_id": "iter019_contra_consensus_tight_obi",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "1. Initial spec received for iter 19. 2. Spec ID and iteration index match. 3. Measured fields are correctly null. 4. Primitives ['ask_depth_concentration', 'obi_ex_bbo'] are whitelisted. 5. Formula is well-formed with no lookahead. 6. All checks passed: hypothesis is well-formed, references are valid, thresholds are sane. 7. Direction `long_if_neg` is consistent with the known contra-directional nature of both primitives, as noted in `prior_iterations_index.md`. 8. Duplicate check: Compared against `iter018_contra_consensus`. The formula differs ('obi_ex_bbo > 0.4' vs '... > 0.3'), so it is not a duplicate. 9. This is a logical, well-justified mutation of a high-performing parent spec, meriting a 'high' expected value."
+}

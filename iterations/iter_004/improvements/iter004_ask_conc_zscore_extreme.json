@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-14T12:00:00Z",
+  "iteration_idx": 4,
+  "parent_spec_id": "iter004_ask_conc_zscore_extreme",
+  "proposed_mutations": [
+    "threshold 3.5 -> 4.0"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent WR=90.9% with expectancy +6.92 bps is a top performer. The feedback recommended a final 'tighten_threshold' step to check for a 'golden' high-conviction subset. This atomic mutation increases the z-score threshold from 3.5 to 4.0 as a definitive test of this hypothesis."
+}

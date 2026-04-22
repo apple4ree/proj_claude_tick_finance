@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-21T12:00:00Z",
+  "iteration_idx": 21,
+  "parent_spec_id": "iter021_tradeflow_into_ask_wall",
+  "proposed_mutations": [
+    "drop primitive trade_imbalance_signed; new formula = ask_depth_concentration > 0.4"
+  ],
+  "search_axes": [
+    "feature"
+  ],
+  "reasoning": "Parent WR=68.2%, n=66. Feedback cited 'extreme performance inconsistency' and recommended dropping a feature. The `ask_depth_concentration` primitive has a stronger historical track record of stability than `trade_imbalance_signed`. This proposal drops the latter to test if a simpler signal based on the more robust primitive is more stable."
+}

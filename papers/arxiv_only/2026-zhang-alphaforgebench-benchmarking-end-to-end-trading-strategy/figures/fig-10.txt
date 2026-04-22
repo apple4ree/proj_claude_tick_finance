@@ -1,1 +1,0 @@
-Figure 10: Cross-run instability of deepseek-v3.2 under different decoding temperatures.

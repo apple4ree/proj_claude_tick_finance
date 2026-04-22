@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-21T12:00:00Z",
+  "iteration_idx": 21,
+  "parent_spec_id": "iter021_tighter_trade_flow_exhaustion",
+  "proposed_mutations": [
+    "tighten z-score threshold 3.5 -> 4.0"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent spec has WR=59.6% over 572 trades. Feedback recommended one final tightening to conclusively determine the performance ceiling for this lineage before considering other mutations. This proposal increases the z-score threshold from 3.5 to 4.0, a standard increment for exploring the extreme tail of the signal."
+}

@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T12:00:00Z",
+  "iteration_idx": 14,
+  "spec_id": "iter014_consensus_without_tradeflow",
+  "name": "Book Pressure Consensus (Simplified)",
+  "hypothesis": "The parent spec 'iter013_mega_consensus_loosened' was inconsistent, with feedback suggesting the trade flow component was unstable. This spec simplifies the formula by removing the 'zscore(trade_imbalance_signed)' component, relying solely on the powerful book pressure consensus signal `(obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration` which has performed exceptionally well in prior iterations (e.g., iter003_full_consensus_tight). This should yield a more robust and consistent signal.",
+  "formula": "(obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "ask_depth_concentration"
+  ],
+  "threshold": 1.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md"
+  ],
+  "parent_spec_id": "iter013_mega_consensus_loosened",
+  "mutation_note": "Following 'drop_feature' recommendation. Removed the 'zscore(trade_imbalance_signed)' component from the parent formula to isolate the successful book pressure consensus signal. Increased the threshold from 1.2 to 1.5 to match the original successful parent 'iter003_full_consensus_tight'.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

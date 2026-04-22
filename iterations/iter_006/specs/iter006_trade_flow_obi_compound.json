@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-14T12:00:00Z",
+  "iteration_idx": 6,
+  "spec_id": "iter006_trade_flow_obi_compound",
+  "name": "Trade Flow and OBI Compound Signal",
+  "hypothesis": "A powerful directional signal can be formed by combining the realized, signed trade flow (`trade_imbalance_signed`) with the instantaneous order book imbalance (`obi_1`). This captures both aggressive market-taking activity and the state of passive resting orders, providing a more complete picture of market pressure.",
+  "formula": "zscore(trade_imbalance_signed, 300) + 3 * obi_1",
+  "primitives_used": [
+    "trade_imbalance_signed",
+    "obi_1"
+  ],
+  "threshold": 2.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md",
+    "signal-generator/references/prior_iterations_index.md"
+  ],
+  "parent_spec_id": null,
+  "mutation_note": "New signal based on Block C smoke tests, creating a compound formula that mixes a trade-flow primitive with a classic book-state primitive for robustness.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

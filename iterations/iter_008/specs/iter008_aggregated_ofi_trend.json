@@ -1,0 +1,25 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T12:00:02Z",
+  "iteration_idx": 8,
+  "spec_id": "iter008_aggregated_ofi_trend",
+  "name": "Aggregated CKS Order Flow Trend",
+  "hypothesis": "Single-tick OFI is noisy, but its short-term trend, captured by a rolling mean, reveals the true direction of liquidity consumption. A positive rolling OFI indicates sustained buying pressure that should predict a near-term price increase.",
+  "formula": "zscore(rolling_mean(ofi_cks_1, 50), 300)",
+  "primitives_used": [
+    "ofi_cks_1"
+  ],
+  "threshold": 1.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 5,
+  "references": [
+    "_shared/references/papers/cont_kukanov_stoikov_2014_ofi.md",
+    "_shared/references/cheat_sheets/ofi_family_formulas.md"
+  ],
+  "parent_spec_id": "iter007_deep_book_pressure",
+  "mutation_note": "Per feedback `swap_feature` on the failed `obi_10` signal, pivoting to a new feature family. This spec explores the formal CKS OFI, aggregated over a 50-tick window to reduce noise and capture the underlying flow trend, as suggested by the CKS paper.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

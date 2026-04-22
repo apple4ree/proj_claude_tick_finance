@@ -1,0 +1,28 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:58:33.123456Z",
+  "iteration_idx": 13,
+  "spec_id": "iter013_ask_conc_low_vol_h50",
+  "name": "Ask Concentration Contra in Low Volatility (h=50)",
+  "hypothesis": "The parent spec showed a perfect win rate at h=20 in low-volatility regimes. This tests the persistence of that edge at a longer, 50-tick horizon to evaluate its decay curve and find the optimal holding period.",
+  "formula": "zscore(ask_depth_concentration, 300) * (rolling_realized_vol(mid_px, 100) < 30)",
+  "primitives_used": [
+    "ask_depth_concentration",
+    "mid_px"
+  ],
+  "threshold": 5.0,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 50,
+  "references": [
+    "signal-generator/references/prior_iterations_index.md",
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/regime_primitives.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md"
+  ],
+  "parent_spec_id": "iter012_ask_conc_low_vol",
+  "mutation_note": "Based on feedback for parent spec 'iter012_ask_conc_low_vol' (100% WR), changing horizon from 20 to 50 ticks to test edge decay.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

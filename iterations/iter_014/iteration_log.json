@@ -1,0 +1,44 @@
+{
+  "iteration_idx": 14,
+  "started_at": "2026-04-22T02:01:08.885007",
+  "finished_at": "2026-04-22T02:09:19.478962",
+  "signal_specs": [
+    "iter014_wall_break_filter",
+    "iter014_consensus_without_tradeflow",
+    "iter014_book_shape_reversal",
+    "iter014_book_divergence_short_horizon"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_014/evaluations/iter014_wall_break_filter.json",
+    "iterations/iter_014/evaluations/iter014_consensus_without_tradeflow.json",
+    "iterations/iter_014/evaluations/iter014_book_shape_reversal.json",
+    "iterations/iter_014/evaluations/iter014_book_divergence_short_horizon.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_014/code/iter014_wall_break_filter.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_014/code/iter014_book_shape_reversal.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_014/code/iter014_book_divergence_short_horizon.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_014/fidelity/iter014_wall_break_filter.json",
+    "iterations/iter_014/fidelity/iter014_book_shape_reversal.json",
+    "iterations/iter_014/fidelity/iter014_book_divergence_short_horizon.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_014/results/iter014_wall_break_filter.json",
+    "iterations/iter_014/results/iter014_book_shape_reversal.json",
+    "iterations/iter_014/results/iter014_book_divergence_short_horizon.json"
+  ],
+  "feedback": [
+    "iterations/iter_014/feedback/iter014_wall_break_filter.json",
+    "iterations/iter_014/feedback/iter014_book_shape_reversal.json",
+    "iterations/iter_014/feedback/iter014_book_divergence_short_horizon.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_014/improvements/iter014_wall_break_filter.json",
+    "iterations/iter_014/improvements/iter014_wall_break_filter_v1.json",
+    "iterations/iter_014/improvements/iter014_book_divergence_short_horizon.json",
+    "iterations/iter_014/improvements/iter014_book_divergence_short_horizon_v1.json"
+  ],
+  "stop_reason": null
+}

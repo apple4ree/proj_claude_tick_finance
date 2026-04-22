@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T04:03:38.261852",
+  "iteration_idx": 6,
+  "parent_spec_id": "iter006_trade_flow_obi_compound",
+  "proposed_mutations": [
+    "horizon 20 → 50 ticks"
+  ],
+  "search_axes": [
+    "horizon"
+  ],
+  "reasoning": "The parent spec is exceptionally strong at the 20-tick horizon. While the primary feedback was to tighten the threshold, exploring a different axis is valuable. Per the 'change_horizon' heuristic, this proposal tests a longer horizon (20 -> 50) to see if the powerful predictive edge persists over a greater time scale."
+}

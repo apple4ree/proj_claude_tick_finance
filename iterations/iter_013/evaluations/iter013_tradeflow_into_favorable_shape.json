@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:58:38.221094Z",
+  "iteration_idx": 13,
+  "spec_id": "iter013_tradeflow_into_favorable_shape",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passed all deterministic checks. The primitives used (trade_imbalance_signed, bid_depth_concentration, ask_depth_concentration) are all whitelisted as of Block C. The hypothesis is well-formed and provides a clear rationale for combining trade flow with book shape indicators. The formula is syntactically valid and does not contain lookahead bias. All measured fields are correctly null for a first submission. A duplicate check against the prior iterations index confirms this is a novel combination of primitives and conditions. The spec cites four relevant references and proposes a logical, synergistic combination of new primitives, aligning with the strategic goals outlined in the prior index, meriting a 'high' expected merit."
+}

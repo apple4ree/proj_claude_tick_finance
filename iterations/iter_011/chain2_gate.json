@@ -1,0 +1,69 @@
+{
+  "agent_name": "chain2-gate",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:44:22.969307",
+  "iteration_idx": 11,
+  "iterations_scanned": [
+    11
+  ],
+  "total_valid_specs": 3,
+  "scenarios": [
+    {
+      "fee_scenario": "krx_cash_23bps",
+      "fee_rt_bps": 23.0,
+      "top_candidates": [],
+      "excluded": {
+        "iter011_ask_conc_final_frontier": "gate_failed:G1_density:14.5<300.0",
+        "iter011_consensus_opening_gate": "gate_failed:G3_exp_post_fee:-16.186<=0",
+        "iter011_tradeflow_plus_shape": "gate_failed:G1_density:14.2<300.0"
+      }
+    },
+    {
+      "fee_scenario": "hypothetical_low_fee_5bps",
+      "fee_rt_bps": 5.0,
+      "top_candidates": [
+        {
+          "spec_id": "iter011_consensus_opening_gate",
+          "score": 0.27042081351598424,
+          "priority": "marginal",
+          "wr": 0.972972972972973,
+          "expectancy_bps": 6.814142571444106,
+          "expectancy_post_fee_bps": 1.8141425714441057,
+          "fee_absorption_ratio": 2.7256570285776425,
+          "trade_density_per_day_per_sym": 481.0,
+          "complexity_score": 5.0,
+          "has_regime_self_filter": false,
+          "dominates": [],
+          "dominated_by": null,
+          "factor_breakdown": {
+            "edge_w": 0.06349499000054369,
+            "density_w": 0.026925823515440525,
+            "filter_w": 0.0,
+            "simple_w": 0.03,
+            "multi_w": 0.15,
+            "raw_edge": 0.18141425714441056,
+            "raw_density": 0.1346291175772026,
+            "raw_filter": 0.0,
+            "raw_simple": 0.2,
+            "raw_multi": 1.0
+          },
+          "rationale_kr": "시나리오 `hypothetical_low_fee_5bps` 하에서 score **0.270** (marginal). 주요 기여 factor: **multi** (0.150) — multi-day 재현성 확보. WR 0.973, post-fee expectancy +1.814 bps.",
+          "expected_chain2_concerns": [
+            "post-fee edge 얇음 (+1.81 bps) — Chain 2 adverse selection 에 민감",
+            "complexity=5 — execution 튜닝 공간 복잡",
+            "regime filter 부재 — high-spread 구간에서 fee 손실 누적 가능"
+          ]
+        }
+      ],
+      "excluded": {
+        "iter011_ask_conc_final_frontier": "gate_failed:G1_density:14.5<300.0",
+        "iter011_tradeflow_plus_shape": "gate_failed:G1_density:14.2<300.0"
+      }
+    }
+  ],
+  "cross_scenario_consensus": [],
+  "warnings": [
+    "no candidates passed gates under krx_cash_23bps"
+  ],
+  "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 통과 후보 없음\n- **hypothetical_low_fee_5bps**: 최상위 `iter011_consensus_opening_gate` score=0.270 (priority=marginal, post-fee exp +1.81 bps)"
+}

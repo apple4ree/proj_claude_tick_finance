@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:35:45.123456Z",
+  "iteration_idx": 18,
+  "spec_id": "iter018_bbo_divergence_tight",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passed all validation checks. The primitives `obi_1`, `obi_ex_bbo`, and `trade_imbalance_signed`, along with the `zscore` helper, are all whitelisted. The formula is well-formed and contains no lookahead. The spec directly implements a `tighten_threshold` recommendation from its parent (`iter017_bbo_divergence_trade_confirm`), which had a strong WR of 88.3%. The hypothesis is theoretically sound, referencing the divergence between BBO and deeper book sentiment, confirmed by trade flow. A check against the prior iterations index confirmed this is a novel combination of parameters and not a duplicate. Due to the strong performance of the parent and the logical mutation, expected merit is high."
+}

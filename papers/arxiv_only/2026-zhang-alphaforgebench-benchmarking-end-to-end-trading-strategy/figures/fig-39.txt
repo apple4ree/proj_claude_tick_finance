@@ -1,1 +1,0 @@
-Figure 39: Cross-asset robustness analysis. Box plots show performance distribution across 7 different assets.

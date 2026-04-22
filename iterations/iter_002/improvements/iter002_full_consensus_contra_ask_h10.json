@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T10:00:00Z",
+  "iteration_idx": 2,
+  "parent_spec_id": "iter002_full_consensus_contra_ask_h10",
+  "proposed_mutations": [
+    "threshold 1.2 -> 1.5"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent spec is a top performer (WR=92.8%, Exp=+6.72bps, N=12722). As per feedback to confirm robustness, tightening the threshold by 25% (1.2 -> 1.5) will isolate a higher-conviction subset, testing if performance improves in the signal's tail."
+}

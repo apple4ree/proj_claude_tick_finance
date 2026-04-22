@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-14T12:00:00Z",
+  "iteration_idx": 14,
+  "parent_spec_id": "iter014_book_divergence_short_horizon",
+  "proposed_mutations": [
+    "add filter: AND rolling_realized_vol(mid_px, 100) > 40"
+  ],
+  "search_axes": [
+    "filter"
+  ],
+  "reasoning": "Parent WR=94.9% is extremely high over 3,033 trades. As per the 'add_regime_filter' recommendation, this mutation tests if the signal's short-term predictive power is amplified during high-volatility periods, where price moves are larger, potentially increasing the +5.81 bps expectancy."
+}

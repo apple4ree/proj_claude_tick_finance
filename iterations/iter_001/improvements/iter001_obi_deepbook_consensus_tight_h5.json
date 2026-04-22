@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-16T12:00:00Z",
+  "iteration_idx": 1,
+  "parent_spec_id": "iter001_obi_deepbook_consensus_tight_h5",
+  "proposed_mutations": [
+    "add filter: AND spread_bps < 10"
+  ],
+  "search_axes": [
+    "filter"
+  ],
+  "reasoning": "Parent iter001_obi_deepbook_consensus_tight_h5 has an outstanding WR of 95.0% and exp=+6.60bps over 5220 trades. The feedback suggested adding a filter to test robustness. This mutation adds a tight spread filter to determine if performance improves in lower-cost, high-liquidity conditions."
+}

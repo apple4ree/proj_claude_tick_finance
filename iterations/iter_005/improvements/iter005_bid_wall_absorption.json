@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T12:00:00Z",
+  "iteration_idx": 5,
+  "parent_spec_id": "iter005_bid_wall_absorption",
+  "proposed_mutations": [
+    "tighten component threshold: 'obi_1 > 0.7' -> 'obi_1 > 0.8'"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent spec (WR=83.7%, exp=+5.07 bps) confirmed a strong edge. Feedback recommended tightening one of its components. This proposal tightens the BBO imbalance filter (`obi_1`) to isolate higher-conviction absorption events."
+}

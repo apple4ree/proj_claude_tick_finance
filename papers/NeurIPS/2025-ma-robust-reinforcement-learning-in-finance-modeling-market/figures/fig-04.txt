@@ -1,1 +1,0 @@
-Figure 4: Robustness of RL agents to market impact under increasing trading volumes. The left three

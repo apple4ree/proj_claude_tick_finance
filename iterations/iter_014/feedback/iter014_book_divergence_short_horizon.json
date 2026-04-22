@@ -1,0 +1,21 @@
+{
+  "agent_name": "feedback-analyst",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:08:30.950886",
+  "iteration_idx": 14,
+  "spec_id": "iter014_book_divergence_short_horizon",
+  "strengths": [
+    "The spec demonstrates an exceptionally strong predictive edge, achieving an aggregate Win Rate of 94.9% with a positive expectancy of +5.81 bps over a large, statistically significant sample of 3,033 trades.",
+    "Changing the horizon from 20 ticks (in parent spec `iter013_book_divergence_inverted`) to 1 tick proved to be the critical insight, transforming a failing signal (WR 9.0%) into a highly successful one and validating the hypothesis that the effect is extremely short-lived.",
+    "Performance is highly consistent across the universe, with average per-symbol win rates for 005930 (94.5%) and 000660 (95.7%) differing by only 1.2 percentage points.",
+    "The horizon curve confirms the short-term nature of the signal, peaking at a 5-tick horizon (WR 94.9%, Exp. +6.35 bps) before gracefully decaying, which is characteristic of a genuine microstructural alpha."
+  ],
+  "weaknesses": [
+    "While the Win Rate is highly consistent, the profitability per trade is not. The average expectancy for symbol 000660 (+8.84 bps) is nearly double that of 005930 (+4.56 bps), suggesting symbol-specific differences in price impact for the same signal strength."
+  ],
+  "win_bucket_insight": "Winning trades are characterized by a sudden, large imbalance at the best-bid-offer (high positive `obi_1`) that is not supported by the deeper book (low or negative `obi_ex_bbo`). This divergence signals an aggressive buyer initiating a move that the rest of the order book has not yet reacted to, leading to a rapid price appreciation in the immediate next ticks.",
+  "loss_bucket_insight": "The rare losses (5.1% of trades) occur in what appear to be 'spoofing' or liquidity-testing scenarios. A large, transient order appears at the BBO, triggering the signal, but is withdrawn before it can be fully executed, causing the price to revert or move against the signal as the false pressure dissipates.",
+  "cross_symbol_consistency": "consistent",
+  "recommended_next_direction": "add_regime_filter",
+  "recommended_direction_reasoning": "The spec demonstrates an exceptionally strong and consistent edge with a 94.9% Win Rate over 3,033 trades. Since the signal is already in a high-conviction state, further tightening of the threshold offers diminishing returns. The next logical step is to add a regime filter, such as a volatility or spread filter, to isolate market conditions where this powerful but short-lived signal has the greatest price impact, potentially increasing the expectancy per trade."
+}

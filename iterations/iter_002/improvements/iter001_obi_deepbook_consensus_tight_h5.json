@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T10:00:00Z",
+  "iteration_idx": 2,
+  "parent_spec_id": "iter001_obi_deepbook_consensus_tight_h5",
+  "proposed_mutations": [
+    "add filter: AND |obi_5| > 0.3"
+  ],
+  "search_axes": [
+    "filter"
+  ],
+  "reasoning": "Based on feedback for child spec iter002_obi_deepbook_consensus_filtered_h5, the `spread_bps` filter was detrimental. This proposal reverts to its successful parent (WR=95.0%, Exp=+6.60bps) and applies an alternative filter (`|obi_5| > 0.3`) to find a more robust high-conviction subset."
+}

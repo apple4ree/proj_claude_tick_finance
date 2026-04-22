@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-22T15:00:00Z",
+  "iteration_idx": 7,
+  "spec_id": "iter007_trade_flow_exhaustion_into_wall",
+  "name": "Trade Flow Exhaustion into Ask Wall (Contra-Signal)",
+  "hypothesis": "An extreme spike in buyer-initiated trade flow (high positive z-score of trade_imbalance_signed) that runs directly into a thick wall of resting sellers (high ask_depth_concentration) is an absorption/exhaustion pattern. The buying pressure will likely fail, leading to a price reversal. Thus, a high positive signal value predicts a negative price move.",
+  "formula": "zscore(trade_imbalance_signed, 300) > 2.5 AND ask_depth_concentration > 0.4",
+  "primitives_used": [
+    "trade_imbalance_signed",
+    "ask_depth_concentration"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": null,
+  "mutation_note": "Novel combination based on preliminary findings that both high trade imbalance z-scores and high ask concentration can be contra-indicators. This spec tests the hypothesis that their confluence creates a strong reversal signal.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

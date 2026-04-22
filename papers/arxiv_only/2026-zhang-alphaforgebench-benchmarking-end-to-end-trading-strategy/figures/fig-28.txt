@@ -1,1 +1,0 @@
-Figure 28: Grouped bar chart of Sharpe Ratio across difficulty levels (L1, L2, L3) for six LLMs on the Stage 2 benchmark.

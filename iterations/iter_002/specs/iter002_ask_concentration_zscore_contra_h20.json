@@ -1,0 +1,25 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-16T12:05:01Z",
+  "iteration_idx": 2,
+  "spec_id": "iter002_ask_concentration_zscore_contra_h20",
+  "name": "Extreme Ask Concentration (Contra Z-Score)",
+  "hypothesis": "The predictive power of ask-side liquidity concentration is most pronounced in its statistical extremes. A very high concentration relative to its recent history (high z-score) signals strong resistance, leading to a price drop. Therefore, a very negative z-score should predict a price rise.",
+  "formula": "zscore(ask_depth_concentration, 300)",
+  "primitives_used": [
+    "ask_depth_concentration"
+  ],
+  "threshold": 2.5,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md"
+  ],
+  "parent_spec_id": "iter001_ask_concentration_contra_t04_h20",
+  "mutation_note": "Following feedback to test extreme quantiles, this spec replaces the static threshold of the parent with a dynamic z-score threshold (z > 2.5) to isolate the signal's tail. The contra-directional nature (`long_if_neg`) is preserved.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

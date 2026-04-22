@@ -1,0 +1,22 @@
+{
+  "agent_name": "feedback-analyst",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:04:39.605785",
+  "iteration_idx": 14,
+  "spec_id": "iter014_wall_break_filter",
+  "strengths": [
+    "The spec maintains an exceptionally high aggregate Win Rate of 96.3% and a strong expectancy of +9.83 bps over a statistically significant sample of 324 trades.",
+    "Performance is perfect (100% WR) across shorter horizons (1, 5, and 20 ticks in aggregate), indicating very high immediate predictive power.",
+    "The signal demonstrated flawless performance on symbol 005930, achieving a 100% Win Rate across all 86 trades in three separate sessions."
+  ],
+  "weaknesses": [
+    "The primary weakness is that the added trade flow filter had no effect; the spec produced identical results (WR=96.3%, N=324) to its parent, `iter013_ask_conc_low_vol_h50`, failing to eliminate the previously identified loss cases.",
+    "Performance remains mixed across symbols. While 005930 had a perfect 100% WR, the WR on 000660 sessions dropped as low as 92.8%, indicating the signal's edge is not uniform across the universe.",
+    "All 12 recorded losses were concentrated on a single symbol (000660), confirming that the spec's failure mode is symbol-specific and was not corrected by the trade flow filter."
+  ],
+  "win_bucket_insight": "Winning trades are concentrated in low-volatility regimes where a large ask wall creates predictable downward price pressure. The signal's perfect 100% WR on symbol 005930 suggests this dynamic is extremely reliable in certain stocks.",
+  "loss_bucket_insight": "Losses occurred exclusively on symbol 000660 during 'wall-breaking' events. The added trade imbalance filter failed to veto these trades, indicating the buying pressure that broke the ask wall was not strong enough to exceed the z-score threshold of 1.0, or it manifested in ways not captured by the Lee-Ready tick rule.",
+  "cross_symbol_consistency": "mixed",
+  "recommended_next_direction": "add_regime_filter",
+  "recommended_direction_reasoning": "The spec has an outstanding WR of 96.3% over 324 trades with a high threshold of 5.0, making further tightening ineffective. Since the attempt to filter out losses with trade flow failed, the next logical step is to add a different regime filter, such as time-of-day or spread_bps, to further concentrate entries in periods where the signal's edge is historically strongest and avoid known periods of instability."
+}

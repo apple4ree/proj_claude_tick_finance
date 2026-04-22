@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:36:11.451337Z",
+  "iteration_idx": 10,
+  "spec_id": "iter010_ask_conc_extreme_push",
+  "valid": true,
+  "concerns": [
+    "The z-score threshold of 7.5 is extremely high, which will likely result in a very low number of trades, potentially leading to statistically insignificant backtest results. This is noted in the spec's hypothesis ('rarer, signal')."
+  ],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passed all hard-fail validity checks, including whitelist validation for the 'ask_depth_concentration' primitive and 'zscore' helper. The spec is not a duplicate, as it incrementally tightens the threshold of a previously successful signal lineage (parent 'iter009_ask_conc_final_pinnacle' had threshold 6.0). The hypothesis is well-formed and directly references prior results, aiming to test the performance limits of the signal. The only concern is the extreme z-score threshold (7.5), which is expected to yield a low trade count but is the explicit goal of the test. Given the strong evidence from prior iterations and clear motivation, the spec has high expected merit."
+}

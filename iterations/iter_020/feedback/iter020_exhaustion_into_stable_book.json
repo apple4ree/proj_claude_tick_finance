@@ -1,0 +1,22 @@
+{
+  "agent_name": "feedback-analyst",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:48:38.863921",
+  "iteration_idx": 20,
+  "spec_id": "iter020_exhaustion_into_stable_book",
+  "strengths": [
+    "Establishes a candidate edge with a Win Rate of 59.9% over a statistically significant sample of 623 trades.",
+    "The signal is profitable, with a positive aggregate expectancy of +1.75 bps per trade, which improves upon its parent spec (iter018_exhaustion_pinnacle, +1.39 bps).",
+    "Demonstrates high potential in specific regimes, achieving a Win Rate as high as 74.4% and +5.69 bps expectancy on symbol 000660 for one session."
+  ],
+  "weaknesses": [
+    "The signal's performance is highly inconsistent across different trading sessions. Per-session Win Rates vary drastically from a low of 48.3% (a net loss) to a high of 74.4%, a spread of over 26 percentage points.",
+    "The added book shape filters (`bid_depth_concentration` and `ask_depth_concentration`) failed to create a consistently performing signal, suggesting the 'stable book' condition is not a reliable regime filter.",
+    "The reversal signal is not immediate; performance is weak at short horizons (WR=53.8% at 5 ticks) and only becomes profitable around the 20-tick mark."
+  ],
+  "win_bucket_insight": "Winning trades (59.9%) correctly identify exhaustion points. An aggressive buying spike (z-score > 3.0) is absorbed by a deep, stable order book (low concentration on both sides), leading to a failure of the upward move and a subsequent price reversion over the 50-tick horizon.",
+  "loss_bucket_insight": "Losing trades (40.1%) likely occur when the high trade imbalance is not an exhaustion event but the beginning of a strong upward trend. In these cases, the seemingly 'stable' book is quickly consumed by sustained buying pressure, and the signal incorrectly initiates a short position against the emerging momentum.",
+  "cross_symbol_consistency": "mixed",
+  "recommended_next_direction": "tighten_threshold",
+  "recommended_direction_reasoning": "The spec demonstrates a candidate edge with a WR of 59.9% and positive expectancy of +1.75 bps over 623 trades. Given the signal's inconsistency, the next logical step is to tighten the thresholds (e.g., on `trade_imbalance_signed` z-score) to confirm if a higher-conviction subset of events can produce a more reliable and profitable signal."
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T12:00:03Z",
+  "iteration_idx": 8,
+  "spec_id": "iter008_trifecta_plus_spread_filter",
+  "valid": true,
+  "concerns": [
+    "The spec's top-level `threshold: 0.5` is unused because the formula itself is a complete boolean expression with hardcoded thresholds (`>`, `<`). This is a non-fatal spec design issue."
+  ],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passes all deterministic checks: spec_id and iteration_idx are well-formed (iter008, #8). Measured fields are null as required for a new submission. Primitives used (`obi_1`, `mid_px`, `spread_bps`) and the `rolling_momentum` helper are all on the whitelist per `obi_family_formulas.md` and `regime_primitives.md`. No lookahead patterns were found. A check against `prior_iterations_index.md` confirms this formula is novel and not a duplicate. The hypothesis is well-formed and directly follows the `add_filter` feedback on its parent `iter007_obi_micro_momentum_trifecta`. Expected merit is rated 'high' as it is a theoretically sound modification (adding a liquidity filter) to a previously high-performing signal. One minor concern is noted regarding the redundant `threshold` field in a spec with a self-contained boolean formula, but this does not invalidate the logic."
+}

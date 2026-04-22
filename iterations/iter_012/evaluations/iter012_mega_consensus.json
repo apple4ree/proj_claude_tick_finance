@@ -1,0 +1,15 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:46:25.987654Z",
+  "iteration_idx": 12,
+  "spec_id": "iter012_mega_consensus",
+  "valid": true,
+  "concerns": [
+    "The formula combines two complex, restrictive signals with an AND operator. The second signal component (`iter011_tradeflow_plus_shape`) had only 85 trades. The intersection of both signals may result in a statistically insignificant number of trades.",
+    "The formula requires `ask_depth_concentration > 0.3` twice. The first instance is implicitly via `((obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration) > 1.5`. The second is explicit. This redundancy could be simplified, but is not a logical error."
+  ],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passed all hard-fail checks: primitives are whitelisted, no lookahead is present, spec ID and iteration index are correctly formatted, and measured fields are null. The spec is not a duplicate. The hypothesis is well-motivated, combining two previously successful but uncorrelated signals (`iter011_consensus_opening_gate` and `iter011_tradeflow_plus_shape`) as recommended by prior feedback. This novel combination of elite signals gives it high expected merit. Two minor concerns were noted: the potential for a very low trade count due to the restrictive AND logic, and a redundant condition on `ask_depth_concentration`. Neither concern is fatal, so the spec is deemed valid."
+}

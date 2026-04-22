@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-15T10:00:00Z",
+  "iteration_idx": 0,
+  "parent_spec_id": "iter000_ask_concentration_contra_h20",
+  "proposed_mutations": [
+    "threshold 0.3 → 0.45"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent shows a powerful edge (WR=88.9%, exp=+5.93 bps). Feedback recommends tightening the threshold to confirm robustness. This mutation increases the threshold by 50% (0.3 * 1.5), aiming to improve WR by selecting for more extreme ask-side liquidity concentrations."
+}

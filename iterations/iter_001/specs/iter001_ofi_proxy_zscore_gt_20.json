@@ -1,0 +1,25 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T08:30:00Z",
+  "iteration_idx": 1,
+  "spec_id": "iter001_ofi_proxy_zscore_gt_20",
+  "name": "Z-Scored OFI Proxy > 2.0",
+  "hypothesis": "The parent spec iter000_ofi_proxy_zscore_gt_15 showed a strong 71.2% win rate. By tightening the threshold from 1.5 to 2.0, we select for more extreme order flow imbalance events. This should isolate higher-conviction predictions and potentially yield a higher win rate, as suggested by the feedback (`tighten_threshold`).",
+  "formula": "zscore(ofi_proxy, 300)",
+  "primitives_used": [
+    "ofi_proxy"
+  ],
+  "threshold": 2.0,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 1,
+  "references": [
+    "_shared/references/cheat_sheets/ofi_family_formulas.md",
+    "_shared/references/papers/cont_kukanov_stoikov_2014_ofi.md"
+  ],
+  "parent_spec_id": "iter000_ofi_proxy_zscore_gt_15",
+  "mutation_note": "Based on feedback (`tighten_threshold`) for iter000_ofi_proxy_zscore_gt_15 (WR=71.2%), increasing threshold from 1.5 to 2.0 to test for improved win rate on a smaller set of more extreme signals.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:00:00Z",
+  "iteration_idx": 4,
+  "parent_spec_id": "iter004_obi1_gt_09_h20",
+  "proposed_mutations": [
+    "horizon 20 -> 100 ticks"
+  ],
+  "search_axes": [
+    "horizon"
+  ],
+  "reasoning": "Following the feedback to probe the signal's longer-term predictive capacity, this proposal jumps to a 100-tick horizon. Comparing the performance at 50 and 100 ticks will provide crucial data on how quickly the alpha from the OBI signal decays."
+}

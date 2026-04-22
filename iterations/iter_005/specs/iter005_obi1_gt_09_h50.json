@@ -1,0 +1,25 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T15:05:00Z",
+  "iteration_idx": 5,
+  "spec_id": "iter005_obi1_gt_09_h50",
+  "name": "Extreme OBI-1 Persistence (50-tick horizon)",
+  "hypothesis": "Extreme top-of-book imbalance (obi_1 > 0.9) has a powerful, persistent price impact. This spec tests if the signal's high predictive power, confirmed at a 20-tick horizon, extends to a 50-tick (approx. 5-second) horizon, mapping its decay profile as recommended by prior feedback.",
+  "formula": "obi_1",
+  "primitives_used": [
+    "obi_1"
+  ],
+  "threshold": 0.9,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 50,
+  "references": [
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "signal-generator/references/prior_iterations_index.md"
+  ],
+  "parent_spec_id": "iter004_obi1_gt_09_h20",
+  "mutation_note": "Following feedback to explore the signal's decay, extended prediction horizon from 20 to 50 ticks.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

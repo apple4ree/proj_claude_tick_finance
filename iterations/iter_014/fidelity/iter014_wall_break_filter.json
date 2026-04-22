@@ -1,0 +1,40 @@
+{
+  "agent_name": "fidelity-checker",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:01:59.796869",
+  "iteration_idx": 14,
+  "spec_id": "iter014_wall_break_filter",
+  "overall_passed": true,
+  "checks": [
+    {
+      "name": "1_formula_match",
+      "passed": true,
+      "detail": "canonical match: `(_HELPER_rolling_realized_vol_mid_px_100.update(mid_px(snap)) < 30) * _HELPER_zscore_ask_depth_concentration_300.update(ask_depth_concentration(snap)) * (_HELPER_zscore_trade_imbalance_signed_300.update(trade_imbalance_signed(snap, getattr(snap, 'prev', None))) < 1.0)`"
+    },
+    {
+      "name": "2_threshold_horizon",
+      "passed": true,
+      "detail": "THRESHOLD=5.0 HORIZON=50 DIRECTION='long_if_neg'"
+    },
+    {
+      "name": "3_signal_returns_scalar",
+      "passed": true,
+      "detail": "return expression node: BinOp"
+    },
+    {
+      "name": "4_execution_equal_1",
+      "passed": true,
+      "detail": "no banned execution identifiers"
+    },
+    {
+      "name": "5_no_lookahead",
+      "passed": true,
+      "detail": "no lookahead patterns found"
+    },
+    {
+      "name": "6_no_side_effects",
+      "passed": true,
+      "detail": "no banned imports/calls/mutations"
+    }
+  ]
+}

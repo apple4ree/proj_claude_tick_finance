@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T12:00:00Z",
+  "iteration_idx": 15,
+  "parent_spec_id": "iter015_deep_book_vs_tradeflow_divergence",
+  "proposed_mutations": [
+    "add filter: AND spread_bps < 10"
+  ],
+  "search_axes": [
+    "filter"
+  ],
+  "reasoning": "Parent has promising WR=62.9% but may benefit from higher quality execution environments. While feedback suggested tightening thresholds, adding a spread filter is a standard method for improving signal conviction and is a logical alternative exploration axis for this high-potential parent."
+}

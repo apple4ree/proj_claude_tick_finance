@@ -1,1 +1,0 @@
-Figure 48: deepseek-v3.2 performance across 9 difficulty levels.

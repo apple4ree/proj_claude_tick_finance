@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:42:00Z",
+  "iteration_idx": 11,
+  "spec_id": "iter011_tradeflow_plus_shape",
+  "name": "Trade Flow into Ask Wall (Contra)",
+  "hypothesis": "Strong buyer-initiated trade flow (high positive trade imbalance z-score) that runs into a densely packed ask book (high ask depth concentration) is likely to be absorbed, leading to a price reversal (down-move). This spec tests if the contra-directional interaction of these two Block C primitives creates a reliable short signal.",
+  "formula": "zscore(trade_imbalance_signed, 300) > 2.0 AND ask_depth_concentration > 0.3",
+  "primitives_used": [
+    "trade_imbalance_signed",
+    "ask_depth_concentration"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 20,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md",
+    "_shared/references/papers/bouchaud_mezard_potters_2002_book_shape.md"
+  ],
+  "parent_spec_id": "iter010_tradeflow_exhaustion_into_wall",
+  "mutation_note": "Responding to `drop_feature` feedback on an unstable spec. The parent had inconsistent results; this version simplifies the hypothesis by dropping the z-score on ask_concentration and using a simpler, fixed threshold. The direction is explicitly set to `long_if_neg` to test for a price reversal.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

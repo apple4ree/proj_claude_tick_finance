@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-21T12:00:00Z",
+  "iteration_idx": 10,
+  "parent_spec_id": "iter010_ask_conc_extreme_push",
+  "proposed_mutations": [
+    "threshold 7.5 -> 11.25"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Based on parent spec (WR=86.0%, n=172) and feedback 'tighten_threshold'. This proposal follows the feedback's suggestion for one 'final, even more extreme' push. By applying a large tightening (k=1.5), we aim to definitively confirm if performance has peaked and to understand the signal's behavior at its conviction limit."
+}

@@ -1,0 +1,15 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-14T12:00:00Z",
+  "iteration_idx": 4,
+  "parent_spec_id": "iter004_full_consensus_high_vol",
+  "proposed_mutations": [
+    "replace static threshold with dynamic: zscore((obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration, 300) > 2.5"
+  ],
+  "search_axes": [
+    "threshold",
+    "feature"
+  ],
+  "reasoning": "Parent WR=96.1% with expectancy +6.86 bps is exceptional. The feedback recommended 'extreme_quantile' to isolate the most powerful signal instances. This proposal replaces the static threshold with a dynamic z-score on the compound formula, testing if the p99+ tail offers an even stronger edge."
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-21T08:35:58.913058",
+  "iteration_idx": 3,
+  "spec_id": "iter003_deep_ofi_momentum_combo",
+  "valid": false,
+  "concerns": [
+    "declared_but_unused:['mid_px']"
+  ],
+  "duplicate_of": null,
+  "expected_merit": "low",
+  "reasoning": "Deterministic-only evaluation. hard_valid=False. 1 concern(s) recorded: [\"declared_but_unused:['mid_px']\"]"
+}

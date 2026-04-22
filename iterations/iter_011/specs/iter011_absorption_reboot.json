@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T01:42:00Z",
+  "iteration_idx": 11,
+  "spec_id": "iter011_absorption_reboot",
+  "name": "Bid Wall Absorption (Reboot)",
+  "hypothesis": "A strong bid-side imbalance (high obi_1) that absorbs significant seller-initiated trade flow (negative trade_imbalance_signed z-score) predicts an upward price move. The previous attempt failed by being too restrictive. This version removes the spread filter and slightly loosens the core signal thresholds to generate a viable number of trades.",
+  "formula": "obi_1 > 0.9 AND zscore(trade_imbalance_signed, 300) < -2.5",
+  "primitives_used": [
+    "obi_1",
+    "trade_imbalance_signed"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": "iter010_absorption_spread_filter",
+  "mutation_note": "Responding to feedback `loosen_threshold` on a spec with 0 trades. Removed the overly restrictive `spread_bps` filter and slightly relaxed the core thresholds (obi_1 > 0.95 -> 0.9, zscore < -3.0 -> -2.5) to generate a testable sample.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

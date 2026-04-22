@@ -1,0 +1,48 @@
+{
+  "iteration_idx": 4,
+  "started_at": "2026-04-21T10:12:45.128359",
+  "finished_at": "2026-04-21T10:19:56.020101",
+  "signal_specs": [
+    "iter004_full_consensus_high_vol",
+    "iter004_ask_conc_zscore_extreme",
+    "iter004_bbo_reversal_on_tradeflow",
+    "iter004_deep_book_reversal"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_004/evaluations/iter004_full_consensus_high_vol.json",
+    "iterations/iter_004/evaluations/iter004_ask_conc_zscore_extreme.json",
+    "iterations/iter_004/evaluations/iter004_bbo_reversal_on_tradeflow.json",
+    "iterations/iter_004/evaluations/iter004_deep_book_reversal.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_004/code/iter004_full_consensus_high_vol.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_004/code/iter004_ask_conc_zscore_extreme.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_004/code/iter004_bbo_reversal_on_tradeflow.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_004/code/iter004_deep_book_reversal.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_004/fidelity/iter004_full_consensus_high_vol.json",
+    "iterations/iter_004/fidelity/iter004_ask_conc_zscore_extreme.json",
+    "iterations/iter_004/fidelity/iter004_bbo_reversal_on_tradeflow.json",
+    "iterations/iter_004/fidelity/iter004_deep_book_reversal.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_004/results/iter004_full_consensus_high_vol.json",
+    "iterations/iter_004/results/iter004_ask_conc_zscore_extreme.json",
+    "iterations/iter_004/results/iter004_bbo_reversal_on_tradeflow.json",
+    "iterations/iter_004/results/iter004_deep_book_reversal.json"
+  ],
+  "feedback": [
+    "iterations/iter_004/feedback/iter004_full_consensus_high_vol.json",
+    "iterations/iter_004/feedback/iter004_ask_conc_zscore_extreme.json",
+    "iterations/iter_004/feedback/iter004_bbo_reversal_on_tradeflow.json",
+    "iterations/iter_004/feedback/iter004_deep_book_reversal.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_004/improvements/iter004_full_consensus_high_vol.json",
+    "iterations/iter_004/improvements/iter004_ask_conc_zscore_extreme.json",
+    "iterations/iter_004/improvements/iter004_bbo_reversal_on_tradeflow.json",
+    "iterations/iter_004/improvements/iter004_deep_book_reversal.json"
+  ],
+  "stop_reason": null
+}

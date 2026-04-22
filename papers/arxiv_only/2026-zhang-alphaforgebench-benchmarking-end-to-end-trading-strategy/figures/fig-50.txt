@@ -1,1 +1,0 @@
-Figure 50: grok-4.1-fast performance across 9 difficulty levels.

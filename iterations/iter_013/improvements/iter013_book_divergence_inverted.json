@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-16T12:00:00Z",
+  "iteration_idx": 13,
+  "parent_spec_id": "iter013_book_divergence_inverted",
+  "proposed_mutations": [
+    "horizon 20 -> 1 ticks"
+  ],
+  "search_axes": [
+    "horizon"
+  ],
+  "reasoning": "Parent spec conclusively failed at the 20-tick horizon (WR=9.0%). As per feedback, this is a final diagnostic test before retiring the feature family. By changing the horizon to the shortest possible timescale (1 tick), we test for any immediate, short-lived predictive power that decays rapidly."
+}

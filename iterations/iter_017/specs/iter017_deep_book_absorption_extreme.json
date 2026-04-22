@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:27:01.314159Z",
+  "iteration_idx": 17,
+  "spec_id": "iter017_deep_book_absorption_extreme",
+  "name": "Deep Book Absorption (Extreme Thresholds)",
+  "hypothesis": "A stronger deep-book bid imbalance (obi_ex_bbo > 0.5) combined with a more extreme seller-initiated trade flow (z-score < -3.0) will more reliably identify true absorption events, filtering out instances of 'spoofed' liquidity and improving the win rate.",
+  "formula": "obi_ex_bbo > 0.5 AND zscore(trade_imbalance_signed, 300) < -3.0",
+  "primitives_used": [
+    "obi_ex_bbo",
+    "trade_imbalance_signed"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md",
+    "_shared/references/papers/lee_ready_1991_tick_rule.md"
+  ],
+  "parent_spec_id": "iter016_deep_book_absorption_tight",
+  "mutation_note": "Based on feedback to 'tighten_threshold'. Tightened both conditions (obi_ex_bbo > 0.4 to 0.5; z-score < -2.5 to -3.0) to test if a more extreme divergence and flow combination is more predictive.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

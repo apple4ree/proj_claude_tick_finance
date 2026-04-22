@@ -1,0 +1,29 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-21T18:00:00Z",
+  "iteration_idx": 4,
+  "spec_id": "iter004_full_consensus_high_vol",
+  "name": "Full Consensus with High Volatility Filter",
+  "hypothesis": "The top-performing consensus signal (combining BBO, deep-book, and shape imbalance) is even more profitable during periods of high short-term volatility. The filter aims to isolate regimes where imbalances resolve into larger, more profitable price moves, boosting expectancy.",
+  "formula": "((obi_1 + obi_ex_bbo) - 2 * ask_depth_concentration) > 1.5 AND rolling_realized_vol(mid_px, 100) > 40",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo",
+    "ask_depth_concentration",
+    "mid_px"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_pos",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/cheat_sheets/regime_primitives.md"
+  ],
+  "parent_spec_id": "iter003_full_consensus_tight",
+  "mutation_note": "Based on feedback to 'add_regime_filter', this spec adds a volatility filter (rolling_realized_vol > 40) to the parent formula, attempting to increase expectancy per trade.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

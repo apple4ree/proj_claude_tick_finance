@@ -1,0 +1,27 @@
+{
+  "agent_name": "signal-generator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-14T12:00:00Z",
+  "iteration_idx": 6,
+  "spec_id": "iter006_deep_book_vs_bbo_divergence",
+  "name": "Deep Book vs BBO Divergence Reversal",
+  "hypothesis": "When the BBO shows strong buying pressure (`obi_1 > 0.7`) but the deeper book shows selling pressure (`obi_ex_bbo < -0.3`), the BBO is likely fragile and about to be overrun. This divergence signals a probable reversal, predicting a price decrease.",
+  "formula": "obi_1 > 0.7 AND obi_ex_bbo < -0.3",
+  "primitives_used": [
+    "obi_1",
+    "obi_ex_bbo"
+  ],
+  "threshold": 0.5,
+  "direction": "long_if_neg",
+  "prediction_horizon_ticks": 10,
+  "references": [
+    "_shared/references/cheat_sheets/microstructure_advanced.md",
+    "_shared/references/cheat_sheets/obi_family_formulas.md",
+    "_shared/references/papers/gould_bonart_2016_queue_imbalance.md"
+  ],
+  "parent_spec_id": null,
+  "mutation_note": "New exploratory signal based on the 'BBO stall' concept from microstructure theory, where disagreement between BBO and deeper liquidity predicts a reversal. This tests a contra-directional hypothesis.",
+  "measured_wr": null,
+  "measured_expectancy_bps": null,
+  "measured_n_trades": null
+}

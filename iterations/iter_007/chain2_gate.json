@@ -1,0 +1,30 @@
+{
+  "agent_name": "chain2-gate",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T04:06:20.474974",
+  "iteration_idx": 7,
+  "iterations_scanned": [
+    7
+  ],
+  "total_valid_specs": 0,
+  "scenarios": [
+    {
+      "fee_scenario": "krx_cash_23bps",
+      "fee_rt_bps": 23.0,
+      "top_candidates": [],
+      "excluded": {}
+    },
+    {
+      "fee_scenario": "hypothetical_low_fee_5bps",
+      "fee_rt_bps": 5.0,
+      "top_candidates": [],
+      "excluded": {}
+    }
+  ],
+  "cross_scenario_consensus": [],
+  "warnings": [
+    "no candidates passed gates under krx_cash_23bps",
+    "no candidates passed gates under hypothetical_low_fee_5bps"
+  ],
+  "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 통과 후보 없음\n- **hypothetical_low_fee_5bps**: 통과 후보 없음"
+}

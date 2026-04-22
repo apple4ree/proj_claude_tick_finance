@@ -1,0 +1,44 @@
+{
+  "iteration_idx": 5,
+  "started_at": "2026-04-21T10:20:22.126013",
+  "finished_at": "2026-04-21T10:26:05.061039",
+  "signal_specs": [
+    "iter005_full_consensus_zscore",
+    "iter005_ask_conc_zscore_ultra",
+    "iter005_bid_wall_absorption",
+    "iter005_full_consensus_bid_shape"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_005/evaluations/iter005_full_consensus_zscore.json",
+    "iterations/iter_005/evaluations/iter005_ask_conc_zscore_ultra.json",
+    "iterations/iter_005/evaluations/iter005_bid_wall_absorption.json",
+    "iterations/iter_005/evaluations/iter005_full_consensus_bid_shape.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_005/code/iter005_ask_conc_zscore_ultra.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_005/code/iter005_bid_wall_absorption.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_005/code/iter005_full_consensus_bid_shape.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_005/fidelity/iter005_ask_conc_zscore_ultra.json",
+    "iterations/iter_005/fidelity/iter005_bid_wall_absorption.json",
+    "iterations/iter_005/fidelity/iter005_full_consensus_bid_shape.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_005/results/iter005_ask_conc_zscore_ultra.json",
+    "iterations/iter_005/results/iter005_bid_wall_absorption.json",
+    "iterations/iter_005/results/iter005_full_consensus_bid_shape.json"
+  ],
+  "feedback": [
+    "iterations/iter_005/feedback/iter005_ask_conc_zscore_ultra.json",
+    "iterations/iter_005/feedback/iter005_bid_wall_absorption.json",
+    "iterations/iter_005/feedback/iter005_full_consensus_bid_shape.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_005/improvements/iter005_ask_conc_zscore_ultra.json",
+    "iterations/iter_005/improvements/iter005_bid_wall_absorption.json",
+    "iterations/iter_005/improvements/iter005_bid_wall_absorption_v1.json",
+    "iterations/iter_005/improvements/iter005_full_consensus_bid_shape.json"
+  ],
+  "stop_reason": null
+}

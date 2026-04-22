@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-15T10:00:00Z",
+  "iteration_idx": 0,
+  "parent_spec_id": "iter000_obi_deepbook_consensus_h5",
+  "proposed_mutations": [
+    "change formula: 'obi_ex_bbo > 0.2' to 'obi_ex_bbo > 0.3'"
+  ],
+  "search_axes": [
+    "threshold"
+  ],
+  "reasoning": "Parent has outstanding WR (93.1%) and expectancy (+6.33 bps). This is the second atomic mutation from the feedback, tightening only the deep-book imbalance component (obi_ex_bbo). This tests if higher-conviction signals from deeper in the book improve performance."
+}

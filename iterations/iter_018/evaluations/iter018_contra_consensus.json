@@ -1,0 +1,12 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2026-04-22T02:35:05.100000Z",
+  "iteration_idx": 18,
+  "spec_id": "iter018_contra_consensus",
+  "valid": true,
+  "concerns": [],
+  "duplicate_of": null,
+  "expected_merit": "high",
+  "reasoning": "The spec passed all hard-fail and soft-fail checks. Primitives 'ask_depth_concentration' and 'obi_ex_bbo' are whitelisted as per the 'Block C expansion' note in prior_iterations_index.md. The formula is well-formed, contains no lookahead, and is a novel combination not found in the prior iterations index, so it is not a duplicate. The hypothesis is well-articulated, proposing a consensus mechanism between two contra-directional signals, and is supported by three references. The chosen thresholds (0.4 and 0.3) are consistent with previously tested values for these primitives. Given the novel combination of high-performing primitives and strong theoretical backing, the expected merit is rated as 'high'."
+}

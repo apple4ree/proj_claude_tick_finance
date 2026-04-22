@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-20T12:00:00Z",
+  "iteration_idx": 9,
+  "parent_spec_id": "iter009_consensus_opening_burst",
+  "proposed_mutations": [
+    "drop primitive minute_of_session"
+  ],
+  "search_axes": [
+    "filter"
+  ],
+  "reasoning": "Parent WR=75.3%, Exp=+4.25bps, N=89. Feedback indicates the `minute_of_session < 15` filter was detrimental, causing extreme performance instability and degrading metrics versus its parent. This proposal follows the `drop_feature` recommendation to remove the unsuccessful time-based regime filter and restore the core signal logic."
+}

@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-evaluator",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-22T14:00:03.135000Z",
+  "iteration_idx": 21,
+  "spec_id": "iter021_contra_consensus_reversion",
+  "valid": false,
+  "concerns": [
+    "Spec is a duplicate of a previously executed spec 'iter019_contra_consensus_tight_obi'."
+  ],
+  "duplicate_of": "iter019_contra_consensus_tight_obi",
+  "expected_merit": "low",
+  "reasoning": "1. All initial mechanical checks (spec_id, metadata, hypothesis, primitives whitelist) passed without issue. 2. The core signal definition was checked against the provided `prior_iterations_index.md` for duplication. 3. The spec's formula (`ask_depth_concentration > 0.4 AND obi_ex_bbo > 0.4`), threshold (0.5), and horizon (20 ticks) are an exact match for the previously executed spec `iter019_contra_consensus_tight_obi`. 4. The direction `long_if_neg` is also consistent with the known contra-directional behavior of the primitives and the high performance of the prior spec. 5. Based on the exact match of all key parameters, the spec is flagged as a duplicate. Resubmitting an identical, previously successful spec without modification is not a valid new iteration. The spec is therefore marked as invalid."
+}

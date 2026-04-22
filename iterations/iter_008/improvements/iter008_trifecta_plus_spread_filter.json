@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-07-25T12:00:00Z",
+  "iteration_idx": 8,
+  "parent_spec_id": "iter008_trifecta_plus_spread_filter",
+  "proposed_mutations": [
+    "combine with iter008_obi1_gt_099_h50"
+  ],
+  "search_axes": [
+    "combine"
+  ],
+  "reasoning": "Parent WR=95.9% exp=+6.02bps n=1290. Feedback direction is `combine_with_other_spec`, citing the signal's maturity. This proposal combines two high-conviction, complementary signals from this iteration: a short-horizon (1-tick) complex signal with a long-horizon (50-tick) simple signal. The combination tests if their joint predictive power is super-additive."
+}

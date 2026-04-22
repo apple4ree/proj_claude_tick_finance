@@ -1,1 +1,0 @@
-Figure 9. STAR ensemble results in round 4, per single GGB benchmark questions. Double-inverted GGB questions were only presented

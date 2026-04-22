@@ -1,0 +1,14 @@
+{
+  "agent_name": "signal-improver",
+  "agent_version": "0.1.0",
+  "timestamp": "2024-05-15T15:30:00.000002Z",
+  "iteration_idx": 2,
+  "parent_spec_id": "iter002_obi1_and_microprice_consensus",
+  "proposed_mutations": [
+    "add filter: AND rolling_realized_vol(mid_px, 100) > 40"
+  ],
+  "search_axes": [
+    "filter"
+  ],
+  "reasoning": "Parent spec combining obi_1 and microprice_dev had a very strong WR of 94.4% over 4k+ trades. Feedback suggests adding a regime filter to concentrate entries in more profitable conditions. This proposal tests a high-volatility regime, where larger price moves are expected."
+}

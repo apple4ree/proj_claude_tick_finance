@@ -1,0 +1,40 @@
+{
+  "iteration_idx": 20,
+  "started_at": "2026-04-22T02:44:53.697621",
+  "finished_at": "2026-04-22T02:49:47.492026",
+  "signal_specs": [
+    "iter020_contra_consensus_trade_confirm",
+    "iter020_fragile_bbo_divergence",
+    "iter020_exhaustion_into_stable_book",
+    "iter020_full_consensus_contra_momentum"
+  ],
+  "spec_evaluations": [
+    "iterations/iter_020/evaluations/iter020_contra_consensus_trade_confirm.json",
+    "iterations/iter_020/evaluations/iter020_fragile_bbo_divergence.json",
+    "iterations/iter_020/evaluations/iter020_exhaustion_into_stable_book.json",
+    "iterations/iter_020/evaluations/iter020_full_consensus_contra_momentum.json"
+  ],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_020/code/iter020_contra_consensus_trade_confirm.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_020/code/iter020_exhaustion_into_stable_book.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_020/fidelity/iter020_contra_consensus_trade_confirm.json",
+    "iterations/iter_020/fidelity/iter020_exhaustion_into_stable_book.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_020/results/iter020_contra_consensus_trade_confirm.json",
+    "iterations/iter_020/results/iter020_exhaustion_into_stable_book.json"
+  ],
+  "feedback": [
+    "iterations/iter_020/feedback/iter020_contra_consensus_trade_confirm.json",
+    "iterations/iter_020/feedback/iter020_exhaustion_into_stable_book.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_020/improvements/iter020_contra_consensus_trade_confirm.json",
+    "iterations/iter_020/improvements/iter020_exhaustion_into_stable_book.json",
+    "iterations/iter_020/improvements/iter020_exhaustion_into_stable_book_v1.json",
+    "iterations/iter_020/improvements/iter020_exhaustion_into_stable_book_v2.json"
+  ],
+  "stop_reason": null
+}
