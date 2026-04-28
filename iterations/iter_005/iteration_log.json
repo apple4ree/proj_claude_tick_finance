@@ -1,44 +1,39 @@
 {
   "iteration_idx": 5,
-  "started_at": "2026-04-21T10:20:22.126013",
-  "finished_at": "2026-04-21T10:26:05.061039",
+  "started_at": "2026-04-28T04:56:14.036197",
+  "finished_at": "2026-04-28T05:16:54.212398",
   "signal_specs": [
-    "iter005_full_consensus_zscore",
-    "iter005_ask_conc_zscore_ultra",
-    "iter005_bid_wall_absorption",
-    "iter005_full_consensus_bid_shape"
+    "iter005_stabilized_trade_flow_reversal",
+    "iter005_extreme_ask_wall_reversion",
+    "iter005_long_horizon_ofi_trend",
+    "iter005_deep_book_microprice_velocity"
   ],
   "spec_evaluations": [
-    "iterations/iter_005/evaluations/iter005_full_consensus_zscore.json",
-    "iterations/iter_005/evaluations/iter005_ask_conc_zscore_ultra.json",
-    "iterations/iter_005/evaluations/iter005_bid_wall_absorption.json",
-    "iterations/iter_005/evaluations/iter005_full_consensus_bid_shape.json"
+    "iterations/iter_005/evaluations/iter005_stabilized_trade_flow_reversal.json",
+    "iterations/iter_005/evaluations/iter005_extreme_ask_wall_reversion.json",
+    "iterations/iter_005/evaluations/iter005_long_horizon_ofi_trend.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_005/code/iter005_ask_conc_zscore_ultra.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_005/code/iter005_bid_wall_absorption.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_005/code/iter005_full_consensus_bid_shape.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_005/code/iter005_extreme_ask_wall_reversion.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_005/code/iter005_long_horizon_ofi_trend.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_005/fidelity/iter005_ask_conc_zscore_ultra.json",
-    "iterations/iter_005/fidelity/iter005_bid_wall_absorption.json",
-    "iterations/iter_005/fidelity/iter005_full_consensus_bid_shape.json"
+    "iterations/iter_005/fidelity/iter005_extreme_ask_wall_reversion.json",
+    "iterations/iter_005/fidelity/iter005_long_horizon_ofi_trend.json"
   ],
   "backtest_results": [
-    "iterations/iter_005/results/iter005_ask_conc_zscore_ultra.json",
-    "iterations/iter_005/results/iter005_bid_wall_absorption.json",
-    "iterations/iter_005/results/iter005_full_consensus_bid_shape.json"
+    "iterations/iter_005/results/iter005_extreme_ask_wall_reversion.json",
+    "iterations/iter_005/results/iter005_long_horizon_ofi_trend.json"
   ],
   "feedback": [
-    "iterations/iter_005/feedback/iter005_ask_conc_zscore_ultra.json",
-    "iterations/iter_005/feedback/iter005_bid_wall_absorption.json",
-    "iterations/iter_005/feedback/iter005_full_consensus_bid_shape.json"
+    "iterations/iter_005/feedback/iter005_extreme_ask_wall_reversion.json",
+    "iterations/iter_005/feedback/iter005_long_horizon_ofi_trend.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_005/improvements/iter005_ask_conc_zscore_ultra.json",
-    "iterations/iter_005/improvements/iter005_bid_wall_absorption.json",
-    "iterations/iter_005/improvements/iter005_bid_wall_absorption_v1.json",
-    "iterations/iter_005/improvements/iter005_full_consensus_bid_shape.json"
+    "iterations/iter_005/improvements/iter005_extreme_ask_wall_reversion.json",
+    "iterations/iter_005/improvements/iter005_extreme_ask_wall_reversion_v1.json",
+    "iterations/iter_005/improvements/iter005_extreme_ask_wall_reversion_v2.json",
+    "iterations/iter_005/improvements/iter005_long_horizon_ofi_trend.json"
   ],
   "stop_reason": null
 }

@@ -56,8 +56,15 @@ UniverseSpec = _INPUT_MODULE.UniverseSpec
 _SPEC_ID_RE = re.compile(r"^iter\d{3}_[a-z0-9_]+$")
 
 
-def _build_user_message(gi: Any) -> str:
-    """Render the GenerateInput into the AGENTS.md user_prompt template."""
+def _build_user_message(gi: Any, fee_bps_rt: float = 0.0) -> str:
+    """Render the GenerateInput into the AGENTS.md user_prompt template.
+
+    fee_bps_rt : when > 0, an extra paragraph is injected reminding the LLM
+    that net_expectancy = expectancy_bps − fee_bps_rt must be > 0 for a spec
+    to be deployable. This shifts the hypothesis space toward magnitude
+    (longer horizons, p99+ selectivity, regime concentration) rather than
+    pure WR maximisation.
+    """
     prior_fb_block = "none (first iteration)"
     if gi.prior_feedback:
         prior_fb_block = json.dumps(
@@ -75,12 +82,26 @@ def _build_user_message(gi: Any) -> str:
 
     universe_block = json.dumps(gi.universe.model_dump(), indent=2)
 
+    fee_block = ""
+    if fee_bps_rt > 0:
+        fee_block = (
+            f"\nDeployment fee (round-trip): {fee_bps_rt:.1f} bps. "
+            f"For a spec to be deployable, expectancy_bps MUST exceed {fee_bps_rt:.1f} bps "
+            f"(net_expectancy = expectancy − fee > 0). Pure WR maximisation is insufficient: "
+            f"a spec with WR=0.96 but expectancy=9 bps is still capped post-fee. "
+            f"Hypothesise about MAGNITUDE per fill (longer horizons → larger |Δmid|; "
+            f"p99+ selectivity → bigger tail moves; regime concentration → "
+            f"high-volatility windows). Include the expected expectancy_bps in your hypothesis text "
+            f"so the post-hoc calibration check can score you.\n"
+        )
+
     return (
         f"Iteration index: {gi.iteration_idx}\n"
         f"Number of candidates requested: {gi.n_candidates}\n"
         f"Universe (symbols × dates the generated specs will run against):\n{universe_block}\n\n"
         f"Prior feedback (if any):\n{prior_fb_block}\n\n"
-        f"Prior improvement proposal (if any):\n{prior_improve_block}\n\n"
+        f"Prior improvement proposal (if any):\n{prior_improve_block}\n"
+        f"{fee_block}\n"
         f"Target: produce exactly {gi.n_candidates} SignalSpec candidates, all referencing at least one "
         f"file under _shared/references/. Remember: execution is fixed at 1; do NOT propose execution "
         f"logic. Use only whitelisted primitives."
@@ -128,6 +149,7 @@ def generate_signals(
     prior_improvement: Any | None = None,
     client: LLMClient | None = None,
     model_override: str | None = None,
+    fee_bps_rt: float = 0.0,
 ) -> list[SignalSpec]:
     """Top-level entry: build GenerateInput → LLM → normalized list[SignalSpec]."""
     client = client or LLMClient()
@@ -139,7 +161,7 @@ def generate_signals(
         prior_feedback=prior_feedback,
         prior_improvement=prior_improvement,
     )
-    user_msg = _build_user_message(gi)
+    user_msg = _build_user_message(gi, fee_bps_rt=fee_bps_rt)
 
     result: Any = client.call_agent(
         agent_name="signal-generator",

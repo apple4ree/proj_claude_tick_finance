@@ -1,7 +1,7 @@
 {
   "agent_name": "chain2-gate",
   "agent_version": "0.1.0",
-  "timestamp": "2026-04-22T01:29:28.349377",
+  "timestamp": "2026-04-28T07:07:37.832975",
   "iteration_idx": 9,
   "iterations_scanned": [
     9
@@ -13,9 +13,9 @@
       "fee_rt_bps": 23.0,
       "top_candidates": [],
       "excluded": {
-        "iter009_ask_conc_final_pinnacle": "gate_failed:G1_density:63.5<300.0",
-        "iter009_absorption_high_vol": "gate_failed:G1_density:9.5<300.0",
-        "iter009_consensus_opening_burst": "gate_failed:G1_density:14.8<300.0"
+        "iter009_confirmed_long_hold_pressure": "gate_failed:G1_density:268.3<300.0",
+        "iter009_sticky_microprice_relaxed": "gate_failed:G1_density:185.6<300.0",
+        "iter009_closing_momentum_burst": "gate_failed:G1_density:0.0<300.0"
       }
     },
     {
@@ -23,16 +23,19 @@
       "fee_rt_bps": 5.0,
       "top_candidates": [],
       "excluded": {
-        "iter009_ask_conc_final_pinnacle": "gate_failed:G1_density:63.5<300.0",
-        "iter009_absorption_high_vol": "gate_failed:G1_density:9.5<300.0",
-        "iter009_consensus_opening_burst": "gate_failed:G1_density:14.8<300.0"
+        "iter009_confirmed_long_hold_pressure": "gate_failed:G1_density:268.3<300.0",
+        "iter009_sticky_microprice_relaxed": "gate_failed:G1_density:185.6<300.0",
+        "iter009_closing_momentum_burst": "gate_failed:G1_density:0.0<300.0"
       }
     }
   ],
   "cross_scenario_consensus": [],
   "warnings": [
     "no candidates passed gates under krx_cash_23bps",
-    "no candidates passed gates under hypothetical_low_fee_5bps"
+    "no candidates passed gates under hypothetical_low_fee_5bps",
+    "no-positive-post-fee-under-krx_cash_23bps — all specs fail G3 under this scenario; ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)",
+    "no-positive-post-fee-under-hypothetical_low_fee_5bps — all specs fail G3 under this scenario; ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)",
+    "DSR-computable specs: 0/3 (others lack trace data; their priority capped at STRONG)"
   ],
   "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 통과 후보 없음\n- **hypothetical_low_fee_5bps**: 통과 후보 없음"
 }

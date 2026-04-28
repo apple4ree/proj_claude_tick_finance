@@ -144,8 +144,9 @@ def _deterministic_checks(spec: SignalSpec, iteration_idx: int) -> tuple[bool, l
             concerns.append(f"threshold_out_of_range:{spec.threshold} for bounded primitives")
             # Soft concern, not hard-fail (could be intentional z-score threshold)
 
-    # 5. Horizon range
-    if not (1 <= spec.prediction_horizon_ticks <= 100):
+    # 5. Horizon range (revised 2026-04-22: 100 → 1000 for extended sweeps;
+    #    Schema enforces 1 ≤ H ≤ 1000 via SignalSpec.prediction_horizon_ticks Field.)
+    if not (1 <= spec.prediction_horizon_ticks <= 1000):
         concerns.append(f"horizon_out_of_range:{spec.prediction_horizon_ticks}")
         hard_valid = False
 
@@ -288,6 +289,56 @@ def evaluate_signal(
     if not hard_valid:
         eval_data["valid"] = False
     # Ensure iteration_idx and spec_id match
+    eval_data["iteration_idx"] = iteration_idx
+    eval_data["spec_id"] = spec.spec_id
+    eval_data["agent_name"] = "signal-evaluator"
+    return SpecEvaluation(**eval_data)
+
+
+async def evaluate_signal_async(
+    spec: SignalSpec,
+    iteration_idx: int,
+    client: LLMClient | None = None,
+    model_override: str | None = None,
+    skip_llm: bool = False,
+) -> SpecEvaluation:
+    """Async version of evaluate_signal — same logic, uses call_agent_async."""
+    hard_valid, det_concerns = _deterministic_checks(spec, iteration_idx)
+
+    if skip_llm or not hard_valid:
+        merit = "unknown" if hard_valid else "low"
+        return SpecEvaluation(
+            agent_name="signal-evaluator",
+            iteration_idx=iteration_idx,
+            spec_id=spec.spec_id,
+            valid=hard_valid,
+            concerns=det_concerns,
+            duplicate_of=None,
+            expected_merit=merit,
+            reasoning=(
+                f"Deterministic-only evaluation. hard_valid={hard_valid}. "
+                f"{len(det_concerns)} concern(s) recorded: {det_concerns[:5]}"
+            ),
+        )
+
+    client = client or LLMClient()
+    user_msg = _build_user_message(spec, iteration_idx, det_concerns)
+    result: Any = await client.call_agent_async(
+        agent_name="signal-evaluator",
+        user_message=user_msg,
+        response_model=EvaluateOutput,
+        model_override=model_override,
+    )
+
+    eval_obj = result.evaluation
+    eval_data = eval_obj.model_dump()
+    merged_concerns = list(dict.fromkeys(det_concerns + eval_data.get("concerns", [])))
+    if not eval_data.get("valid", True) and not merged_concerns:
+        reasoning_brief = (eval_data.get("reasoning") or "LLM rejected without explicit concern")[:200]
+        merged_concerns = [f"llm_reject_without_concern: {reasoning_brief}"]
+    eval_data["concerns"] = merged_concerns
+    if not hard_valid:
+        eval_data["valid"] = False
     eval_data["iteration_idx"] = iteration_idx
     eval_data["spec_id"] = spec.spec_id
     eval_data["agent_name"] = "signal-evaluator"

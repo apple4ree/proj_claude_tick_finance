@@ -1,48 +1,44 @@
 {
   "iteration_idx": 3,
-  "started_at": "2026-04-21T10:04:15.549365",
-  "finished_at": "2026-04-21T10:12:16.129753",
+  "started_at": "2026-04-28T04:10:56.979143",
+  "finished_at": "2026-04-28T04:29:22.931424",
   "signal_specs": [
-    "iter003_full_consensus_tight",
-    "iter003_ask_conc_zscore_contra_tight",
-    "iter003_book_consensus_tradeflow_confirm",
-    "iter003_tradeflow_momentum_combo_h20"
+    "iter003_stabilized_trade_flow_exhaustion",
+    "iter003_bbo_deep_book_disagreement",
+    "iter003_sticky_ofi_in_high_vol",
+    "iter003_closing_auction_pressure"
   ],
   "spec_evaluations": [
-    "iterations/iter_003/evaluations/iter003_full_consensus_tight.json",
-    "iterations/iter_003/evaluations/iter003_ask_conc_zscore_contra_tight.json",
-    "iterations/iter_003/evaluations/iter003_book_consensus_tradeflow_confirm.json",
-    "iterations/iter_003/evaluations/iter003_tradeflow_momentum_combo_h20.json"
+    "iterations/iter_003/evaluations/iter003_stabilized_trade_flow_exhaustion.json",
+    "iterations/iter_003/evaluations/iter003_bbo_deep_book_disagreement.json",
+    "iterations/iter_003/evaluations/iter003_sticky_ofi_in_high_vol.json",
+    "iterations/iter_003/evaluations/iter003_closing_auction_pressure.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_003/code/iter003_full_consensus_tight.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_003/code/iter003_ask_conc_zscore_contra_tight.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_003/code/iter003_book_consensus_tradeflow_confirm.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_003/code/iter003_tradeflow_momentum_combo_h20.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_003/code/iter003_bbo_deep_book_disagreement.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_003/code/iter003_sticky_ofi_in_high_vol.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_003/code/iter003_closing_auction_pressure.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_003/fidelity/iter003_full_consensus_tight.json",
-    "iterations/iter_003/fidelity/iter003_ask_conc_zscore_contra_tight.json",
-    "iterations/iter_003/fidelity/iter003_book_consensus_tradeflow_confirm.json",
-    "iterations/iter_003/fidelity/iter003_tradeflow_momentum_combo_h20.json"
+    "iterations/iter_003/fidelity/iter003_bbo_deep_book_disagreement.json",
+    "iterations/iter_003/fidelity/iter003_sticky_ofi_in_high_vol.json",
+    "iterations/iter_003/fidelity/iter003_closing_auction_pressure.json"
   ],
   "backtest_results": [
-    "iterations/iter_003/results/iter003_full_consensus_tight.json",
-    "iterations/iter_003/results/iter003_ask_conc_zscore_contra_tight.json",
-    "iterations/iter_003/results/iter003_book_consensus_tradeflow_confirm.json",
-    "iterations/iter_003/results/iter003_tradeflow_momentum_combo_h20.json"
+    "iterations/iter_003/results/iter003_bbo_deep_book_disagreement.json",
+    "iterations/iter_003/results/iter003_sticky_ofi_in_high_vol.json",
+    "iterations/iter_003/results/iter003_closing_auction_pressure.json"
   ],
   "feedback": [
-    "iterations/iter_003/feedback/iter003_full_consensus_tight.json",
-    "iterations/iter_003/feedback/iter003_ask_conc_zscore_contra_tight.json",
-    "iterations/iter_003/feedback/iter003_book_consensus_tradeflow_confirm.json",
-    "iterations/iter_003/feedback/iter003_tradeflow_momentum_combo_h20.json"
+    "iterations/iter_003/feedback/iter003_bbo_deep_book_disagreement.json",
+    "iterations/iter_003/feedback/iter003_sticky_ofi_in_high_vol.json",
+    "iterations/iter_003/feedback/iter003_closing_auction_pressure.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_003/improvements/iter003_full_consensus_tight.json",
-    "iterations/iter_003/improvements/iter003_full_consensus_tight_v1.json",
-    "iterations/iter_003/improvements/iter003_ask_conc_zscore_contra_tight.json",
-    "iterations/iter_003/improvements/iter003_tradeflow_momentum_combo_h20.json"
+    "iterations/iter_003/improvements/iter003_bbo_deep_book_disagreement.json",
+    "iterations/iter_003/improvements/iter003_bbo_deep_book_disagreement_v1.json",
+    "iterations/iter_003/improvements/iter003_sticky_ofi_in_high_vol.json",
+    "iterations/iter_003/improvements/iter003_closing_auction_pressure.json"
   ],
   "stop_reason": null
 }

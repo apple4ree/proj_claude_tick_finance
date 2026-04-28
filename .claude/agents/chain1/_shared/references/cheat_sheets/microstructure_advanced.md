@@ -135,6 +135,125 @@ refutes empirically.
 
 ---
 
+---
+
+## Block D (2026-04-25) — Velocity / probability / cumulative primitives
+
+Six new primitives added based on additional paper grounding (Hasbrouck 1991/1995, Stoikov 2018, Cartea-Jaimungal 2015, Glosten-Milgrom 1985, Avellaneda-Stoikov 2008).
+
+### Probability-style imbalance <a name="queue_imbalance"></a>
+
+**`queue_imbalance_best`** (stateless, [0, 1])
+```
+QI = B_1 / (B_1 + A_1)
+```
+- 0.5 = balanced
+- > 0.5 = bid-heavy (probability of next mid-up)
+- Linearly equivalent to `obi_1` (= 2·QI − 1)
+- **Direction**: Category A (long_if_pos)
+- **Use when**: LLM wants probability-style threshold, e.g., `QI > 0.7` (= obi_1 > 0.4)
+
+Paper ref: Gould-Bonart 2016.
+
+### Velocity primitives <a name="velocity"></a>
+
+**`microprice_velocity`** (stateful, bps per tick)
+```
+mv_t = (microprice_t − microprice_{t-1}) / mid_t × 1e4
+```
+- Captures fair-value drift speed
+- Large |velocity| = adverse-selection arrival
+- **Direction**: Category A at moderate magnitude; B2 at extreme
+
+**`book_imbalance_velocity`** (stateful, range ≈ [-2, 2])
+```
+biv_t = obi_1_t − obi_1_{t-1}
+```
+- Speed of imbalance shift
+- Large positive = bid-side stacking fast
+- Large negative = bid being eaten / ask stacking
+- **Direction**: Category A (signed pressure-derivative)
+
+Paper ref: Stoikov 2018 §3.4 (microprice dynamics), Cartea-Jaimungal 2015 §HF momentum.
+
+### Spread dynamics <a name="spread_dynamics"></a>
+
+**`spread_change_bps`** (stateful, signed bps)
+```
+sc_t = spread_bps(t) − spread_bps(t-1)
+```
+- Sudden widening (positive spike) → adverse-selection arrival
+- Gradual widening → inventory pressure
+- Narrowing → informed flow exhaustion
+- **Direction**: Category C (regime/state filter, not signal)
+- **Use case**: `spread_change_bps > 1.0` to exclude adverse-arrival moments
+
+Paper ref: Glosten-Milgrom 1985 (adverse selection component), Avellaneda-Stoikov 2008 (inventory).
+
+### Cumulative signed flow <a name="cumulative_flow"></a>
+
+**`signed_volume_cumulative`** (stateful, alias for `trade_imbalance_signed`)
+
+Provided under Hasbrouck 1991 / Lee-Ready 1991 nomenclature for naming clarity. Use with `rolling_sum` for the cumulative quantity:
+
+```python
+formula = "rolling_sum(signed_volume_cumulative, 100) > 50000"
+# Hasbrouck cumulative signed flow over 10 seconds
+```
+
+- **Direction**: Category A (raw flow direction); B2 when z-scored at extreme
+
+### Book-wide pressure <a name="book_pressure"></a>
+
+**`book_pressure_asymmetry`** (stateless, [-1, 1])
+```
+bpa = (total_bid_qty − total_ask_qty) / (total_bid_qty + total_ask_qty)
+```
+- Distinct from `obi_total` which uses ICDC (KIS-published incremental). This uses raw totals.
+- Less sensitive to ICDC publication latency
+- **Direction**: Category A (pressure)
+
+Paper ref: Cont-Kukanov-Stoikov 2014 §6.
+
+### New helpers (Block D)
+
+| Helper | Use |
+|---|---|
+| `rolling_max(primitive, W)` | Recent-high reference. e.g., `obi_1 > rolling_max(obi_1, 50) − 0.1` |
+| `rolling_min(primitive, W)` | Mirror of above |
+| `rolling_sum(primitive, W)` | Hasbrouck cumulative signed flow |
+
+### Suggested Block D specs (iter_023+)
+
+1. Pure velocity-based:
+   ```
+   formula = microprice_velocity > 5.0
+   threshold = 5.0, direction = long_if_pos, horizon = 5
+   ```
+2. Hasbrouck-style cumulative flow:
+   ```
+   formula = zscore(rolling_sum(signed_volume_cumulative, 100), 300)
+   threshold = 2.0, direction = long_if_neg (extreme = exhaustion), horizon = 20
+   ```
+3. Velocity + filter:
+   ```
+   formula = (book_imbalance_velocity > 0.05) AND (spread_change_bps < 1.0)
+   threshold = 0.5, direction = long_if_pos, horizon = 10
+   ```
+4. QI extreme:
+   ```
+   formula = queue_imbalance_best
+   threshold = 0.85, direction = long_if_pos, horizon = 1
+   ```
+5. Cross-asymmetry:
+   ```
+   formula = book_pressure_asymmetry - obi_1
+   threshold = 0.3, direction = long_if_pos, horizon = 5
+   ```
+   (Whole-book signal stronger than BBO-only → deeper conviction)
+
+---
+
 ## Quick starter specs (suggested for iter_010)
 
 1. `trade_imbalance_signed` smoothed:

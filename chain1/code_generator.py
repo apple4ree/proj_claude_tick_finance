@@ -48,7 +48,14 @@ TEMPLATE_VERSION = "v0.1.0_basic"
 # assignments, any name not in PRIMITIVE_WHITELIST or the extras dict below.
 
 
-ALLOWED_EXTRAS = {"abs", "sign"}
+ALLOWED_EXTRAS = {
+    "abs", "sign",
+    # 2026-04-26 D4 multiplicative interaction expansion:
+    "sqrt", "exp", "log", "log10",
+    "min", "max",
+    "floor", "ceil",
+    "where",       # numpy-style ternary: where(cond, a, b)
+}
 PRIMITIVE_NAMES = set(PRIMITIVE_WHITELIST.keys())
 
 # Stateful helpers: zscore(primitive, window), rolling_mean(primitive, window),
@@ -60,6 +67,10 @@ STATEFUL_HELPERS: dict[str, str] = {
     "zscore":              "RollingZScore",
     "rolling_realized_vol": "RollingRealizedVol",
     "rolling_momentum":    "RollingMomentum",
+    "rolling_max":         "RollingMax",       # 2026-04-25
+    "rolling_min":         "RollingMin",       # 2026-04-25
+    "rolling_sum":         "RollingSum",       # 2026-04-25 — for cumulative signed flow per Hasbrouck 1991
+    "rolling_range_bps":   "RollingRangeBps",  # 2026-04-27 — Parkinson high-low range for magnitude regimes
 }
 
 ALLOWED_NAMES = PRIMITIVE_NAMES | ALLOWED_EXTRAS | set(STATEFUL_HELPERS.keys()) | {"True", "False"}
@@ -135,13 +146,17 @@ class _FormulaValidator(ast.NodeVisitor):
         for kw in node.keywords:
             if not isinstance(kw.value, ast.Constant):
                 raise FormulaParseError(f"kwargs must be literal constants in {fname}")
-        for arg in node.args:
-            if not isinstance(arg, (ast.Constant, ast.Name)):
-                raise FormulaParseError(f"Call {fname}: arg type {type(arg).__name__} not allowed")
-        # Record primitive usage
+        # Argument-type constraints differ:
+        # - PRIMITIVE_NAMES: simple args only (Constant or Name) — primitives take snap implicitly
+        # - ALLOWED_EXTRAS (math fns): allow nested expressions (BinOp, Compare, etc.) for D4
+        #   multiplicative-interaction patterns. AST validator still walks children.
         if fname in PRIMITIVE_NAMES:
+            for arg in node.args:
+                if not isinstance(arg, (ast.Constant, ast.Name)):
+                    raise FormulaParseError(f"Call {fname}: arg type {type(arg).__name__} not allowed")
             self.primitives_seen.add(fname)
-        # Visit children so nested arg Names get validated
+        # ALLOWED_EXTRAS (sqrt, exp, log, sign, where, ...) — permit any expression as args.
+        # Visit children so nested args get validated.
         self.generic_visit(node)
 
 
@@ -279,6 +294,20 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from chain1.primitives import {imports}
+
+# Math extras for D4 multiplicative-interaction formulas (2026-04-26):
+# Map names used in formulas to their numpy/math implementations.
+import numpy as _np
+abs    = abs
+sign   = _np.sign
+sqrt   = _np.sqrt
+exp    = _np.exp
+log    = _np.log
+log10  = _np.log10
+floor  = _np.floor
+ceil   = _np.ceil
+where  = _np.where
+# `min`/`max` are Python builtins (variadic); numpy versions handle arrays.
 
 
 SPEC_ID = "{spec_id}"

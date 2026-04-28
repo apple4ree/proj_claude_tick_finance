@@ -79,14 +79,51 @@ def _primary_recommendation(
     spec: SignalSpec,
     result: BacktestResult,
     cross_sym: str,
+    fee_bps_rt: float = 0.0,
 ) -> tuple[str, str]:
     """Return (recommended_next_direction, reasoning_sentence).
 
-    Implements analysis_framework.md §Decision tree verbatim.
+    Decision tree keyed on **net expectancy** (= expectancy_bps − fee_bps_rt) to
+    align LLM optimisation with the deployment objective (net PnL after fees),
+    not raw WR. When `fee_bps_rt == 0` the behaviour collapses back to the
+    pre-2026-04-27 WR-driven tree. With a positive `fee_bps_rt`, capped-post-fee
+    specs (high WR but net ≤ 0) are routed to magnitude-seeking actions.
     """
     n = result.aggregate_n_trades
     wr = result.aggregate_wr
     exp = result.aggregate_expectancy_bps
+    net_exp = exp - fee_bps_rt
+    # Regime-state mode metrics (2026-04-27)
+    is_regime = getattr(result, "backtest_mode", "fixed_h") == "regime_state"
+    duty = getattr(result, "aggregate_signal_duty_cycle", None)
+    n_regimes = getattr(result, "aggregate_n_regimes", None)
+    n_sessions = len(result.per_symbol)
+
+    # Regime-state degeneracy checks (run BEFORE other rules so buy-and-hold artifacts
+    # don't trigger 'tighten_threshold' or get treated as deployable).
+    if is_regime:
+        # (a) Signal almost always ON → degenerate to buy-and-hold
+        if duty is not None and duty > 0.95:
+            return "swap_feature", (
+                f"Buy-and-hold artifact: signal duty cycle {duty:.3f} > 0.95 — "
+                f"signal is almost always True, regimes degenerate to one-per-session "
+                f"holds. Replace primitive with one that has meaningful temporal toggling."
+            )
+        # (b) Almost no regimes per session → signal too rare to validate
+        if n_regimes is not None and n_sessions > 0 and n_regimes / max(n_sessions, 1) < 1.5:
+            return "loosen_threshold", (
+                f"Signal too rare: {n_regimes} regimes across {n_sessions} sessions "
+                f"({n_regimes/max(n_sessions,1):.2f}/session). Lower threshold so the "
+                f"signal toggles enough times to validate directional alpha."
+            )
+        # (c) Signal too short — flickering, not regime-like
+        mean_dur = getattr(result, "aggregate_mean_duration_ticks", None)
+        if mean_dur is not None and mean_dur < 5.0 and n_regimes is not None and n_regimes > 100:
+            return "add_filter", (
+                f"Signal flickering: mean regime duration {mean_dur:.1f} ticks (<5) "
+                f"with {n_regimes} regimes — signal is too noisy to support stable holding. "
+                f"Add a regime filter or smoother to extend holding period."
+            )
 
     if n < 30:
         return "loosen_threshold", (
@@ -102,6 +139,22 @@ def _primary_recommendation(
         return "drop_feature", (
             "Cross-symbol results are inconsistent (wr std > 10% or sign-flip across symbols). "
             "Feature behaves differently per symbol; drop it or restrict universe."
+        )
+    # NEW (2026-04-27, Fix #1): capped post-fee — high WR but net ≤ 0.
+    # WR-tightening would only push WR closer to 1 without changing magnitude;
+    # rotate among magnitude-seeking actions instead.
+    if fee_bps_rt > 0 and wr >= 0.55 and n >= 100 and net_exp <= 0:
+        magnitude_options = [
+            ("change_horizon", "longer horizon → larger |Δmid| (random-walk √h scaling)"),
+            ("extreme_quantile", "push to p99+ selectivity to find tail trades with bigger magnitude"),
+            ("combine_with_other_spec", "combine with complementary spec to amplify edge per fill"),
+            ("add_regime_filter", "concentrate entries to regimes with larger expected moves (high-vol / closing)"),
+        ]
+        idx = hash(spec.spec_id) % len(magnitude_options)
+        direction, why = magnitude_options[idx]
+        return direction, (
+            f"Capped post-fee: WR={wr:.3f} exp={exp:+.3f}bps net={net_exp:+.3f}bps "
+            f"(fee={fee_bps_rt:.1f}bps RT). WR is high but fee eats the edge — {why}."
         )
     if wr >= 0.55 and n >= 100 and exp > 0:
         # NOTE: 2026-04-21 empirical horizon sweep showed expectancy PEAKS at
@@ -156,6 +209,7 @@ def _headline_strengths_weaknesses(
     spec: SignalSpec,
     result: BacktestResult,
     cross_sym: str,
+    fee_bps_rt: float = 0.0,
 ) -> tuple[list[str], list[str]]:
     strengths: list[str] = []
     weaknesses: list[str] = []
@@ -163,11 +217,14 @@ def _headline_strengths_weaknesses(
     wr = result.aggregate_wr
     exp = result.aggregate_expectancy_bps
     n = result.aggregate_n_trades
+    net_exp = exp - fee_bps_rt
 
     if wr > 0.55 and n >= 100:
         strengths.append(f"Sustained WR={wr:.3f} over {n} trades (above 55% threshold)")
-    if exp > 0 and n >= 30:
-        strengths.append(f"Expectancy={exp:+.3f}bps per trade is positive")
+    if net_exp > 0 and n >= 30:
+        strengths.append(f"Net expectancy={net_exp:+.3f}bps/trade after {fee_bps_rt:.1f}bps fee")
+    elif exp > 0 and n >= 30:
+        strengths.append(f"Gross expectancy={exp:+.3f}bps per trade is positive")
     if cross_sym == "consistent":
         strengths.append("Cross-symbol consistency: per-symbol WRs agree within 2 percentage points")
 
@@ -177,6 +234,11 @@ def _headline_strengths_weaknesses(
         weaknesses.append(f"WR={wr:.3f} within noise band (0.48–0.52)")
     if exp <= 0 and n >= 30:
         weaknesses.append(f"Non-positive expectancy ({exp:+.3f} bps/trade) despite {n} trades")
+    if fee_bps_rt > 0 and exp > 0 and net_exp <= 0:
+        weaknesses.append(
+            f"Capped post-fee: gross={exp:+.3f}bps but net={net_exp:+.3f}bps "
+            f"after {fee_bps_rt:.1f}bps RT fee — undeployable"
+        )
     if cross_sym == "inconsistent":
         wrs_str = ", ".join(f"{ps.symbol}:{ps.wr:.2f}" for ps in result.per_symbol)
         weaknesses.append(f"Cross-symbol inconsistency: {wrs_str}")
@@ -192,10 +254,11 @@ def _build_deterministic_feedback(
     spec: SignalSpec,
     result: BacktestResult,
     iteration_idx: int,
+    fee_bps_rt: float = 0.0,
 ) -> Feedback:
     cross_sym = _cross_symbol_consistency(result)
-    recommendation, reason = _primary_recommendation(spec, result, cross_sym)
-    strengths, weaknesses = _headline_strengths_weaknesses(spec, result, cross_sym)
+    recommendation, reason = _primary_recommendation(spec, result, cross_sym, fee_bps_rt)
+    strengths, weaknesses = _headline_strengths_weaknesses(spec, result, cross_sym, fee_bps_rt)
 
     return Feedback(
         agent_name="feedback-analyst",
@@ -256,9 +319,15 @@ def analyze_feedback(
     client: LLMClient | None = None,
     model_override: str | None = None,
     skip_llm: bool = False,
+    fee_bps_rt: float = 0.0,
 ) -> Feedback:
-    """Hybrid feedback analysis: deterministic decision + optional LLM narrative."""
-    det_fb = _build_deterministic_feedback(spec, result, iteration_idx)
+    """Hybrid feedback analysis: deterministic decision + optional LLM narrative.
+
+    fee_bps_rt : round-trip fee in bps. When > 0, the decision tree keys on
+    net_expectancy = expectancy_bps - fee_bps_rt instead of raw expectancy,
+    pushing the optimisation target toward deployment-realistic net PnL.
+    """
+    det_fb = _build_deterministic_feedback(spec, result, iteration_idx, fee_bps_rt=fee_bps_rt)
     if skip_llm:
         return det_fb
 
@@ -282,6 +351,40 @@ def analyze_feedback(
     return Feedback(**merged)
 
 
+async def analyze_feedback_async(
+    spec: SignalSpec,
+    result: BacktestResult,
+    iteration_idx: int,
+    recent_feedback: list[Feedback] | None = None,
+    client: LLMClient | None = None,
+    model_override: str | None = None,
+    skip_llm: bool = False,
+    fee_bps_rt: float = 0.0,
+) -> Feedback:
+    """Async version of analyze_feedback."""
+    det_fb = _build_deterministic_feedback(spec, result, iteration_idx, fee_bps_rt=fee_bps_rt)
+    if skip_llm:
+        return det_fb
+
+    client = client or LLMClient()
+    user_msg = _build_user_message(spec, result, iteration_idx, recent_feedback, det_fb)
+    response: Any = await client.call_agent_async(
+        agent_name="feedback-analyst",
+        user_message=user_msg,
+        response_model=FeedbackOutput,
+        model_override=model_override,
+    )
+
+    fb = response.feedback
+    merged = fb.model_dump()
+    merged["iteration_idx"] = iteration_idx
+    merged["spec_id"] = spec.spec_id
+    merged["agent_name"] = "feedback-analyst"
+    merged["cross_symbol_consistency"] = det_fb.cross_symbol_consistency
+    merged["recommended_next_direction"] = det_fb.recommended_next_direction
+    return Feedback(**merged)
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -296,6 +399,8 @@ if __name__ == "__main__":
     ap.add_argument("--iteration-idx", type=int, default=0)
     ap.add_argument("--skip-llm", action="store_true")
     ap.add_argument("--model", default=None)
+    ap.add_argument("--fee-bps-rt", type=float, default=0.0,
+                    help="Round-trip fee in bps; decision tree keys on net_expectancy when > 0.")
     args = ap.parse_args()
 
     spec = SignalSpec(**json.loads(Path(args.spec_json).read_text()))
@@ -305,5 +410,6 @@ if __name__ == "__main__":
         spec, result, args.iteration_idx,
         skip_llm=args.skip_llm,
         model_override=args.model,
+        fee_bps_rt=args.fee_bps_rt,
     )
     print(fb.model_dump_json(indent=2))

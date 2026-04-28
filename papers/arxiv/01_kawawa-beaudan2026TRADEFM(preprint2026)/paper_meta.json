@@ -1,0 +1,25 @@
+{
+  "title": "TradeFM: A Generative Foundation Model for Trade-flow and Market Microstructure",
+  "authors": [
+    "Maxime Kawawa-Beaudan",
+    "Srijan Sood",
+    "Kassiani Papasotiriou",
+    "Daniel Borrajo",
+    "Manuela Veloso"
+  ],
+  "year": 2026,
+  "venue": null,
+  "abstract": "Foundation models have transformed domains from language to genomics by learning general-purpose representations from large-scale, heterogeneous data. We introduce TradeFM, a 524M-parameter generative Transformer that brings this paradigm to market microstructure, learning directly from billions of trade events across >9K equities. To enable cross-asset generalization, we develop scale-invariant features and a universal tokenization scheme that map the heterogeneous, multi-modal event stream of order flow into a unified discrete sequence -- eliminating asset-specific calibration. Integrated with a deterministic market simulator, TradeFM-generated rollouts reproduce key stylized facts of financial returns, including heavy tails, volatility clustering, and absence of return autocorrelation. Quantitatively, TradeFM achieves 2-3x lower distributional error than Compound Hawkes baselines and generalizes zero-shot to geographically out-of-distribution APAC markets with moderate perplexity degradation. Together, these results suggest that scale-invariant trade representations capture transferable structure in market microstructure, opening a path toward synthetic data generation, stress testing, and learning-based trading agents.",
+  "url": "http://arxiv.org/abs/2602.23784v1",
+  "pdf_url": "https://arxiv.org/pdf/2602.23784v1",
+  "arxiv_id": "2602.23784v1",
+  "doi": null,
+  "source": "arxiv",
+  "folder": "01_kawawa-beaudan2026TRADEFM(preprint2026)",
+  "index": 1,
+  "method": "TRADEFM",
+  "pages": 29,
+  "main_figures": 6,
+  "appendix_figures": 11,
+  "boundary_page": 12
+}

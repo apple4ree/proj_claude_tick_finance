@@ -1,0 +1,87 @@
+{
+  "S1_baseline": {
+    "n": 77,
+    "wr": 0.0,
+    "net_bps": -26.996109992626327,
+    "n_maker": 0,
+    "n_taker": 77,
+    "cost": {
+      "spread": 9.557579443883586,
+      "maker_fee": 0.0,
+      "taker_fee": 3.0,
+      "sell_tax": 20.0,
+      "adv_sel": -0.9391617284888342,
+      "slippage": 0.0
+    },
+    "sharpe": -59.174308706827816,
+    "mdd_bps": 2060.7908192628665
+  },
+  "S2_market_ptsl": {
+    "n": 73,
+    "wr": 0.0,
+    "net_bps": -26.42359239266023,
+    "n_maker": 0,
+    "n_taker": 73,
+    "cost": {
+      "spread": 9.530197014122873,
+      "maker_fee": 0.0,
+      "taker_fee": 3.0,
+      "sell_tax": 20.0,
+      "adv_sel": -0.9219578324016358,
+      "slippage": 0.0
+    },
+    "sharpe": -74.45461780604977,
+    "mdd_bps": 1911.0125944948368
+  },
+  "S3_market_wide": {
+    "n": 68,
+    "wr": 0.0,
+    "net_bps": -26.071210941286708,
+    "n_maker": 0,
+    "n_taker": 68,
+    "cost": {
+      "spread": 9.443586856676305,
+      "maker_fee": 0.0,
+      "taker_fee": 3.0,
+      "sell_tax": 20.0,
+      "adv_sel": -0.9897488494899913,
+      "slippage": 0.0
+    },
+    "sharpe": -55.59815892246267,
+    "mdd_bps": 1749.8436376164273
+  },
+  "S4_maker_flat": {
+    "n": 0,
+    "wr": 0.5,
+    "net_bps": 0.0,
+    "n_maker": 0,
+    "n_taker": 0,
+    "cost": {
+      "spread": 0.0,
+      "maker_fee": 0.0,
+      "taker_fee": 0.0,
+      "sell_tax": 0.0,
+      "adv_sel": 0.0,
+      "slippage": 0.0
+    },
+    "sharpe": 0.0,
+    "mdd_bps": 0.0
+  },
+  "S5_maker_ptsl": {
+    "n": 0,
+    "wr": 0.5,
+    "net_bps": 0.0,
+    "n_maker": 0,
+    "n_taker": 0,
+    "cost": {
+      "spread": 0.0,
+      "maker_fee": 0.0,
+      "taker_fee": 0.0,
+      "sell_tax": 0.0,
+      "adv_sel": 0.0,
+      "slippage": 0.0
+    },
+    "sharpe": 0.0,
+    "mdd_bps": 0.0
+  }
+}

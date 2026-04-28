@@ -1,40 +1,48 @@
 {
   "iteration_idx": 19,
-  "started_at": "2026-04-22T02:40:19.201085",
-  "finished_at": "2026-04-22T02:44:32.277540",
+  "started_at": "2026-04-28T10:41:52.187709",
+  "finished_at": "2026-04-28T11:10:57.937677",
   "signal_specs": [
-    "iter019_bbo_divergence_extreme",
-    "iter019_contra_consensus_tight_obi",
-    "iter019_tradeflow_momentum_confirm",
-    "iter019_ultra_consensus"
+    "iter019_long_horizon_obi_persistence",
+    "iter019_extreme_trade_flow_reversal",
+    "iter019_book_divergence_reversal",
+    "iter019_closing_vol_burst_pressure"
   ],
   "spec_evaluations": [
-    "iterations/iter_019/evaluations/iter019_bbo_divergence_extreme.json",
-    "iterations/iter_019/evaluations/iter019_contra_consensus_tight_obi.json",
-    "iterations/iter_019/evaluations/iter019_tradeflow_momentum_confirm.json",
-    "iterations/iter_019/evaluations/iter019_ultra_consensus.json"
+    "iterations/iter_019/evaluations/iter019_long_horizon_obi_persistence.json",
+    "iterations/iter_019/evaluations/iter019_extreme_trade_flow_reversal.json",
+    "iterations/iter_019/evaluations/iter019_book_divergence_reversal.json",
+    "iterations/iter_019/evaluations/iter019_closing_vol_burst_pressure.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_019/code/iter019_contra_consensus_tight_obi.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_019/code/iter019_ultra_consensus.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_019/code/iter019_long_horizon_obi_persistence.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_019/code/iter019_extreme_trade_flow_reversal.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_019/code/iter019_book_divergence_reversal.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_019/code/iter019_closing_vol_burst_pressure.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_019/fidelity/iter019_contra_consensus_tight_obi.json",
-    "iterations/iter_019/fidelity/iter019_ultra_consensus.json"
+    "iterations/iter_019/fidelity/iter019_long_horizon_obi_persistence.json",
+    "iterations/iter_019/fidelity/iter019_extreme_trade_flow_reversal.json",
+    "iterations/iter_019/fidelity/iter019_book_divergence_reversal.json",
+    "iterations/iter_019/fidelity/iter019_closing_vol_burst_pressure.json"
   ],
   "backtest_results": [
-    "iterations/iter_019/results/iter019_contra_consensus_tight_obi.json",
-    "iterations/iter_019/results/iter019_ultra_consensus.json"
+    "iterations/iter_019/results/iter019_long_horizon_obi_persistence.json",
+    "iterations/iter_019/results/iter019_extreme_trade_flow_reversal.json",
+    "iterations/iter_019/results/iter019_book_divergence_reversal.json",
+    "iterations/iter_019/results/iter019_closing_vol_burst_pressure.json"
   ],
   "feedback": [
-    "iterations/iter_019/feedback/iter019_contra_consensus_tight_obi.json",
-    "iterations/iter_019/feedback/iter019_ultra_consensus.json"
+    "iterations/iter_019/feedback/iter019_long_horizon_obi_persistence.json",
+    "iterations/iter_019/feedback/iter019_extreme_trade_flow_reversal.json",
+    "iterations/iter_019/feedback/iter019_book_divergence_reversal.json",
+    "iterations/iter_019/feedback/iter019_closing_vol_burst_pressure.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_019/improvements/iter019_contra_consensus_tight_obi.json",
-    "iterations/iter_019/improvements/iter019_ultra_consensus.json",
-    "iterations/iter_019/improvements/iter019_contra_consensus_tight_obi_v1.json",
-    "iterations/iter_019/improvements/iter019_contra_consensus_tight_obi_v2.json"
+    "iterations/iter_019/improvements/iter019_closing_vol_burst_pressure.json",
+    "iterations/iter_019/improvements/iter019_book_divergence_reversal.json",
+    "iterations/iter_019/improvements/iter019_extreme_trade_flow_reversal.json",
+    "iterations/iter_019/improvements/iter019_extreme_trade_flow_reversal_v1.json"
   ],
   "stop_reason": null
 }

@@ -1,102 +1,41 @@
 {
   "agent_name": "chain2-gate",
   "agent_version": "0.1.0",
-  "timestamp": "2026-04-21T10:19:56.023842",
+  "timestamp": "2026-04-28T04:56:13.182195",
   "iteration_idx": 4,
   "iterations_scanned": [
     4
   ],
-  "total_valid_specs": 4,
+  "total_valid_specs": 3,
   "scenarios": [
     {
       "fee_scenario": "krx_cash_23bps",
       "fee_rt_bps": 23.0,
       "top_candidates": [],
       "excluded": {
-        "iter004_full_consensus_high_vol": "gate_failed:G3_exp_post_fee:-16.136<=0",
-        "iter004_ask_conc_zscore_extreme": "gate_failed:G3_exp_post_fee:-16.078<=0",
-        "iter004_bbo_reversal_on_tradeflow": "gate_failed:G1_density:75.2<300.0",
-        "iter004_deep_book_reversal": "gate_failed:G2_wr:0.0972<0.55"
+        "iter004_trade_flow_exhaustion": "gate_failed:G2_wr:0.5106<0.55",
+        "iter004_durable_book_consensus": "gate_failed:G1_density:51.3<300.0",
+        "iter004_ask_wall_reversion": "gate_failed:G2_wr:0.4509<0.55"
       }
     },
     {
       "fee_scenario": "hypothetical_low_fee_5bps",
       "fee_rt_bps": 5.0,
-      "top_candidates": [
-        {
-          "spec_id": "iter004_ask_conc_zscore_extreme",
-          "score": 0.3477921552291966,
-          "priority": "marginal",
-          "wr": 0.9090069284064665,
-          "expectancy_bps": 6.921753989153347,
-          "expectancy_post_fee_bps": 1.9217539891533466,
-          "fee_absorption_ratio": 2.7687015956613386,
-          "trade_density_per_day_per_sym": 360.8333333333333,
-          "complexity_score": 2.0,
-          "has_regime_self_filter": false,
-          "dominates": [],
-          "dominated_by": null,
-          "factor_breakdown": {
-            "edge_w": 0.06726138962036712,
-            "density_w": 0.010530765608829483,
-            "filter_w": 0.0,
-            "simple_w": 0.12,
-            "multi_w": 0.15,
-            "raw_edge": 0.19217539891533467,
-            "raw_density": 0.05265382804414741,
-            "raw_filter": 0.0,
-            "raw_simple": 0.8,
-            "raw_multi": 1.0
-          },
-          "rationale_kr": "시나리오 `hypothetical_low_fee_5bps` 하에서 score **0.348** (marginal). 주요 기여 factor: **multi** (0.150) — multi-day 재현성 확보. WR 0.909, post-fee expectancy +1.922 bps.",
-          "expected_chain2_concerns": [
-            "post-fee edge 얇음 (+1.92 bps) — Chain 2 adverse selection 에 민감",
-            "regime filter 부재 — high-spread 구간에서 fee 손실 누적 가능",
-            "density 361/day — Chain 2 에서 sample size 부족 위험"
-          ]
-        },
-        {
-          "spec_id": "iter004_full_consensus_high_vol",
-          "score": 0.27151183363998216,
-          "priority": "marginal",
-          "wr": 0.9614440939362076,
-          "expectancy_bps": 6.86405560407269,
-          "expectancy_post_fee_bps": 1.86405560407269,
-          "fee_absorption_ratio": 2.745622241629076,
-          "trade_density_per_day_per_sym": 475.5,
-          "complexity_score": 5.0,
-          "has_regime_self_filter": false,
-          "dominates": [],
-          "dominated_by": null,
-          "factor_breakdown": {
-            "edge_w": 0.06524194614254415,
-            "density_w": 0.026269887497437996,
-            "filter_w": 0.0,
-            "simple_w": 0.03,
-            "multi_w": 0.15,
-            "raw_edge": 0.18640556040726902,
-            "raw_density": 0.13134943748718997,
-            "raw_filter": 0.0,
-            "raw_simple": 0.2,
-            "raw_multi": 1.0
-          },
-          "rationale_kr": "시나리오 `hypothetical_low_fee_5bps` 하에서 score **0.272** (marginal). 주요 기여 factor: **multi** (0.150) — multi-day 재현성 확보. WR 0.961, post-fee expectancy +1.864 bps.",
-          "expected_chain2_concerns": [
-            "post-fee edge 얇음 (+1.86 bps) — Chain 2 adverse selection 에 민감",
-            "complexity=5 — execution 튜닝 공간 복잡",
-            "regime filter 부재 — high-spread 구간에서 fee 손실 누적 가능"
-          ]
-        }
-      ],
+      "top_candidates": [],
       "excluded": {
-        "iter004_bbo_reversal_on_tradeflow": "gate_failed:G1_density:75.2<300.0",
-        "iter004_deep_book_reversal": "gate_failed:G2_wr:0.0972<0.55"
+        "iter004_trade_flow_exhaustion": "gate_failed:G2_wr:0.5106<0.55",
+        "iter004_durable_book_consensus": "gate_failed:G1_density:51.3<300.0",
+        "iter004_ask_wall_reversion": "gate_failed:G2_wr:0.4509<0.55"
       }
     }
   ],
   "cross_scenario_consensus": [],
   "warnings": [
-    "no candidates passed gates under krx_cash_23bps"
+    "no candidates passed gates under krx_cash_23bps",
+    "no candidates passed gates under hypothetical_low_fee_5bps",
+    "no-positive-post-fee-under-krx_cash_23bps — all specs fail G3 under this scenario; ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)",
+    "no-positive-post-fee-under-hypothetical_low_fee_5bps — all specs fail G3 under this scenario; ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)",
+    "DSR-computable specs: 0/3 (others lack trace data; their priority capped at STRONG)"
   ],
-  "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 통과 후보 없음\n- **hypothetical_low_fee_5bps**: 최상위 `iter004_ask_conc_zscore_extreme` score=0.348 (priority=marginal, post-fee exp +1.92 bps)"
+  "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 통과 후보 없음\n- **hypothetical_low_fee_5bps**: 통과 후보 없음"
 }

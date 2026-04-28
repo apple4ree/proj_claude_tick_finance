@@ -1,44 +1,48 @@
 {
   "iteration_idx": 8,
-  "started_at": "2026-04-22T01:17:31.155241",
-  "finished_at": "2026-04-22T01:23:01.418549",
+  "started_at": "2026-04-28T06:19:59.007505",
+  "finished_at": "2026-04-28T06:44:48.303900",
   "signal_specs": [
-    "iter008_ask_conc_final_push",
-    "iter008_absorption_pinnacle",
-    "iter008_consensus_wide_trade_confirm",
-    "iter008_divergence_long_reversion"
+    "iter008_exhaustion_reversal_in_low_vol",
+    "iter008_consensus_in_high_vol",
+    "iter008_sticky_microprice_trend",
+    "iter008_closing_auction_conviction"
   ],
   "spec_evaluations": [
-    "iterations/iter_008/evaluations/iter008_ask_conc_final_push.json",
-    "iterations/iter_008/evaluations/iter008_absorption_pinnacle.json",
-    "iterations/iter_008/evaluations/iter008_consensus_wide_trade_confirm.json",
-    "iterations/iter_008/evaluations/iter008_divergence_long_reversion.json"
+    "iterations/iter_008/evaluations/iter008_exhaustion_reversal_in_low_vol.json",
+    "iterations/iter_008/evaluations/iter008_consensus_in_high_vol.json",
+    "iterations/iter_008/evaluations/iter008_sticky_microprice_trend.json",
+    "iterations/iter_008/evaluations/iter008_closing_auction_conviction.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_008/code/iter008_ask_conc_final_push.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_008/code/iter008_absorption_pinnacle.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_008/code/iter008_consensus_wide_trade_confirm.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_008/code/iter008_exhaustion_reversal_in_low_vol.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_008/code/iter008_consensus_in_high_vol.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_008/code/iter008_sticky_microprice_trend.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_008/code/iter008_closing_auction_conviction.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_008/fidelity/iter008_ask_conc_final_push.json",
-    "iterations/iter_008/fidelity/iter008_absorption_pinnacle.json",
-    "iterations/iter_008/fidelity/iter008_consensus_wide_trade_confirm.json"
+    "iterations/iter_008/fidelity/iter008_exhaustion_reversal_in_low_vol.json",
+    "iterations/iter_008/fidelity/iter008_consensus_in_high_vol.json",
+    "iterations/iter_008/fidelity/iter008_sticky_microprice_trend.json",
+    "iterations/iter_008/fidelity/iter008_closing_auction_conviction.json"
   ],
   "backtest_results": [
-    "iterations/iter_008/results/iter008_ask_conc_final_push.json",
-    "iterations/iter_008/results/iter008_absorption_pinnacle.json",
-    "iterations/iter_008/results/iter008_consensus_wide_trade_confirm.json"
+    "iterations/iter_008/results/iter008_exhaustion_reversal_in_low_vol.json",
+    "iterations/iter_008/results/iter008_consensus_in_high_vol.json",
+    "iterations/iter_008/results/iter008_sticky_microprice_trend.json",
+    "iterations/iter_008/results/iter008_closing_auction_conviction.json"
   ],
   "feedback": [
-    "iterations/iter_008/feedback/iter008_ask_conc_final_push.json",
-    "iterations/iter_008/feedback/iter008_absorption_pinnacle.json",
-    "iterations/iter_008/feedback/iter008_consensus_wide_trade_confirm.json"
+    "iterations/iter_008/feedback/iter008_exhaustion_reversal_in_low_vol.json",
+    "iterations/iter_008/feedback/iter008_consensus_in_high_vol.json",
+    "iterations/iter_008/feedback/iter008_sticky_microprice_trend.json",
+    "iterations/iter_008/feedback/iter008_closing_auction_conviction.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_008/improvements/iter008_ask_conc_final_push.json",
-    "iterations/iter_008/improvements/iter008_absorption_pinnacle.json",
-    "iterations/iter_008/improvements/iter008_consensus_wide_trade_confirm.json",
-    "iterations/iter_008/improvements/iter008_consensus_wide_trade_confirm_v1.json"
+    "iterations/iter_008/improvements/iter008_consensus_in_high_vol.json",
+    "iterations/iter_008/improvements/iter008_exhaustion_reversal_in_low_vol.json",
+    "iterations/iter_008/improvements/iter008_sticky_microprice_trend.json",
+    "iterations/iter_008/improvements/iter008_closing_auction_conviction.json"
   ],
   "stop_reason": null
 }

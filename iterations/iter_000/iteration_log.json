@@ -1,44 +1,48 @@
 {
   "iteration_idx": 0,
-  "started_at": "2026-04-21T09:44:03.898385",
-  "finished_at": "2026-04-21T09:49:04.467871",
+  "started_at": "2026-04-28T03:05:37.952454",
+  "finished_at": "2026-04-28T03:32:25.303446",
   "signal_specs": [
-    "iter000_trade_imbalance_zscore_h20",
-    "iter000_ask_concentration_contra_h20",
-    "iter000_obi_deepbook_consensus_h5",
-    "iter000_deepbook_reversal_h20"
+    "iter000_zscore_trade_imb_reversal",
+    "iter000_sticky_obi_long_hold",
+    "iter000_multi_family_consensus",
+    "iter000_closing_burst_pressure"
   ],
   "spec_evaluations": [
-    "iterations/iter_000/evaluations/iter000_trade_imbalance_zscore_h20.json",
-    "iterations/iter_000/evaluations/iter000_ask_concentration_contra_h20.json",
-    "iterations/iter_000/evaluations/iter000_obi_deepbook_consensus_h5.json",
-    "iterations/iter_000/evaluations/iter000_deepbook_reversal_h20.json"
+    "iterations/iter_000/evaluations/iter000_zscore_trade_imb_reversal.json",
+    "iterations/iter_000/evaluations/iter000_sticky_obi_long_hold.json",
+    "iterations/iter_000/evaluations/iter000_multi_family_consensus.json",
+    "iterations/iter_000/evaluations/iter000_closing_burst_pressure.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_000/code/iter000_ask_concentration_contra_h20.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_000/code/iter000_obi_deepbook_consensus_h5.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_000/code/iter000_deepbook_reversal_h20.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_000/code/iter000_zscore_trade_imb_reversal.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_000/code/iter000_sticky_obi_long_hold.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_000/code/iter000_multi_family_consensus.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_000/code/iter000_closing_burst_pressure.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_000/fidelity/iter000_ask_concentration_contra_h20.json",
-    "iterations/iter_000/fidelity/iter000_obi_deepbook_consensus_h5.json",
-    "iterations/iter_000/fidelity/iter000_deepbook_reversal_h20.json"
+    "iterations/iter_000/fidelity/iter000_zscore_trade_imb_reversal.json",
+    "iterations/iter_000/fidelity/iter000_sticky_obi_long_hold.json",
+    "iterations/iter_000/fidelity/iter000_multi_family_consensus.json",
+    "iterations/iter_000/fidelity/iter000_closing_burst_pressure.json"
   ],
   "backtest_results": [
-    "iterations/iter_000/results/iter000_ask_concentration_contra_h20.json",
-    "iterations/iter_000/results/iter000_obi_deepbook_consensus_h5.json",
-    "iterations/iter_000/results/iter000_deepbook_reversal_h20.json"
+    "iterations/iter_000/results/iter000_zscore_trade_imb_reversal.json",
+    "iterations/iter_000/results/iter000_sticky_obi_long_hold.json",
+    "iterations/iter_000/results/iter000_multi_family_consensus.json",
+    "iterations/iter_000/results/iter000_closing_burst_pressure.json"
   ],
   "feedback": [
-    "iterations/iter_000/feedback/iter000_ask_concentration_contra_h20.json",
-    "iterations/iter_000/feedback/iter000_obi_deepbook_consensus_h5.json",
-    "iterations/iter_000/feedback/iter000_deepbook_reversal_h20.json"
+    "iterations/iter_000/feedback/iter000_zscore_trade_imb_reversal.json",
+    "iterations/iter_000/feedback/iter000_sticky_obi_long_hold.json",
+    "iterations/iter_000/feedback/iter000_multi_family_consensus.json",
+    "iterations/iter_000/feedback/iter000_closing_burst_pressure.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_000/improvements/iter000_obi_deepbook_consensus_h5.json",
-    "iterations/iter_000/improvements/iter000_obi_deepbook_consensus_h5_v1.json",
-    "iterations/iter_000/improvements/iter000_ask_concentration_contra_h20.json",
-    "iterations/iter_000/improvements/iter000_deepbook_reversal_h20.json"
+    "iterations/iter_000/improvements/iter000_zscore_trade_imb_reversal.json",
+    "iterations/iter_000/improvements/iter000_closing_burst_pressure.json",
+    "iterations/iter_000/improvements/iter000_multi_family_consensus.json",
+    "iterations/iter_000/improvements/iter000_sticky_obi_long_hold.json"
   ],
   "stop_reason": null
 }

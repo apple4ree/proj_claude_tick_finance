@@ -1,23 +1,44 @@
 {
   "iteration_idx": 7,
-  "started_at": "2026-04-22T04:04:27.565913",
-  "finished_at": "2026-04-22T04:06:20.473083",
+  "started_at": "2026-04-28T05:46:26.870306",
+  "finished_at": "2026-04-28T06:19:56.286535",
   "signal_specs": [
-    "iter007_trade_flow_obi_compound_tight",
-    "iter007_bbo_divergence_trade_confirm",
-    "iter007_trade_flow_exhaustion_into_wall",
-    "iter007_ask_conc_zscore_ultra"
+    "iter007_trade_flow_exhaustion_reversal",
+    "iter007_sticky_full_book_pressure",
+    "iter007_closing_microprice_burst",
+    "iter007_consensus_vs_patient_liquidity"
   ],
   "spec_evaluations": [
-    "iterations/iter_007/evaluations/iter007_trade_flow_obi_compound_tight.json",
-    "iterations/iter_007/evaluations/iter007_bbo_divergence_trade_confirm.json",
-    "iterations/iter_007/evaluations/iter007_trade_flow_exhaustion_into_wall.json",
-    "iterations/iter_007/evaluations/iter007_ask_conc_zscore_ultra.json"
+    "iterations/iter_007/evaluations/iter007_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_007/evaluations/iter007_sticky_full_book_pressure.json",
+    "iterations/iter_007/evaluations/iter007_closing_microprice_burst.json",
+    "iterations/iter_007/evaluations/iter007_consensus_vs_patient_liquidity.json"
   ],
-  "generated_codes": [],
-  "fidelity_reports": [],
-  "backtest_results": [],
-  "feedback": [],
-  "improvement_proposals": [],
+  "generated_codes": [
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_007/code/iter007_trade_flow_exhaustion_reversal.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_007/code/iter007_sticky_full_book_pressure.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_007/code/iter007_consensus_vs_patient_liquidity.py"
+  ],
+  "fidelity_reports": [
+    "iterations/iter_007/fidelity/iter007_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_007/fidelity/iter007_sticky_full_book_pressure.json",
+    "iterations/iter_007/fidelity/iter007_consensus_vs_patient_liquidity.json"
+  ],
+  "backtest_results": [
+    "iterations/iter_007/results/iter007_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_007/results/iter007_sticky_full_book_pressure.json",
+    "iterations/iter_007/results/iter007_consensus_vs_patient_liquidity.json"
+  ],
+  "feedback": [
+    "iterations/iter_007/feedback/iter007_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_007/feedback/iter007_sticky_full_book_pressure.json",
+    "iterations/iter_007/feedback/iter007_consensus_vs_patient_liquidity.json"
+  ],
+  "improvement_proposals": [
+    "iterations/iter_007/improvements/iter007_consensus_vs_patient_liquidity.json",
+    "iterations/iter_007/improvements/iter007_consensus_vs_patient_liquidity_v1.json",
+    "iterations/iter_007/improvements/iter007_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_007/improvements/iter007_sticky_full_book_pressure.json"
+  ],
   "stop_reason": null
 }

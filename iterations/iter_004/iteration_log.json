@@ -1,48 +1,44 @@
 {
   "iteration_idx": 4,
-  "started_at": "2026-04-21T10:12:45.128359",
-  "finished_at": "2026-04-21T10:19:56.020101",
+  "started_at": "2026-04-28T04:29:23.773964",
+  "finished_at": "2026-04-28T04:56:12.424764",
   "signal_specs": [
-    "iter004_full_consensus_high_vol",
-    "iter004_ask_conc_zscore_extreme",
-    "iter004_bbo_reversal_on_tradeflow",
-    "iter004_deep_book_reversal"
+    "iter004_trade_flow_exhaustion",
+    "iter004_durable_book_consensus",
+    "iter004_ask_wall_reversion",
+    "iter004_microprice_momentum_in_vol"
   ],
   "spec_evaluations": [
-    "iterations/iter_004/evaluations/iter004_full_consensus_high_vol.json",
-    "iterations/iter_004/evaluations/iter004_ask_conc_zscore_extreme.json",
-    "iterations/iter_004/evaluations/iter004_bbo_reversal_on_tradeflow.json",
-    "iterations/iter_004/evaluations/iter004_deep_book_reversal.json"
+    "iterations/iter_004/evaluations/iter004_trade_flow_exhaustion.json",
+    "iterations/iter_004/evaluations/iter004_durable_book_consensus.json",
+    "iterations/iter_004/evaluations/iter004_ask_wall_reversion.json",
+    "iterations/iter_004/evaluations/iter004_microprice_momentum_in_vol.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_004/code/iter004_full_consensus_high_vol.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_004/code/iter004_ask_conc_zscore_extreme.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_004/code/iter004_bbo_reversal_on_tradeflow.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_004/code/iter004_deep_book_reversal.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_004/code/iter004_trade_flow_exhaustion.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_004/code/iter004_durable_book_consensus.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_004/code/iter004_ask_wall_reversion.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_004/fidelity/iter004_full_consensus_high_vol.json",
-    "iterations/iter_004/fidelity/iter004_ask_conc_zscore_extreme.json",
-    "iterations/iter_004/fidelity/iter004_bbo_reversal_on_tradeflow.json",
-    "iterations/iter_004/fidelity/iter004_deep_book_reversal.json"
+    "iterations/iter_004/fidelity/iter004_trade_flow_exhaustion.json",
+    "iterations/iter_004/fidelity/iter004_durable_book_consensus.json",
+    "iterations/iter_004/fidelity/iter004_ask_wall_reversion.json"
   ],
   "backtest_results": [
-    "iterations/iter_004/results/iter004_full_consensus_high_vol.json",
-    "iterations/iter_004/results/iter004_ask_conc_zscore_extreme.json",
-    "iterations/iter_004/results/iter004_bbo_reversal_on_tradeflow.json",
-    "iterations/iter_004/results/iter004_deep_book_reversal.json"
+    "iterations/iter_004/results/iter004_trade_flow_exhaustion.json",
+    "iterations/iter_004/results/iter004_durable_book_consensus.json",
+    "iterations/iter_004/results/iter004_ask_wall_reversion.json"
   ],
   "feedback": [
-    "iterations/iter_004/feedback/iter004_full_consensus_high_vol.json",
-    "iterations/iter_004/feedback/iter004_ask_conc_zscore_extreme.json",
-    "iterations/iter_004/feedback/iter004_bbo_reversal_on_tradeflow.json",
-    "iterations/iter_004/feedback/iter004_deep_book_reversal.json"
+    "iterations/iter_004/feedback/iter004_trade_flow_exhaustion.json",
+    "iterations/iter_004/feedback/iter004_durable_book_consensus.json",
+    "iterations/iter_004/feedback/iter004_ask_wall_reversion.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_004/improvements/iter004_full_consensus_high_vol.json",
-    "iterations/iter_004/improvements/iter004_ask_conc_zscore_extreme.json",
-    "iterations/iter_004/improvements/iter004_bbo_reversal_on_tradeflow.json",
-    "iterations/iter_004/improvements/iter004_deep_book_reversal.json"
+    "iterations/iter_004/improvements/iter004_durable_book_consensus.json",
+    "iterations/iter_004/improvements/iter004_durable_book_consensus_v1.json",
+    "iterations/iter_004/improvements/iter004_trade_flow_exhaustion.json",
+    "iterations/iter_004/improvements/iter004_trade_flow_exhaustion_v1.json"
   ],
   "stop_reason": null
 }

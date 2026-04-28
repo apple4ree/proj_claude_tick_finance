@@ -1,63 +1,43 @@
 {
   "agent_name": "chain2-gate",
   "agent_version": "0.1.0",
-  "timestamp": "2026-04-22T04:04:02.679311",
+  "timestamp": "2026-04-28T05:41:32.836265",
   "iteration_idx": 6,
   "iterations_scanned": [
     6
   ],
-  "total_valid_specs": 1,
+  "total_valid_specs": 4,
   "scenarios": [
     {
       "fee_scenario": "krx_cash_23bps",
       "fee_rt_bps": 23.0,
       "top_candidates": [],
       "excluded": {
-        "iter006_trade_flow_obi_compound": "gate_failed:G3_exp_post_fee:-16.811<=0"
+        "iter006_trade_flow_exhaustion": "gate_failed:G2_wr:0.5106<0.55",
+        "iter006_sticky_pressure_in_high_vol": "gate_failed:G1_density:153.3<300.0",
+        "iter006_deep_book_reversion": "gate_failed:G4_cross_inconsistent",
+        "iter006_closing_microprice_trend": "gate_failed:G1_density:0.0<300.0"
       }
     },
     {
       "fee_scenario": "hypothetical_low_fee_5bps",
       "fee_rt_bps": 5.0,
-      "top_candidates": [
-        {
-          "spec_id": "iter006_trade_flow_obi_compound",
-          "score": 0.43490381349871365,
-          "priority": "marginal",
-          "wr": 0.9025819377764337,
-          "expectancy_bps": 6.1889960713660415,
-          "expectancy_post_fee_bps": 1.1889960713660415,
-          "fee_absorption_ratio": 2.4755984285464168,
-          "trade_density_per_day_per_sym": 4408.833333333333,
-          "complexity_score": 3.0,
-          "has_regime_self_filter": false,
-          "dominates": [],
-          "dominated_by": null,
-          "factor_breakdown": {
-            "edge_w": 0.04161486249781145,
-            "density_w": 0.15328895100090217,
-            "filter_w": 0.0,
-            "simple_w": 0.09,
-            "multi_w": 0.15,
-            "raw_edge": 0.11889960713660415,
-            "raw_density": 0.7664447550045108,
-            "raw_filter": 0.0,
-            "raw_simple": 0.6,
-            "raw_multi": 1.0
-          },
-          "rationale_kr": "시나리오 `hypothetical_low_fee_5bps` 하에서 score **0.435** (marginal). 주요 기여 factor: **density** (0.153) — 거래 빈도 4409/day/심볼 로 통계적 안정성 확보. WR 0.903, post-fee expectancy +1.189 bps.",
-          "expected_chain2_concerns": [
-            "post-fee edge 얇음 (+1.19 bps) — Chain 2 adverse selection 에 민감",
-            "regime filter 부재 — high-spread 구간에서 fee 손실 누적 가능"
-          ]
-        }
-      ],
-      "excluded": {}
+      "top_candidates": [],
+      "excluded": {
+        "iter006_trade_flow_exhaustion": "gate_failed:G2_wr:0.5106<0.55",
+        "iter006_sticky_pressure_in_high_vol": "gate_failed:G1_density:153.3<300.0",
+        "iter006_deep_book_reversion": "gate_failed:G4_cross_inconsistent",
+        "iter006_closing_microprice_trend": "gate_failed:G1_density:0.0<300.0"
+      }
     }
   ],
   "cross_scenario_consensus": [],
   "warnings": [
-    "no candidates passed gates under krx_cash_23bps"
+    "no candidates passed gates under krx_cash_23bps",
+    "no candidates passed gates under hypothetical_low_fee_5bps",
+    "no-positive-post-fee-under-krx_cash_23bps — all specs fail G3 under this scenario; ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)",
+    "no-positive-post-fee-under-hypothetical_low_fee_5bps — all specs fail G3 under this scenario; ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)",
+    "DSR-computable specs: 0/4 (others lack trace data; their priority capped at STRONG)"
   ],
-  "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 통과 후보 없음\n- **hypothetical_low_fee_5bps**: 최상위 `iter006_trade_flow_obi_compound` score=0.435 (priority=marginal, post-fee exp +1.19 bps)"
+  "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 통과 후보 없음\n- **hypothetical_low_fee_5bps**: 통과 후보 없음"
 }

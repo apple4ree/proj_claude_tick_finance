@@ -137,19 +137,118 @@ def _derived_metrics(
 def _apply_gates(
     spec: SignalSpec, result: BacktestResult, feedback: Feedback, m: dict[str, Any],
     fee_rt_bps: float,
+    is_real_fee_scenario: bool = True,
+    soft_g3: bool = False,
 ) -> str | None:
-    """Return None if pass, else a string describing the gate failure."""
+    """Return None if pass, else a string describing the gate failure.
+
+    G3 (expectancy_post_fee > 0) is SOFT when `soft_g3=True` and all specs in
+    the run fail it (determined externally). In that case G3 is skipped here
+    and all candidates are ranked by fee_absorption_ratio.
+    """
     if m["trade_density_per_day_per_sym"] < GATE_MIN_DENSITY:
         return f"gate_failed:G1_density:{m['trade_density_per_day_per_sym']:.1f}<{GATE_MIN_DENSITY}"
     if m["wr"] < GATE_MIN_WR:
         return f"gate_failed:G2_wr:{m['wr']:.4f}<{GATE_MIN_WR}"
     exp_post = m["expectancy_bps"] - fee_rt_bps
-    if exp_post <= 0:
+    if exp_post <= 0 and not soft_g3:
         return f"gate_failed:G3_exp_post_fee:{exp_post:.3f}<=0"
     cross = feedback.cross_symbol_consistency
     if cross == "inconsistent":
         return "gate_failed:G4_cross_inconsistent"
     return None
+
+
+# ---------------------------------------------------------------------------
+# Statistical evidence (DSR + FDR) — López de Prado 2018 / Benjamini-Hochberg 1995
+# ---------------------------------------------------------------------------
+
+
+def _load_trace_signed_bps(trace_path: str | None) -> list[float]:
+    """Load per-trade signed_bps from a trace.json file. Returns [] on failure."""
+    if not trace_path:
+        return []
+    p = Path(trace_path)
+    if not p.exists():
+        return []
+    try:
+        d = json.loads(p.read_text())
+    except Exception:  # noqa: BLE001
+        return []
+    records = d.get("records", [])
+    return [float(r["signed_bps"]) for r in records if "signed_bps" in r]
+
+
+def _compute_statistical_evidence(
+    triples_normalized: list[Any],
+    iter_dir_resolver,
+    n_trials_for_dsr: int,
+    fdr_q: float = 0.05,
+) -> dict[str, dict]:
+    """Compute per-spec DSR + FDR evidence.
+
+    Args:
+      triples_normalized: list of GateTriple.
+      iter_dir_resolver: callable(iter_idx: int) -> Path — to find trace files.
+      n_trials_for_dsr: M in López de Prado selection-bias correction.
+      fdr_q: target FDR level.
+
+    Returns: {spec_id: {dsr, p_value, fdr_passed, n_trace, sharpe_per_trade}}.
+    If trace is unavailable for a spec, its entry has all fields set to None.
+    """
+    try:
+        from chain1.statistics import (
+            per_trade_stats, spec_one_sided_pvalue,
+            deflated_sharpe_ratio, bh_fdr_threshold,
+        )
+    except ImportError:
+        return {}
+
+    # Collect per-spec trace + compute basic stats
+    spec_data: dict[str, dict] = {}
+    for t in triples_normalized:
+        spec_id = t.spec.spec_id
+        trace_path = getattr(t.result, "trace_path", None)
+        if not trace_path:
+            # Try default location
+            iter_dir = iter_dir_resolver(t.spec.iteration_idx)
+            trace_path = str(iter_dir / "traces" / f"{spec_id}.trace.json") if iter_dir else None
+        bps = _load_trace_signed_bps(trace_path)
+        if not bps:
+            spec_data[spec_id] = {
+                "dsr": None, "p_value": None, "fdr_passed": None,
+                "n_trace": 0, "sharpe_per_trade": None,
+                "reason": "trace unavailable",
+            }
+            continue
+        stats = per_trade_stats(bps)
+        p = spec_one_sided_pvalue(bps)
+        dsr = deflated_sharpe_ratio(
+            sr_observed=stats["sharpe_per_trade"],
+            n_trades=stats["n"],
+            n_trials=n_trials_for_dsr,
+            skewness=stats["skew"],
+            excess_kurtosis=stats["excess_kurt"],
+            autocorrelation=stats["autocorr_lag1"],
+        )
+        spec_data[spec_id] = {
+            "dsr": float(dsr),
+            "p_value": float(p),
+            "n_trace": int(stats["n"]),
+            "sharpe_per_trade": float(stats["sharpe_per_trade"]),
+            "autocorr": float(stats["autocorr_lag1"]),
+        }
+
+    # FDR across all specs with valid p-values
+    valid_ids = [sid for sid, d in spec_data.items() if d.get("p_value") is not None]
+    if valid_ids:
+        import numpy as _np
+        p_arr = _np.array([spec_data[sid]["p_value"] for sid in valid_ids])
+        cutoff, mask = bh_fdr_threshold(p_arr, q=fdr_q)
+        for sid, passed in zip(valid_ids, mask):
+            spec_data[sid]["fdr_passed"] = bool(passed)
+        spec_data["_fdr_cutoff_pvalue"] = float(cutoff)
+    return spec_data
 
 
 # ---------------------------------------------------------------------------
@@ -345,6 +444,17 @@ def run_gate(
     for t in normalized:
         metrics_by_id[t.spec.spec_id] = _derived_metrics(t.spec, t.result, n_symbols, n_dates)
 
+    # Compute statistical evidence (DSR + FDR) once across all specs — this
+    # drives MUST_INCLUDE qualification. 2026-04-23 addition.
+    def _iter_dir_resolver(idx: int) -> Path | None:
+        d = REPO_ROOT / "iterations" / f"iter_{idx:03d}"
+        return d if d.exists() else None
+
+    stat_evidence = _compute_statistical_evidence(
+        normalized, _iter_dir_resolver,
+        n_trials_for_dsr=max(len(normalized), 10),
+    )
+
     scenario_results: list[Chain2ScenarioResult] = []
     candidates_per_scenario: dict[str, list[Chain2Candidate]] = {}
 
@@ -354,11 +464,23 @@ def run_gate(
         rt_bps = FEE_SCENARIOS[fs]["rt_bps"]
         excluded: dict[str, str] = {}
 
-        # Apply gates
+        # Check soft-G3 fallback: if ALL specs fail G3 under this scenario,
+        # treat G3 as soft (per AGENTS.md 2026-04-23 revision).
+        all_fail_g3 = all(
+            (metrics_by_id[t.spec.spec_id]["expectancy_bps"] - rt_bps) <= 0
+            for t in normalized
+        )
+        soft_g3 = all_fail_g3
+        if soft_g3:
+            # This scenario is "deployment-infeasible"; we'll rank but not promote.
+            pass
+
+        # Apply gates (with soft_g3 flag)
         survivors: list[str] = []
         for t in normalized:
             m = metrics_by_id[t.spec.spec_id]
-            failure = _apply_gates(t.spec, t.result, t.feedback, m, rt_bps)
+            failure = _apply_gates(t.spec, t.result, t.feedback, m, rt_bps,
+                                    soft_g3=soft_g3)
             if failure is not None:
                 excluded[t.spec.spec_id] = failure
             else:
@@ -384,10 +506,32 @@ def run_gate(
         for sid in still_alive:
             m = metrics_by_id[sid]
             score, breakdown = _composite_score(m, rt_bps, n_dates)
+
+            # Composite-score-based priority
+            priority = _priority(score)
+
+            # Statistical-evidence-based DOWNGRADE (López de Prado 2018 / BH-FDR):
+            # Only allow MUST_INCLUDE if DSR ≥ 0.95 AND FDR-passed AND
+            # expectancy post-fee > 0 (i.e., not in soft-G3 regime).
+            ev = stat_evidence.get(sid)
+            if priority == Chain2Priority.MUST_INCLUDE:
+                reasons = []
+                if soft_g3:
+                    reasons.append("soft-G3 scenario (no post-fee positive)")
+                if ev and ev.get("dsr") is not None and ev["dsr"] < 0.95:
+                    reasons.append(f"DSR={ev['dsr']:.3f}<0.95")
+                if ev and ev.get("fdr_passed") is False:
+                    reasons.append("FDR not passed")
+                if ev is None or ev.get("dsr") is None:
+                    reasons.append("no trace / DSR uncomputable")
+                if reasons:
+                    priority = Chain2Priority.STRONG
+                    # Will be added to breakdown below
+
             cand = Chain2Candidate(
                 spec_id=sid,
                 score=score,
-                priority=_priority(score),
+                priority=priority,
                 wr=m["wr"],
                 expectancy_bps=m["expectancy_bps"],
                 expectancy_post_fee_bps=m["expectancy_bps"] - rt_bps,
@@ -397,8 +541,30 @@ def run_gate(
                 has_regime_self_filter=m["has_regime_self_filter"],
                 factor_breakdown=breakdown,
             )
+
+            # Attach statistical evidence to factor_breakdown for auditability
+            if ev:
+                if ev.get("dsr") is not None:
+                    cand.factor_breakdown["dsr"] = ev["dsr"]
+                if ev.get("p_value") is not None:
+                    cand.factor_breakdown["p_value"] = ev["p_value"]
+                if ev.get("fdr_passed") is not None:
+                    cand.factor_breakdown["fdr_passed"] = 1.0 if ev["fdr_passed"] else 0.0
+                if ev.get("sharpe_per_trade") is not None:
+                    cand.factor_breakdown["sharpe_per_trade"] = ev["sharpe_per_trade"]
+                if ev.get("autocorr") is not None:
+                    cand.factor_breakdown["autocorr_lag1"] = ev["autocorr"]
+
             # Default concerns + rationale (deterministic fallback)
             cand.expected_chain2_concerns = _default_concerns(cand, specs_by_id[sid])
+            if ev and ev.get("dsr") is not None and ev["dsr"] < 0.95:
+                cand.expected_chain2_concerns.append(
+                    f"DSR={ev['dsr']:.3f}<0.95 — selection-bias-corrected evidence below strong-edge threshold"
+                )
+            if ev and ev.get("fdr_passed") is False:
+                cand.expected_chain2_concerns.append(
+                    "FDR-corrected p-value not passed — spec may reflect chance selection"
+                )
             cand.rationale_kr = _synthesize_rationale_kr(cand, specs_by_id[sid], feedbacks_by_id[sid], fs)
             cands.append(cand)
 
@@ -424,6 +590,27 @@ def run_gate(
     for sr in scenario_results:
         if not sr.top_candidates:
             warnings.append(f"no candidates passed gates under {sr.fee_scenario}")
+
+    # Soft-G3 warnings (2026-04-23)
+    for fs in fee_scenarios:
+        rt = FEE_SCENARIOS[fs]["rt_bps"]
+        all_fail = all(
+            (metrics_by_id[t.spec.spec_id]["expectancy_bps"] - rt) <= 0
+            for t in normalized
+        )
+        if all_fail:
+            warnings.append(
+                f"no-positive-post-fee-under-{fs} — all specs fail G3 under this scenario; "
+                f"ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)"
+            )
+
+    # Statistical evidence warning
+    n_with_dsr = sum(1 for d in stat_evidence.values() if isinstance(d, dict) and d.get("dsr") is not None)
+    n_total = len([t for t in normalized])
+    if n_with_dsr < n_total:
+        warnings.append(
+            f"DSR-computable specs: {n_with_dsr}/{n_total} (others lack trace data; their priority capped at STRONG)"
+        )
 
     # Meta narrative (LLM optional but deterministic fallback always populates)
     meta_narrative = _llm_narrative_layer(

@@ -2,6 +2,32 @@
 
 Mandatory decision tree and diagnostic recipes. All feedback outputs must trace back to entries here.
 
+> **2026-04-27 paradigm shift**: Backtest mode = `regime_state` (default). Decision tree below has been extended with regime-state sanity checks. Read `_shared/references/cheat_sheets/regime_state_paradigm.md` first for context.
+
+---
+
+## Regime-state sanity checks (run FIRST, before headline triage)
+
+When `result.backtest_mode == "regime_state"`, run these BEFORE the WR-based decision tree:
+
+| Trigger | Recommendation | Rationale |
+|---|---|---|
+| `aggregate_signal_duty_cycle > 0.95` | `swap_feature` | Buy-and-hold artifact — signal almost always True, regimes degenerate to one-per-session holds. Replace primitive with one having meaningful temporal toggling. |
+| `aggregate_n_regimes / n_sessions < 1.5` | `loosen_threshold` | Signal too rare to validate. Lower threshold or simplify formula. |
+| `aggregate_mean_duration_ticks < 5` AND `aggregate_n_regimes > 100` | `add_filter` | Signal flickering — too noisy to support stable holding. Add regime gate or rolling smoother. |
+
+These three checks REPLACE any other recommendation when triggered.
+
+### Target metric ranges (regime-state, per `regime_state_paradigm.md`)
+
+| Metric | Healthy range |
+|---|---|
+| `signal_duty_cycle` | 0.05 – 0.80 |
+| `n_regimes / sessions` | 5 – 50 |
+| `mean_duration_ticks` | 20 – 5000 |
+| `WR` | ≥ 0.55 |
+| `expectancy_bps` | ≥ 28 (KRX deployable) |
+
 ---
 
 ## Step-by-step diagnosis
@@ -81,3 +107,69 @@ ELSE:
 - `weaknesses` list: minimum 1 entry (if the spec were perfect it wouldn't be in iteration). Maximum 4.
 - `recommended_direction_reasoning`: must name the primary driving number (e.g., "WR=52.3% over 412 trades is indistinguishable from random walk, so swap_feature").
 - `win_bucket_insight` / `loss_bucket_insight`: always required. Use `"trace not available"` if data missing.
+
+---
+
+## Post-fee deployment sanity (NEW, 2026-04-23)
+
+Chain 1 measures raw expectancy (mid-to-mid, no fees). Chain 2 will later apply execution costs (spread + taker fee + KRX sell_tax ≈ **30 bps RT** for KRX cash equity). A signal with raw expectancy +10 bps is still **−20 bps post-fee** — not deployable.
+
+To make feedback useful for the downstream `signal-improver`, compute per-trade win/loss **magnitudes** (not just WR and expectancy):
+
+```
+avg_win_bps  = sum_win_bps  / n_wins
+avg_loss_bps = sum_loss_bps / n_losses
+```
+
+Note: `sum_loss_bps` is stored as a positive number in our schema (absolute value).
+
+### Fee budget reference (KRX cash equity, our deployment market)
+
+| Component | bps |
+|---|---|
+| Taker fee (entry + exit) | 3 |
+| Sell tax (매도 시) | 20 |
+| Half-spread × 2 (taker cross both sides) | ~7 |
+| **Total RT fee** | **~30** |
+
+For `net_pnl > 0` deployment-feasibility, we need either:
+- **avg_win_bps ≥ 30** (each winning trade individually covers fee), OR
+- `(2·WR − 1) × avg_win − 2·(1−WR)·avg_loss > 30` (portfolio math; high-WR + small-loser payoff)
+
+### Deployment viability tag
+
+Add ONE of the following tags to `concerns` or `recommended_direction_reasoning`:
+
+| Tag | Condition | Interpretation |
+|---|---|---|
+| `deployable_post_fee` | `avg_win_bps ≥ 30` | Single winning trade covers fee. Strong candidate for Chain 2. |
+| `marginal_post_fee`   | `15 ≤ avg_win_bps < 30` | Wins partially cover fee; needs Chain 1.5 (exit policy) or Chain 2 (maker) to push post-fee positive. |
+| `capped_post_fee`     | `avg_win_bps < 15` | Wins cannot cover fee even in principle. Any WR improvement cannot rescue this signal for KRX. Paradigm is wrong for this market. |
+
+### How the tag steers `recommended_next_direction`
+
+Override or augment the headline triage above:
+
+- **`capped_post_fee`** → **prefer `change_horizon` over `tighten_threshold`**. Reasoning: tightening threshold raises WR but does not change avg_win (|Δmid| distribution). Only longer horizon stretches avg_|Δmid|. (Exception: retire if horizon sweep already shows no |Δmid| scaling.)
+- **`marginal_post_fee`** → **prefer `add_filter` / `change_horizon`**. Tag: `signal works but magnitude insufficient — requires regime-gating to isolate high-magnitude subset`.
+- **`deployable_post_fee`** → **prefer `combine_with_other_spec`**. Tag: `signal already economically strong — portfolio diversification gives Sharpe uplift`.
+
+### Example diagnosis flow
+
+Observed metrics for a candidate spec:
+```
+n_trades = 1,661, WR = 0.948, expectancy = +12.98 bps
+sum_win_bps = 22,500 (over 1,575 wins)
+sum_loss_bps = 1,550 (over 86 losses)
+
+→ avg_win_bps = 22,500 / 1,575 = 14.3 bps
+→ avg_loss_bps = 1,550 / 86 = 18.0 bps
+→ Tag: `capped_post_fee` (avg_win < 15)
+→ Recommendation: `change_horizon` to 100 ticks to test if avg_win scales
+```
+
+### Note on raw expectancy vs net expectancy
+
+Raw expectancy `= E[signed_bps]` does not guarantee post-fee profit. It is perfectly possible (and common) to have raw expectancy +5 bps where the signal is **fundamentally capped** at 20 bps avg_win, making KRX deployment impossible regardless of further Chain 1 refinement.
+
+This is why feedback-analyst must emit the viability tag — it tells signal-improver which axes of mutation are **worth spending iteration budget on** and which are **dead ends**.

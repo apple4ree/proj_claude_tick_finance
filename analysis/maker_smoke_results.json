@@ -1,0 +1,50 @@
+{
+  "fee_bps": 23.0,
+  "rows": [
+    {
+      "spec_id": "iter013_opening_burst_conviction",
+      "mid": 4.743578547395746,
+      "maker": 14.005760157954338,
+      "spread": 9.251270955456826,
+      "gain": 9.262181610558592,
+      "net_maker": -8.994239842045662,
+      "n_regimes": 6444
+    },
+    {
+      "spec_id": "iter016_stable_pressure_on_fragile_book",
+      "mid": 4.079078475218413,
+      "maker": 13.929650082807944,
+      "spread": 9.838247048231707,
+      "gain": 9.850571607589531,
+      "net_maker": -9.070349917192056,
+      "n_regimes": 1049
+    },
+    {
+      "spec_id": "iter009_stable_imbalance_vs_fragile_book",
+      "mid": 3.8458254653957473,
+      "maker": 13.728275290464268,
+      "spread": 9.870796939375285,
+      "gain": 9.88244982506852,
+      "net_maker": -9.271724709535732,
+      "n_regimes": 1273
+    },
+    {
+      "spec_id": "iter000_full_book_consensus",
+      "mid": 3.4394537766700677,
+      "maker": 12.146075485746804,
+      "spread": 8.698041661362925,
+      "gain": 8.706621709076737,
+      "net_maker": -10.853924514253196,
+      "n_regimes": 11846
+    },
+    {
+      "spec_id": "iter020_magnitude_consensus_at_open",
+      "mid": 3.42235151645703,
+      "maker": 11.809583462243465,
+      "spread": 8.379242680455677,
+      "gain": 8.387231945786436,
+      "net_maker": -11.190416537756535,
+      "n_regimes": 6840
+    }
+  ]
+}

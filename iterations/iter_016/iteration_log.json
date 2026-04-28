@@ -1,40 +1,44 @@
 {
   "iteration_idx": 16,
-  "started_at": "2026-04-22T02:15:48.513270",
-  "finished_at": "2026-04-22T02:21:20.122956",
+  "started_at": "2026-04-28T09:46:57.777091",
+  "finished_at": "2026-04-28T10:10:43.310764",
   "signal_specs": [
-    "iter016_trade_flow_exhaustion_tight",
-    "iter016_deep_book_absorption_tight",
-    "iter016_exhaustion_into_ask_wall",
-    "iter016_bbo_vs_deep_reversal"
+    "iter016_smoothed_trade_flow_reversion",
+    "iter016_sticky_microprice_in_high_vol",
+    "iter016_closing_wall_reversion_relaxed",
+    "iter016_full_book_and_velocity_consensus"
   ],
   "spec_evaluations": [
-    "iterations/iter_016/evaluations/iter016_trade_flow_exhaustion_tight.json",
-    "iterations/iter_016/evaluations/iter016_deep_book_absorption_tight.json",
-    "iterations/iter_016/evaluations/iter016_exhaustion_into_ask_wall.json",
-    "iterations/iter_016/evaluations/iter016_bbo_vs_deep_reversal.json"
+    "iterations/iter_016/evaluations/iter016_smoothed_trade_flow_reversion.json",
+    "iterations/iter_016/evaluations/iter016_sticky_microprice_in_high_vol.json",
+    "iterations/iter_016/evaluations/iter016_closing_wall_reversion_relaxed.json",
+    "iterations/iter_016/evaluations/iter016_full_book_and_velocity_consensus.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_016/code/iter016_trade_flow_exhaustion_tight.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_016/code/iter016_deep_book_absorption_tight.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_016/code/iter016_sticky_microprice_in_high_vol.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_016/code/iter016_closing_wall_reversion_relaxed.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_016/code/iter016_full_book_and_velocity_consensus.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_016/fidelity/iter016_trade_flow_exhaustion_tight.json",
-    "iterations/iter_016/fidelity/iter016_deep_book_absorption_tight.json"
+    "iterations/iter_016/fidelity/iter016_sticky_microprice_in_high_vol.json",
+    "iterations/iter_016/fidelity/iter016_closing_wall_reversion_relaxed.json",
+    "iterations/iter_016/fidelity/iter016_full_book_and_velocity_consensus.json"
   ],
   "backtest_results": [
-    "iterations/iter_016/results/iter016_trade_flow_exhaustion_tight.json",
-    "iterations/iter_016/results/iter016_deep_book_absorption_tight.json"
+    "iterations/iter_016/results/iter016_sticky_microprice_in_high_vol.json",
+    "iterations/iter_016/results/iter016_closing_wall_reversion_relaxed.json",
+    "iterations/iter_016/results/iter016_full_book_and_velocity_consensus.json"
   ],
   "feedback": [
-    "iterations/iter_016/feedback/iter016_trade_flow_exhaustion_tight.json",
-    "iterations/iter_016/feedback/iter016_deep_book_absorption_tight.json"
+    "iterations/iter_016/feedback/iter016_sticky_microprice_in_high_vol.json",
+    "iterations/iter_016/feedback/iter016_closing_wall_reversion_relaxed.json",
+    "iterations/iter_016/feedback/iter016_full_book_and_velocity_consensus.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_016/improvements/iter016_deep_book_absorption_tight.json",
-    "iterations/iter_016/improvements/iter016_deep_book_absorption_tight_v1.json",
-    "iterations/iter_016/improvements/iter016_deep_book_absorption_tight_v2.json",
-    "iterations/iter_016/improvements/iter016_trade_flow_exhaustion_tight.json"
+    "iterations/iter_016/improvements/iter016_full_book_and_velocity_consensus.json",
+    "iterations/iter_016/improvements/iter016_full_book_and_velocity_consensus_v1.json",
+    "iterations/iter_016/improvements/iter016_closing_wall_reversion_relaxed.json",
+    "iterations/iter_016/improvements/iter016_sticky_microprice_in_high_vol.json"
   ],
   "stop_reason": null
 }

@@ -1,7 +1,7 @@
 {
   "agent_name": "chain2-gate",
   "agent_version": "0.1.0",
-  "timestamp": "2026-04-22T01:37:17.535225",
+  "timestamp": "2026-04-28T07:45:13.465217",
   "iteration_idx": 10,
   "iterations_scanned": [
     10
@@ -13,59 +13,31 @@
       "fee_rt_bps": 23.0,
       "top_candidates": [],
       "excluded": {
-        "iter010_ask_conc_extreme_push": "gate_failed:G1_density:28.7<300.0",
-        "iter010_absorption_spread_filter": "gate_failed:G1_density:0.0<300.0",
-        "iter010_consensus_plus_bid_shape": "gate_failed:G3_exp_post_fee:-16.228<=0",
-        "iter010_tradeflow_exhaustion_into_wall": "gate_failed:G1_density:6.2<300.0"
+        "iter010_trade_flow_exhaustion_reversal": "gate_failed:G2_wr:0.5114<0.55",
+        "iter010_sticky_deep_book_pressure": "gate_failed:G1_density:13.3<300.0",
+        "iter010_microprice_velocity_stable_spread": "gate_failed:G2_wr:0.4817<0.55",
+        "iter010_bbo_deep_book_divergence": "gate_failed:G4_cross_inconsistent"
       }
     },
     {
       "fee_scenario": "hypothetical_low_fee_5bps",
       "fee_rt_bps": 5.0,
-      "top_candidates": [
-        {
-          "spec_id": "iter010_consensus_plus_bid_shape",
-          "score": 0.2200326905430447,
-          "priority": "marginal",
-          "wr": 0.9594594594594594,
-          "expectancy_bps": 6.771604263147173,
-          "expectancy_post_fee_bps": 1.7716042631471733,
-          "fee_absorption_ratio": 2.708641705258869,
-          "trade_density_per_day_per_sym": 345.3333333333333,
-          "complexity_score": 7.0,
-          "has_regime_self_filter": false,
-          "dominates": [],
-          "dominated_by": null,
-          "factor_breakdown": {
-            "edge_w": 0.06200614921015107,
-            "density_w": 0.008026541332893647,
-            "filter_w": 0.0,
-            "simple_w": 0.0,
-            "multi_w": 0.15,
-            "raw_edge": 0.17716042631471735,
-            "raw_density": 0.04013270666446823,
-            "raw_filter": 0.0,
-            "raw_simple": 0.0,
-            "raw_multi": 1.0
-          },
-          "rationale_kr": "시나리오 `hypothetical_low_fee_5bps` 하에서 score **0.220** (marginal). 주요 기여 factor: **multi** (0.150) — multi-day 재현성 확보. WR 0.959, post-fee expectancy +1.772 bps.",
-          "expected_chain2_concerns": [
-            "post-fee edge 얇음 (+1.77 bps) — Chain 2 adverse selection 에 민감",
-            "complexity=7 — execution 튜닝 공간 복잡",
-            "regime filter 부재 — high-spread 구간에서 fee 손실 누적 가능"
-          ]
-        }
-      ],
+      "top_candidates": [],
       "excluded": {
-        "iter010_ask_conc_extreme_push": "gate_failed:G1_density:28.7<300.0",
-        "iter010_absorption_spread_filter": "gate_failed:G1_density:0.0<300.0",
-        "iter010_tradeflow_exhaustion_into_wall": "gate_failed:G1_density:6.2<300.0"
+        "iter010_trade_flow_exhaustion_reversal": "gate_failed:G2_wr:0.5114<0.55",
+        "iter010_sticky_deep_book_pressure": "gate_failed:G1_density:13.3<300.0",
+        "iter010_microprice_velocity_stable_spread": "gate_failed:G2_wr:0.4817<0.55",
+        "iter010_bbo_deep_book_divergence": "gate_failed:G4_cross_inconsistent"
       }
     }
   ],
   "cross_scenario_consensus": [],
   "warnings": [
-    "no candidates passed gates under krx_cash_23bps"
+    "no candidates passed gates under krx_cash_23bps",
+    "no candidates passed gates under hypothetical_low_fee_5bps",
+    "no-positive-post-fee-under-krx_cash_23bps — all specs fail G3 under this scenario; ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)",
+    "no-positive-post-fee-under-hypothetical_low_fee_5bps — all specs fail G3 under this scenario; ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)",
+    "DSR-computable specs: 0/4 (others lack trace data; their priority capped at STRONG)"
   ],
-  "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 통과 후보 없음\n- **hypothetical_low_fee_5bps**: 최상위 `iter010_consensus_plus_bid_shape` score=0.220 (priority=marginal, post-fee exp +1.77 bps)"
+  "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 통과 후보 없음\n- **hypothetical_low_fee_5bps**: 통과 후보 없음"
 }

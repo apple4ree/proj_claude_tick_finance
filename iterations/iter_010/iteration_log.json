@@ -1,48 +1,48 @@
 {
   "iteration_idx": 10,
-  "started_at": "2026-04-22T01:29:50.604479",
-  "finished_at": "2026-04-22T01:37:17.531687",
+  "started_at": "2026-04-28T07:07:38.033166",
+  "finished_at": "2026-04-28T07:45:11.974817",
   "signal_specs": [
-    "iter010_ask_conc_extreme_push",
-    "iter010_absorption_spread_filter",
-    "iter010_consensus_plus_bid_shape",
-    "iter010_tradeflow_exhaustion_into_wall"
+    "iter010_trade_flow_exhaustion_reversal",
+    "iter010_sticky_deep_book_pressure",
+    "iter010_microprice_velocity_stable_spread",
+    "iter010_bbo_deep_book_divergence"
   ],
   "spec_evaluations": [
-    "iterations/iter_010/evaluations/iter010_ask_conc_extreme_push.json",
-    "iterations/iter_010/evaluations/iter010_absorption_spread_filter.json",
-    "iterations/iter_010/evaluations/iter010_consensus_plus_bid_shape.json",
-    "iterations/iter_010/evaluations/iter010_tradeflow_exhaustion_into_wall.json"
+    "iterations/iter_010/evaluations/iter010_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_010/evaluations/iter010_sticky_deep_book_pressure.json",
+    "iterations/iter_010/evaluations/iter010_microprice_velocity_stable_spread.json",
+    "iterations/iter_010/evaluations/iter010_bbo_deep_book_divergence.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_010/code/iter010_ask_conc_extreme_push.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_010/code/iter010_absorption_spread_filter.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_010/code/iter010_consensus_plus_bid_shape.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_010/code/iter010_tradeflow_exhaustion_into_wall.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_010/code/iter010_trade_flow_exhaustion_reversal.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_010/code/iter010_sticky_deep_book_pressure.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_010/code/iter010_microprice_velocity_stable_spread.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_010/code/iter010_bbo_deep_book_divergence.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_010/fidelity/iter010_ask_conc_extreme_push.json",
-    "iterations/iter_010/fidelity/iter010_absorption_spread_filter.json",
-    "iterations/iter_010/fidelity/iter010_consensus_plus_bid_shape.json",
-    "iterations/iter_010/fidelity/iter010_tradeflow_exhaustion_into_wall.json"
+    "iterations/iter_010/fidelity/iter010_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_010/fidelity/iter010_sticky_deep_book_pressure.json",
+    "iterations/iter_010/fidelity/iter010_microprice_velocity_stable_spread.json",
+    "iterations/iter_010/fidelity/iter010_bbo_deep_book_divergence.json"
   ],
   "backtest_results": [
-    "iterations/iter_010/results/iter010_ask_conc_extreme_push.json",
-    "iterations/iter_010/results/iter010_absorption_spread_filter.json",
-    "iterations/iter_010/results/iter010_consensus_plus_bid_shape.json",
-    "iterations/iter_010/results/iter010_tradeflow_exhaustion_into_wall.json"
+    "iterations/iter_010/results/iter010_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_010/results/iter010_sticky_deep_book_pressure.json",
+    "iterations/iter_010/results/iter010_microprice_velocity_stable_spread.json",
+    "iterations/iter_010/results/iter010_bbo_deep_book_divergence.json"
   ],
   "feedback": [
-    "iterations/iter_010/feedback/iter010_ask_conc_extreme_push.json",
-    "iterations/iter_010/feedback/iter010_absorption_spread_filter.json",
-    "iterations/iter_010/feedback/iter010_consensus_plus_bid_shape.json",
-    "iterations/iter_010/feedback/iter010_tradeflow_exhaustion_into_wall.json"
+    "iterations/iter_010/feedback/iter010_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_010/feedback/iter010_sticky_deep_book_pressure.json",
+    "iterations/iter_010/feedback/iter010_microprice_velocity_stable_spread.json",
+    "iterations/iter_010/feedback/iter010_bbo_deep_book_divergence.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_010/improvements/iter010_ask_conc_extreme_push.json",
-    "iterations/iter_010/improvements/iter010_ask_conc_extreme_push_v1.json",
-    "iterations/iter_010/improvements/iter010_consensus_plus_bid_shape.json",
-    "iterations/iter_010/improvements/iter010_consensus_plus_bid_shape_v1.json"
+    "iterations/iter_010/improvements/iter010_bbo_deep_book_divergence.json",
+    "iterations/iter_010/improvements/iter010_bbo_deep_book_divergence_v1.json",
+    "iterations/iter_010/improvements/iter010_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_010/improvements/iter010_sticky_deep_book_pressure.json"
   ],
   "stop_reason": null
 }

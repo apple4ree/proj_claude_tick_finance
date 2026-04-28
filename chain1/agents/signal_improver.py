@@ -167,11 +167,20 @@ def _allocate_budget(n_parents: int, budget: int) -> list[int]:
 # ---------------------------------------------------------------------------
 
 
-def _rank_triples(triples: list[FeedbackTriple]) -> list[FeedbackTriple]:
+def _rank_triples(triples: list[FeedbackTriple], fee_bps_rt: float = 0.0) -> list[FeedbackTriple]:
+    """Sort triples best→worst.
+
+    Primary key: net_expectancy = expectancy_bps − fee_bps_rt. When
+    fee_bps_rt > 0 this ranks deployable specs above WR-pretty-but-fee-capped
+    ones (Fix #1, 2026-04-27). When fee_bps_rt == 0 the order matches the
+    pre-fix expectancy → wr → n_trades cascade.
+    """
     def key(t: FeedbackTriple) -> tuple:
         r = t.result
+        exp = r.aggregate_expectancy_bps or 0.0
+        net_exp = exp - fee_bps_rt
         return (
-            -(r.aggregate_expectancy_bps or 0.0),
+            -net_exp,
             -(r.aggregate_wr or 0.0),
             -(r.aggregate_n_trades or 0),
         )
@@ -182,10 +191,11 @@ def _build_deterministic_proposals(
     triples: list[FeedbackTriple],
     iteration_idx: int,
     next_budget: int,
+    fee_bps_rt: float = 0.0,
 ) -> list[ImprovementProposal]:
     # Drop retires
     survivors = [t for t in triples if t.feedback.recommended_next_direction != "retire"]
-    ranked = _rank_triples(survivors)
+    ranked = _rank_triples(survivors, fee_bps_rt=fee_bps_rt)
     if not ranked:
         return []
     alloc = _allocate_budget(len(ranked), next_budget)
@@ -201,6 +211,7 @@ def _build_deterministic_proposals(
         # Duplicate the proposal `seats` times with minor variant labels if >1 seat
         for seat_idx in range(seats):
             variant_note = "" if seats == 1 else f" (variant {seat_idx+1}/{seats})"
+            net_exp = (parent.result.aggregate_expectancy_bps or 0.0) - fee_bps_rt
             proposals.append(ImprovementProposal(
                 agent_name="signal-improver",
                 iteration_idx=iteration_idx,
@@ -210,6 +221,7 @@ def _build_deterministic_proposals(
                 reasoning=(
                     f"Parent WR={parent.result.aggregate_wr:.3f} "
                     f"exp={parent.result.aggregate_expectancy_bps:+.3f}bps "
+                    f"net={net_exp:+.3f}bps (fee={fee_bps_rt:.1f}bps RT) "
                     f"n={parent.result.aggregate_n_trades}. Feedback direction={direction}: "
                     f"{parent.feedback.recommended_direction_reasoning[:200]}"
                 ),
@@ -228,23 +240,32 @@ def _build_user_message(
     iteration_idx: int,
     next_budget: int,
     det_proposals: list[ImprovementProposal],
+    fee_bps_rt: float = 0.0,
 ) -> str:
     summaries = []
     for t in triples:
+        exp = t.result.aggregate_expectancy_bps
         summaries.append({
             "spec_id": t.spec.spec_id,
             "formula": t.spec.formula,
             "threshold": t.spec.threshold,
             "horizon": t.spec.prediction_horizon_ticks,
             "wr": t.result.aggregate_wr,
-            "expectancy_bps": t.result.aggregate_expectancy_bps,
+            "expectancy_bps": exp,
+            "net_expectancy_bps": (exp or 0.0) - fee_bps_rt,
             "n_trades": t.result.aggregate_n_trades,
             "recommendation": t.feedback.recommended_next_direction,
             "reasoning": t.feedback.recommended_direction_reasoning,
         })
     det = [p.model_dump() for p in det_proposals]
+    fee_block = (
+        f"Deployment fee (round-trip): {fee_bps_rt:.1f} bps. "
+        f"Net expectancy = expectancy_bps − {fee_bps_rt:.1f}. A spec is deployable only "
+        f"when net_expectancy_bps > 0; rank parents accordingly.\n\n"
+    ) if fee_bps_rt > 0 else ""
     return (
         f"Iteration: {iteration_idx}\nNext-iteration budget: {next_budget}\n\n"
+        f"{fee_block}"
         f"Feedback triples this iteration:\n{json.dumps(summaries, indent=2, default=str)}\n\n"
         f"Deterministic proposal draft (use this as anchor — preserve parent_spec_id + search_axes; "
         f"you may refine proposed_mutations strings and reasoning):\n{json.dumps(det, indent=2, default=str)}\n\n"
@@ -263,8 +284,13 @@ def improve_signals(
     client: LLMClient | None = None,
     model_override: str | None = None,
     skip_llm: bool = False,
+    fee_bps_rt: float = 0.0,
 ) -> list[ImprovementProposal]:
-    """Hybrid signal-improver entry point."""
+    """Hybrid signal-improver entry point.
+
+    fee_bps_rt : round-trip fee in bps. When > 0, ranking and proposal reasoning
+    use net_expectancy = expectancy_bps − fee_bps_rt as primary key.
+    """
     # Accept both FeedbackTriple instances and plain dicts
     normalized: list[FeedbackTriple] = []
     for t in triples:
@@ -272,7 +298,9 @@ def improve_signals(
             normalized.append(t)
         else:
             normalized.append(FeedbackTriple(**t))
-    det_proposals = _build_deterministic_proposals(normalized, iteration_idx, next_iteration_budget)
+    det_proposals = _build_deterministic_proposals(
+        normalized, iteration_idx, next_iteration_budget, fee_bps_rt=fee_bps_rt,
+    )
     if skip_llm:
         return det_proposals
 
@@ -280,7 +308,9 @@ def improve_signals(
         return []
 
     client = client or LLMClient()
-    user_msg = _build_user_message(normalized, iteration_idx, next_iteration_budget, det_proposals)
+    user_msg = _build_user_message(
+        normalized, iteration_idx, next_iteration_budget, det_proposals, fee_bps_rt=fee_bps_rt,
+    )
     response: Any = client.call_agent(
         agent_name="signal-improver",
         user_message=user_msg,
@@ -311,11 +341,14 @@ if __name__ == "__main__":
     ap.add_argument("--budget", type=int, default=3)
     ap.add_argument("--skip-llm", action="store_true")
     ap.add_argument("--model", default=None)
+    ap.add_argument("--fee-bps-rt", type=float, default=0.0,
+                    help="Round-trip fee in bps; ranks parents by net_expectancy when > 0.")
     args = ap.parse_args()
 
     triples = json.loads(Path(args.triples_json).read_text())
     proposals = improve_signals(
         triples, args.iteration_idx, args.budget,
         skip_llm=args.skip_llm, model_override=args.model,
+        fee_bps_rt=args.fee_bps_rt,
     )
     print(json.dumps([p.model_dump() for p in proposals], indent=2, default=str))

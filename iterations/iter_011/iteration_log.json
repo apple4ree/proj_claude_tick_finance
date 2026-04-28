@@ -1,44 +1,40 @@
 {
   "iteration_idx": 11,
-  "started_at": "2026-04-22T01:37:38.250148",
-  "finished_at": "2026-04-22T01:44:22.965915",
+  "started_at": "2026-04-28T07:45:15.090146",
+  "finished_at": "2026-04-28T08:02:24.762847",
   "signal_specs": [
-    "iter011_ask_conc_final_frontier",
-    "iter011_absorption_reboot",
-    "iter011_consensus_opening_gate",
-    "iter011_tradeflow_plus_shape"
+    "iter011_persistent_trade_flow_reversal",
+    "iter011_closing_auction_conviction",
+    "iter011_long_horizon_microprice_stickiness",
+    "iter011_book_shape_reversion"
   ],
   "spec_evaluations": [
-    "iterations/iter_011/evaluations/iter011_ask_conc_final_frontier.json",
-    "iterations/iter_011/evaluations/iter011_absorption_reboot.json",
-    "iterations/iter_011/evaluations/iter011_consensus_opening_gate.json",
-    "iterations/iter_011/evaluations/iter011_tradeflow_plus_shape.json"
+    "iterations/iter_011/evaluations/iter011_persistent_trade_flow_reversal.json",
+    "iterations/iter_011/evaluations/iter011_closing_auction_conviction.json",
+    "iterations/iter_011/evaluations/iter011_long_horizon_microprice_stickiness.json",
+    "iterations/iter_011/evaluations/iter011_book_shape_reversion.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_011/code/iter011_ask_conc_final_frontier.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_011/code/iter011_consensus_opening_gate.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_011/code/iter011_tradeflow_plus_shape.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_011/code/iter011_long_horizon_microprice_stickiness.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_011/code/iter011_book_shape_reversion.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_011/fidelity/iter011_ask_conc_final_frontier.json",
-    "iterations/iter_011/fidelity/iter011_consensus_opening_gate.json",
-    "iterations/iter_011/fidelity/iter011_tradeflow_plus_shape.json"
+    "iterations/iter_011/fidelity/iter011_long_horizon_microprice_stickiness.json",
+    "iterations/iter_011/fidelity/iter011_book_shape_reversion.json"
   ],
   "backtest_results": [
-    "iterations/iter_011/results/iter011_ask_conc_final_frontier.json",
-    "iterations/iter_011/results/iter011_consensus_opening_gate.json",
-    "iterations/iter_011/results/iter011_tradeflow_plus_shape.json"
+    "iterations/iter_011/results/iter011_long_horizon_microprice_stickiness.json",
+    "iterations/iter_011/results/iter011_book_shape_reversion.json"
   ],
   "feedback": [
-    "iterations/iter_011/feedback/iter011_ask_conc_final_frontier.json",
-    "iterations/iter_011/feedback/iter011_consensus_opening_gate.json",
-    "iterations/iter_011/feedback/iter011_tradeflow_plus_shape.json"
+    "iterations/iter_011/feedback/iter011_long_horizon_microprice_stickiness.json",
+    "iterations/iter_011/feedback/iter011_book_shape_reversion.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_011/improvements/iter011_consensus_opening_gate.json",
-    "iterations/iter_011/improvements/iter011_tradeflow_plus_shape.json",
-    "iterations/iter_011/improvements/iter011_tradeflow_plus_shape_v1.json",
-    "iterations/iter_011/improvements/iter011_ask_conc_final_frontier.json"
+    "iterations/iter_011/improvements/iter011_long_horizon_microprice_stickiness.json",
+    "iterations/iter_011/improvements/iter011_long_horizon_microprice_stickiness_v1.json",
+    "iterations/iter_011/improvements/iter011_book_shape_reversion.json",
+    "iterations/iter_011/improvements/iter011_book_shape_reversion_v1.json"
   ],
   "stop_reason": null
 }

@@ -1,44 +1,44 @@
 {
   "iteration_idx": 1,
-  "started_at": "2026-04-21T09:49:33.069502",
-  "finished_at": "2026-04-21T09:55:21.761587",
+  "started_at": "2026-04-28T03:32:31.822719",
+  "finished_at": "2026-04-28T03:42:57.204338",
   "signal_specs": [
-    "iter001_ask_concentration_contra_t04_h20",
-    "iter001_obi_deepbook_consensus_tight_h5",
-    "iter001_tradeflow_plus_obi_h20",
-    "iter001_deepbook_reversal_h100"
+    "iter001_smoothed_trade_imb_reversal",
+    "iter001_robust_pressure_vs_concentration",
+    "iter001_deep_book_divergence",
+    "iter001_closing_pressure_relaxed"
   ],
   "spec_evaluations": [
-    "iterations/iter_001/evaluations/iter001_ask_concentration_contra_t04_h20.json",
-    "iterations/iter_001/evaluations/iter001_obi_deepbook_consensus_tight_h5.json",
-    "iterations/iter_001/evaluations/iter001_tradeflow_plus_obi_h20.json",
-    "iterations/iter_001/evaluations/iter001_deepbook_reversal_h100.json"
+    "iterations/iter_001/evaluations/iter001_smoothed_trade_imb_reversal.json",
+    "iterations/iter_001/evaluations/iter001_robust_pressure_vs_concentration.json",
+    "iterations/iter_001/evaluations/iter001_deep_book_divergence.json",
+    "iterations/iter_001/evaluations/iter001_closing_pressure_relaxed.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_001/code/iter001_ask_concentration_contra_t04_h20.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_001/code/iter001_obi_deepbook_consensus_tight_h5.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_001/code/iter001_tradeflow_plus_obi_h20.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_001/code/iter001_robust_pressure_vs_concentration.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_001/code/iter001_deep_book_divergence.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_001/code/iter001_closing_pressure_relaxed.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_001/fidelity/iter001_ask_concentration_contra_t04_h20.json",
-    "iterations/iter_001/fidelity/iter001_obi_deepbook_consensus_tight_h5.json",
-    "iterations/iter_001/fidelity/iter001_tradeflow_plus_obi_h20.json"
+    "iterations/iter_001/fidelity/iter001_robust_pressure_vs_concentration.json",
+    "iterations/iter_001/fidelity/iter001_deep_book_divergence.json",
+    "iterations/iter_001/fidelity/iter001_closing_pressure_relaxed.json"
   ],
   "backtest_results": [
-    "iterations/iter_001/results/iter001_ask_concentration_contra_t04_h20.json",
-    "iterations/iter_001/results/iter001_obi_deepbook_consensus_tight_h5.json",
-    "iterations/iter_001/results/iter001_tradeflow_plus_obi_h20.json"
+    "iterations/iter_001/results/iter001_robust_pressure_vs_concentration.json",
+    "iterations/iter_001/results/iter001_deep_book_divergence.json",
+    "iterations/iter_001/results/iter001_closing_pressure_relaxed.json"
   ],
   "feedback": [
-    "iterations/iter_001/feedback/iter001_ask_concentration_contra_t04_h20.json",
-    "iterations/iter_001/feedback/iter001_obi_deepbook_consensus_tight_h5.json",
-    "iterations/iter_001/feedback/iter001_tradeflow_plus_obi_h20.json"
+    "iterations/iter_001/feedback/iter001_robust_pressure_vs_concentration.json",
+    "iterations/iter_001/feedback/iter001_deep_book_divergence.json",
+    "iterations/iter_001/feedback/iter001_closing_pressure_relaxed.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_001/improvements/iter001_ask_concentration_contra_t04_h20.json",
-    "iterations/iter_001/improvements/iter001_obi_deepbook_consensus_tight_h5.json",
-    "iterations/iter_001/improvements/iter001_obi_deepbook_consensus_tight_h5_v1.json",
-    "iterations/iter_001/improvements/iter001_tradeflow_plus_obi_h20.json"
+    "iterations/iter_001/improvements/iter001_deep_book_divergence.json",
+    "iterations/iter_001/improvements/iter001_deep_book_divergence_v1.json",
+    "iterations/iter_001/improvements/iter001_closing_pressure_relaxed.json",
+    "iterations/iter_001/improvements/iter001_robust_pressure_vs_concentration.json"
   ],
   "stop_reason": null
 }

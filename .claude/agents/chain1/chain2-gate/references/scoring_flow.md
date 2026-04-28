@@ -2,18 +2,21 @@
 
 이 파일이 유일한 권위. 가중치·임계값 변경은 여기서 이루어지며, 코드는 이 값을 상수로 참조한다.
 
+> **2026-04-27 paradigm shift (regime-state)**: `n_trades` 의 의미가 **per-regime trades** 로 바뀜. Fee 도 매 regime 에 1 회만 부과. 게이트 임계값 모두 regime-state 기준으로 재해석. 자세한 paradigm: `_shared/references/cheat_sheets/regime_state_paradigm.md`.
+
 ---
 
 ## Gates (hard-fail → excluded)
 
-| 게이트 | 조건 | 설명 |
+| 게이트 | 조건 (regime-state) | 설명 |
 |---|---|---|
-| G1 | `trade_density_per_day_per_sym ≥ 300` | 통계적 안정성 하한. 300 미만이면 WR 추정오차 커져 의미 없음 |
+| G1 | `n_regimes_per_session ≥ 5` (= aggregate_n_trades / n_sessions ≥ 5) | 통계적 안정성. session 당 5+ regime 이어야 directional alpha 측정 가능. (Legacy fixed-H 기준 trade_density 300 → regime-state 기준 5/session.) |
 | G2 | `WR ≥ 0.55` | 방향 예측력 최소 |
-| G3 | `expectancy_post_fee_bps > 0` | 해당 fee scenario 하에서 **양수 기대값** (필수) |
+| G3 | `expectancy_post_fee_bps > 0` (per regime) | Fee 가 매 regime 마다 1 RT 부과. `expectancy_post_fee = aggregate_expectancy_bps − fee_bps_rt`. real-fee 시나리오 (krx_cash_23bps) 에서 모두 fail 시 soft-gate (priority=MARGINAL, warning 추가). |
 | G4 | `cross_symbol_consistency ∈ {consistent, mixed, not_applicable}` | `inconsistent` 는 제외 |
+| **G5 (NEW)** | `signal_duty_cycle ∈ [0.05, 0.95]` AND `mean_duration_ticks ≥ 5` | Buy-and-hold artifact (duty>0.95) 와 flickering (mean_dur<5) 동시 차단. |
 
-G1-G4 중 하나라도 실패 → excluded dict 에 `gate_failed:<gate_name>:<detail>` 로 기록.
+G1-G5 중 하나라도 실패 → excluded dict 에 `gate_failed:<gate_name>:<detail>` 로 기록.
 
 단, `not_applicable` 은 single symbol 시나리오에서 불가피 → G4 통과로 간주.
 

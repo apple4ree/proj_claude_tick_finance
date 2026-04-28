@@ -227,10 +227,12 @@ def fig_winloss_timeline(traces: dict[str, dict]) -> go.Figure | None:
         return None
     ids = list(traces.keys())
     rows = len(ids)
+    # plotly cap: vertical_spacing < 1 / (rows - 1)
+    vspace = min(0.05, 1.0 / max(rows + 1, 2)) if rows > 1 else 0.05
     fig = make_subplots(
         rows=rows, cols=1, shared_xaxes=True,
         subplot_titles=[f"{sid}" for sid in ids],
-        vertical_spacing=0.05,
+        vertical_spacing=vspace,
     )
     for i, sid in enumerate(ids):
         records = traces[sid].get("records", [])
@@ -303,10 +305,13 @@ def fig_price_with_trades(traces: dict[str, dict]) -> go.Figure | None:
     # One subplot per (symbol, date); shared x for same symbol simplifies
     # but different dates can have very different ranges — give each its own row
     pairs_sorted = sorted(pairs)
+    n_rows = len(pairs_sorted)
+    # plotly cap: vertical_spacing < 1 / (rows - 1). Scale down for many subplots.
+    vspace = min(0.08, 1.0 / max(n_rows + 1, 2)) if n_rows > 1 else 0.08
     fig = make_subplots(
-        rows=len(pairs_sorted), cols=1,
+        rows=n_rows, cols=1,
         subplot_titles=[f"{sym} {date}" for sym, date in pairs_sorted],
-        vertical_spacing=0.08,
+        vertical_spacing=vspace,
     )
 
     # Color palette for specs (cycles if many)

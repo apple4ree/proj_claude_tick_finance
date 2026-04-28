@@ -1,30 +1,105 @@
 {
   "agent_name": "chain2-gate",
   "agent_version": "0.1.0",
-  "timestamp": "2026-04-22T04:06:20.474974",
+  "timestamp": "2026-04-28T06:19:58.111610",
   "iteration_idx": 7,
   "iterations_scanned": [
     7
   ],
-  "total_valid_specs": 0,
+  "total_valid_specs": 3,
   "scenarios": [
     {
       "fee_scenario": "krx_cash_23bps",
       "fee_rt_bps": 23.0,
-      "top_candidates": [],
-      "excluded": {}
+      "top_candidates": [
+        {
+          "spec_id": "iter007_consensus_vs_patient_liquidity",
+          "score": 0.23674272226776388,
+          "priority": "marginal",
+          "wr": 0.9587468379062074,
+          "expectancy_bps": 3.2955418980451805,
+          "expectancy_post_fee_bps": -19.70445810195482,
+          "fee_absorption_ratio": 0.28656886069958093,
+          "trade_density_per_day_per_sym": 479.4583333333333,
+          "complexity_score": 4.0,
+          "has_regime_self_filter": false,
+          "dominates": [],
+          "dominated_by": null,
+          "factor_breakdown": {
+            "edge_w": 0.0,
+            "density_w": 0.02674272226776388,
+            "filter_w": 0.0,
+            "simple_w": 0.06,
+            "multi_w": 0.15,
+            "raw_edge": 0.0,
+            "raw_density": 0.1337136113388194,
+            "raw_filter": 0.0,
+            "raw_simple": 0.4,
+            "raw_multi": 1.0
+          },
+          "rationale_kr": "시나리오 `krx_cash_23bps` 하에서 score **0.237** (marginal). 주요 기여 factor: **multi** (0.150) — multi-day 재현성 확보. WR 0.959, post-fee expectancy -19.704 bps.",
+          "expected_chain2_concerns": [
+            "post-fee edge 얇음 (-19.70 bps) — Chain 2 adverse selection 에 민감",
+            "complexity=4 — execution 튜닝 공간 복잡",
+            "regime filter 부재 — high-spread 구간에서 fee 손실 누적 가능"
+          ]
+        }
+      ],
+      "excluded": {
+        "iter007_trade_flow_exhaustion_reversal": "gate_failed:G2_wr:0.5106<0.55",
+        "iter007_sticky_full_book_pressure": "gate_failed:G1_density:42.8<300.0"
+      }
     },
     {
       "fee_scenario": "hypothetical_low_fee_5bps",
       "fee_rt_bps": 5.0,
-      "top_candidates": [],
-      "excluded": {}
+      "top_candidates": [
+        {
+          "spec_id": "iter007_consensus_vs_patient_liquidity",
+          "score": 0.23674272226776388,
+          "priority": "marginal",
+          "wr": 0.9587468379062074,
+          "expectancy_bps": 3.2955418980451805,
+          "expectancy_post_fee_bps": -1.7044581019548195,
+          "fee_absorption_ratio": 1.3182167592180722,
+          "trade_density_per_day_per_sym": 479.4583333333333,
+          "complexity_score": 4.0,
+          "has_regime_self_filter": false,
+          "dominates": [],
+          "dominated_by": null,
+          "factor_breakdown": {
+            "edge_w": 0.0,
+            "density_w": 0.02674272226776388,
+            "filter_w": 0.0,
+            "simple_w": 0.06,
+            "multi_w": 0.15,
+            "raw_edge": 0.0,
+            "raw_density": 0.1337136113388194,
+            "raw_filter": 0.0,
+            "raw_simple": 0.4,
+            "raw_multi": 1.0
+          },
+          "rationale_kr": "시나리오 `hypothetical_low_fee_5bps` 하에서 score **0.237** (marginal). 주요 기여 factor: **multi** (0.150) — multi-day 재현성 확보. WR 0.959, post-fee expectancy -1.704 bps.",
+          "expected_chain2_concerns": [
+            "post-fee edge 얇음 (-1.70 bps) — Chain 2 adverse selection 에 민감",
+            "complexity=4 — execution 튜닝 공간 복잡",
+            "regime filter 부재 — high-spread 구간에서 fee 손실 누적 가능"
+          ]
+        }
+      ],
+      "excluded": {
+        "iter007_trade_flow_exhaustion_reversal": "gate_failed:G2_wr:0.5106<0.55",
+        "iter007_sticky_full_book_pressure": "gate_failed:G1_density:42.8<300.0"
+      }
     }
   ],
-  "cross_scenario_consensus": [],
-  "warnings": [
-    "no candidates passed gates under krx_cash_23bps",
-    "no candidates passed gates under hypothetical_low_fee_5bps"
+  "cross_scenario_consensus": [
+    "iter007_consensus_vs_patient_liquidity"
   ],
-  "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 통과 후보 없음\n- **hypothetical_low_fee_5bps**: 통과 후보 없음"
+  "warnings": [
+    "no-positive-post-fee-under-krx_cash_23bps — all specs fail G3 under this scenario; ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)",
+    "no-positive-post-fee-under-hypothetical_low_fee_5bps — all specs fail G3 under this scenario; ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)",
+    "DSR-computable specs: 0/3 (others lack trace data; their priority capped at STRONG)"
+  ],
+  "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 최상위 `iter007_consensus_vs_patient_liquidity` score=0.237 (priority=marginal, post-fee exp -19.70 bps)\n- **hypothetical_low_fee_5bps**: 최상위 `iter007_consensus_vs_patient_liquidity` score=0.237 (priority=marginal, post-fee exp -1.70 bps)"
 }

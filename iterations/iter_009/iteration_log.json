@@ -1,44 +1,44 @@
 {
   "iteration_idx": 9,
-  "started_at": "2026-04-22T01:23:23.590589",
-  "finished_at": "2026-04-22T01:29:28.346201",
+  "started_at": "2026-04-28T06:44:48.614568",
+  "finished_at": "2026-04-28T07:07:37.698098",
   "signal_specs": [
-    "iter009_ask_conc_final_pinnacle",
-    "iter009_absorption_high_vol",
-    "iter009_consensus_opening_burst",
-    "iter009_bbo_deep_disagreement"
+    "iter009_stable_trade_flow_exhaustion",
+    "iter009_confirmed_long_hold_pressure",
+    "iter009_sticky_microprice_relaxed",
+    "iter009_closing_momentum_burst"
   ],
   "spec_evaluations": [
-    "iterations/iter_009/evaluations/iter009_ask_conc_final_pinnacle.json",
-    "iterations/iter_009/evaluations/iter009_absorption_high_vol.json",
-    "iterations/iter_009/evaluations/iter009_consensus_opening_burst.json",
-    "iterations/iter_009/evaluations/iter009_bbo_deep_disagreement.json"
+    "iterations/iter_009/evaluations/iter009_stable_trade_flow_exhaustion.json",
+    "iterations/iter_009/evaluations/iter009_confirmed_long_hold_pressure.json",
+    "iterations/iter_009/evaluations/iter009_sticky_microprice_relaxed.json",
+    "iterations/iter_009/evaluations/iter009_closing_momentum_burst.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_009/code/iter009_ask_conc_final_pinnacle.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_009/code/iter009_absorption_high_vol.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_009/code/iter009_consensus_opening_burst.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_009/code/iter009_confirmed_long_hold_pressure.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_009/code/iter009_sticky_microprice_relaxed.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_009/code/iter009_closing_momentum_burst.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_009/fidelity/iter009_ask_conc_final_pinnacle.json",
-    "iterations/iter_009/fidelity/iter009_absorption_high_vol.json",
-    "iterations/iter_009/fidelity/iter009_consensus_opening_burst.json"
+    "iterations/iter_009/fidelity/iter009_confirmed_long_hold_pressure.json",
+    "iterations/iter_009/fidelity/iter009_sticky_microprice_relaxed.json",
+    "iterations/iter_009/fidelity/iter009_closing_momentum_burst.json"
   ],
   "backtest_results": [
-    "iterations/iter_009/results/iter009_ask_conc_final_pinnacle.json",
-    "iterations/iter_009/results/iter009_absorption_high_vol.json",
-    "iterations/iter_009/results/iter009_consensus_opening_burst.json"
+    "iterations/iter_009/results/iter009_confirmed_long_hold_pressure.json",
+    "iterations/iter_009/results/iter009_sticky_microprice_relaxed.json",
+    "iterations/iter_009/results/iter009_closing_momentum_burst.json"
   ],
   "feedback": [
-    "iterations/iter_009/feedback/iter009_ask_conc_final_pinnacle.json",
-    "iterations/iter_009/feedback/iter009_absorption_high_vol.json",
-    "iterations/iter_009/feedback/iter009_consensus_opening_burst.json"
+    "iterations/iter_009/feedback/iter009_confirmed_long_hold_pressure.json",
+    "iterations/iter_009/feedback/iter009_sticky_microprice_relaxed.json",
+    "iterations/iter_009/feedback/iter009_closing_momentum_burst.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_009/improvements/iter009_ask_conc_final_pinnacle.json",
-    "iterations/iter_009/improvements/iter009_absorption_high_vol.json",
-    "iterations/iter_009/improvements/iter009_consensus_opening_burst.json",
-    "iterations/iter_009/improvements/iter009_ask_conc_final_pinnacle_v1.json"
+    "iterations/iter_009/improvements/iter009_confirmed_long_hold_pressure.json",
+    "iterations/iter_009/improvements/iter009_confirmed_long_hold_pressure_v1.json",
+    "iterations/iter_009/improvements/iter009_closing_momentum_burst.json",
+    "iterations/iter_009/improvements/iter009_closing_momentum_burst_v1.json"
   ],
   "stop_reason": null
 }

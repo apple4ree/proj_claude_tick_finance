@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>Workflow & Skill/Prompt 기록 — 2026-04-22 Pivot 기준</title>
+<style>
+  :root {
+    --bg: #fafafa; --fg: #1a1a1a; --muted: #6b6b6b;
+    --accent: #0b6623; --accent-soft: #e8f4ea;
+    --warn: #b03a2e; --warn-soft: #fbebea;
+    --info: #1f6fb4; --info-soft: #e7f1f8;
+    --gold: #d4a300; --gold-soft: #fff7e0;
+    --purple: #6a3d9a; --purple-soft: #f1ebf7;
+    --code-bg: #f0f0f0; --border: #d0d0d0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: var(--bg); color: var(--fg);
+    line-height: 1.7; max-width: 1100px;
+    margin: 0 auto; padding: 2em 1.5em 4em;
+  }
+  h1 { font-size: 2em; border-bottom: 2px solid var(--accent); padding-bottom: 0.3em; margin-top: 1.5em; }
+  h2 { font-size: 1.4em; color: var(--accent); margin-top: 2em;
+       border-bottom: 1px solid var(--border); padding-bottom: 0.2em; }
+  h3 { font-size: 1.15em; margin-top: 1.5em; }
+  h4 { font-size: 1em; color: var(--muted); margin-top: 1.2em; text-transform: uppercase;
+       letter-spacing: 0.05em; }
+  p { margin: 0.7em 0; }
+  code, pre { font-family: "JetBrains Mono", "Consolas", "Menlo", monospace; font-size: 0.9em; }
+  code { background: var(--code-bg); padding: 0.12em 0.35em; border-radius: 3px; }
+  pre { background: var(--code-bg); padding: 1em; border-radius: 6px;
+        overflow-x: auto; border-left: 3px solid var(--accent); }
+  pre.diagram { background: #2a2a2a; color: #e0e0e0; border-left-color: var(--info);
+                font-size: 0.85em; line-height: 1.4; }
+  blockquote {
+    border-left: 4px solid var(--accent); background: var(--accent-soft);
+    margin: 1em 0; padding: 0.7em 1em; color: #333;
+  }
+  blockquote.example {
+    border-left-color: var(--info); background: var(--info-soft);
+    font-style: italic;
+  }
+  .warn { border-left: 4px solid var(--warn); background: var(--warn-soft);
+          margin: 1em 0; padding: 0.7em 1em; }
+  .info { border-left: 4px solid var(--info); background: var(--info-soft);
+          margin: 1em 0; padding: 0.7em 1em; }
+  .gold { border-left: 4px solid var(--gold); background: var(--gold-soft);
+          margin: 1em 0; padding: 0.7em 1em; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.92em; }
+  th, td { border: 1px solid var(--border); padding: 0.5em 0.7em; text-align: left; vertical-align: top; }
+  th { background: #ececec; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td.center { text-align: center; }
+  .toc { background: #fff; border: 1px solid var(--border);
+         padding: 1em 1.5em; border-radius: 6px; margin-bottom: 2em; }
+  .toc ol { margin: 0; padding-left: 1.3em; }
+  .toc li { margin: 0.2em 0; }
+  .muted { color: var(--muted); font-size: 0.9em; }
+  hr { border: none; border-top: 1px dashed var(--border); margin: 2em 0; }
+  .footer { margin-top: 4em; padding-top: 1em; border-top: 1px solid var(--border);
+            color: var(--muted); font-size: 0.85em; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1em; margin: 1em 0; }
+  .kpi-card { background: #fff; border: 1px solid var(--border); padding: 1em;
+              border-radius: 6px; text-align: center; }
+  .kpi-card .label { font-size: 0.85em; color: var(--muted); }
+  .kpi-card .value { font-size: 1.5em; font-weight: 600; color: var(--accent); }
+  .kpi-card .delta { font-size: 0.85em; color: #555; }
+
+  .skill-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 8px;
+    padding: 1.2em 1.5em; margin: 1em 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .skill-card.entry { border-left: 5px solid var(--accent); }
+  .skill-card.aux   { border-left: 5px solid var(--purple); background: #fcfaff; }
+  .skill-card .name {
+    font-family: "JetBrains Mono", monospace; font-size: 1.1em; font-weight: 700;
+    color: var(--accent);
+  }
+  .skill-card.aux .name { color: var(--purple); }
+  .skill-card .role {
+    color: var(--muted); font-size: 0.9em; margin: 0.2em 0 0.8em 0;
+  }
+  .skill-card .tag {
+    display: inline-block; font-size: 0.75em; padding: 0.15em 0.5em;
+    background: var(--accent-soft); color: var(--accent); border-radius: 3px;
+    margin-right: 0.4em; font-weight: 600;
+  }
+  .skill-card.aux .tag { background: var(--purple-soft); color: var(--purple); }
+
+  .phase-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8em; margin: 1.2em 0;
+  }
+  .phase-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.9em 1em; position: relative;
+  }
+  .phase-card .phase-tag {
+    position: absolute; top: -10px; left: 12px;
+    background: var(--accent); color: #fff; padding: 0.1em 0.6em;
+    font-size: 0.75em; border-radius: 3px; font-weight: 700;
+  }
+  .phase-card h4 { margin: 0.5em 0 0.3em 0; color: var(--fg); text-transform: none;
+                   letter-spacing: 0; font-size: 1em; }
+  .phase-card .duration {
+    color: var(--muted); font-size: 0.8em; margin-bottom: 0.5em;
+  }
+  .phase-card .body { font-size: 0.88em; }
+
+  .agent-pill {
+    display: inline-block; padding: 0.15em 0.6em; margin: 0.15em;
+    background: var(--info-soft); color: var(--info);
+    border-radius: 12px; font-family: "JetBrains Mono", monospace;
+    font-size: 0.8em; font-weight: 600;
+  }
+
+  details { margin: 0.5em 0; }
+  details summary {
+    cursor: pointer; padding: 0.4em 0;
+    font-weight: 600; color: var(--info);
+  }
+  details[open] summary { margin-bottom: 0.5em; }
+
+  .legend {
+    display: flex; gap: 1.5em; flex-wrap: wrap; margin: 0.5em 0 1em 0;
+    font-size: 0.85em; color: var(--muted);
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.4em; }
+  .legend-swatch { width: 14px; height: 14px; border-radius: 3px; }
+
+  .anchor-link {
+    color: var(--muted); text-decoration: none; margin-left: 0.3em;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  h2:hover .anchor-link, h3:hover .anchor-link { opacity: 1; }
+</style>
+</head>
+<body>
+
+<h1>Workflow &amp; Skill/Prompt 기록 — 2026-04-22 Pivot 기준</h1>
+<p class="muted">
+  Document date: 2026-04-23 ·
+  Scope: <code>proj_claude_tick_finance</code> 현재 셋업 (commit <code>1465dc7 remake</code> 이후) ·
+  Purpose: 현재 워크플로우와 그 안에서 쓰이는 skill·prompt 패턴의 descriptive 기록
+</p>
+
+<div class="toc">
+<strong>목차</strong>
+<ol>
+  <li><a href="#summary">Executive Summary</a></li>
+  <li><a href="#snapshot">현재 셋업 스냅샷</a></li>
+  <li><a href="#structure">시스템 구조 (Pivot 후)</a></li>
+  <li><a href="#flow">전형적 워크플로우 — 한 cycle</a></li>
+  <li><a href="#skills">진입점 Skill — 4개 + α</a></li>
+  <li><a href="#agents">Sub-agent 구성 (chain1)</a></li>
+  <li><a href="#agents-md">AGENTS.md 작성 규약</a></li>
+  <li><a href="#schemas">데이터 계약 — _shared/schemas.py</a></li>
+  <li><a href="#refs">Reference 인프라</a></li>
+  <li><a href="#meta">메타-도구 (auto-memory · 권한 모델 · MCP)</a></li>
+  <li><a href="#prompt-style">Prompt 작성 스타일 관찰</a></li>
+  <li><a href="#summary-line">한 줄 요약</a></li>
+</ol>
+</div>
+
+<!-- ============================================== -->
+<h2 id="summary">1. Executive Summary <a href="#summary" class="anchor-link">#</a></h2>
+
+<div class="info">
+<strong>TL;DR</strong>
+<ol>
+  <li>현재 셋업은 <strong>"진입점 4 skills × 무거운 추론 8 sub-agents"</strong> 구조다. 사용자 손은
+      좁은 표면(<code>/new-strategy</code>, <code>/experiment</code>, <code>/co-review</code>,
+      <code>/update-config</code>)만 닿고, chain1 sub-agent들이 그 뒤에서 자동 진행한다.</li>
+  <li>모든 chain1 agent는 <strong>6-section AGENTS.md</strong> (system / user / reference / input / output /
+      reasoning_flow) + <strong>Pydantic schema</strong> + <strong>인용 가능한 reference</strong>를
+      강제적으로 갖는다 — CLAUDE.md §Agent 구성 원칙이 파일 레벨로 내려옴.</li>
+  <li>한 cycle 흐름: <strong>(A) 방향 정의 → (B) <code>/experiment</code> 자동 진행 → (C) 회고 → (D) 코드 수정 시 <code>/co-review</code></strong>.
+      방향 정의는 자유서술 (한·영 혼용), <code>/experiment</code>는 CLI flag 모드와 loose 한국어 모드 둘 다 받음.</li>
+  <li>모든 inter-agent 통신은 schema 강제 (자유 dict 금지). <strong>②.75 fidelity-checker</strong>가
+      spec ↔ code 정합성을 게이트로 검사 — 실패 시 ③ 백테스트 진입 차단.</li>
+</ol>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="label">진입점 Skill</div>
+    <div class="value">4</div>
+    <div class="delta">+ 보조 ~3</div>
+  </div>
+  <div class="kpi-card">
+    <div class="label">Chain1 Sub-agents</div>
+    <div class="value">8</div>
+    <div class="delta">stage 1 ~ 5 + gate</div>
+  </div>
+  <div class="kpi-card">
+    <div class="label">Schema (Pydantic)</div>
+    <div class="value">531 L</div>
+    <div class="delta">_shared/schemas.py</div>
+  </div>
+  <div class="kpi-card">
+    <div class="label">Reference 자료</div>
+    <div class="value">5 + 5</div>
+    <div class="delta">papers + cheat sheets</div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<h2 id="snapshot">2. 현재 셋업 스냅샷 <a href="#snapshot" class="anchor-link">#</a></h2>
+
+<table>
+  <thead>
+    <tr><th>레이어</th><th>구성</th><th>역할</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Editor</strong></td>
+      <td>VS Code Server (remote) + Claude Code 확장 2.1.109</td>
+      <td>파일 열람·diff. 추론은 안 함.</td>
+    </tr>
+    <tr>
+      <td><strong>Agent harness</strong></td>
+      <td>Claude Code CLI · Opus 4.7 (1M ctx)</td>
+      <td>모든 추론·툴 호출의 상위 orchestrator</td>
+    </tr>
+    <tr>
+      <td><strong>Glue</strong></td>
+      <td>Bash (project venv) · git · MCP <code>ouroboros</code> · auto-memory</td>
+      <td>실행 환경 + 세션 간 컨텍스트 전수</td>
+    </tr>
+    <tr>
+      <td><strong>Domain layer</strong></td>
+      <td><code>.claude/agents/chain1/</code> — 8 agents + <code>_shared/{schemas,references}</code></td>
+      <td><strong>이 셋업의 본체.</strong> 신호 생성 → 평가 → 코드화 → 백테스트 → 피드백 → 개선 루프.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>주요 정책 강제는 두 곳:</p>
+<ul>
+  <li><code>/home/dgu/tick/CLAUDE.md</code> — workspace-wide (구현은 Claude 직접, review는 <code>co-review</code> 위임)</li>
+  <li><code>/home/dgu/tick/proj_claude_tick_finance/CLAUDE.md</code> — 466 L,
+      Chain1/Chain2 architecture · workflow · agent 6-component 규칙 · 절대 위반 금지 규칙 · repo ground truth</li>
+</ul>
+
+<!-- ============================================== -->
+<h2 id="structure">3. 시스템 구조 (Pivot 후) <a href="#structure" class="anchor-link">#</a></h2>
+
+<p>Apr 22 <code>1465dc7 remake</code> commit이 flat agent layer (<code>alpha-*</code>, <code>strategy-*</code>)를
+폐기하고 <code>chain1/</code> 구조화 layer로 교체. 현재의 canonical 흐름:</p>
+
+<pre class="diagram">
+사용자
+  │
+  │  ① 방향 주입
+  ▼
+┌─────────────────┐
+│ /new-strategy   │  ──────▶  signal-generator
+└─────────────────┘                  │
+                                     │  list[SignalSpec]
+                                     ▼
+                              signal-evaluator           (② 정적 검증)
+                                     │  pass / fail
+                                     ▼
+                              code-generator             (②.5 코드화)
+                                     │  Python signal()
+                                     ▼
+                              fidelity-checker           (②.75 게이트)
+                                     │  pass → 진행 / fail → ②.5 재시도
+                                     ▼
+┌─────────────────┐
+│ /experiment     │  ──────▶  backtest-runner            (③ 결정론적 실행)
+└─────────────────┘                  │  BacktestResult
+                                     ▼
+                              feedback-analyst           (④ 분석)
+                                     │  Feedback (recommended_next_direction, retire?)
+                                     ▼
+                              signal-improver            (⑤ 다음 iter 종자)
+                                     │  ImprovementProposal
+                                     ▼
+                              chain2-gate                (활성화 게이트)
+                                     │  통과 시 chain2 hand-off (현재 비활성)
+                                     ▼
+                              (다음 iter loop back to ①)
+
+부수 채널:
+  /co-review     ──▶  외부 Codex (Claude self-review 회피)
+  /update-config ──▶  settings.json / settings.local.json
+</pre>
+
+<div class="legend">
+  <div class="legend-item"><span class="legend-swatch" style="background:var(--accent)"></span>사용자 진입점</div>
+  <div class="legend-item"><span class="legend-swatch" style="background:var(--info)"></span>chain1 sub-agent</div>
+  <div class="legend-item"><span class="legend-swatch" style="background:var(--gold)"></span>fidelity 게이트</div>
+</div>
+
+<div class="info">
+<strong>핵심:</strong> 사용자 입장에서는 <code>/new-strategy</code> + <code>/experiment</code> 두 줄로
+①~⑤ 전체가 자동 진행. ②.75 게이트 실패는 ②.5로 자동 회귀하므로 사용자 개입 불필요.
+chain2-gate는 §활성화 조건 (WR ≥ 55%, n_trades ≥ 50, ≥ 3일 재현) 미충족 시 단순 통과.
+</div>
+
+<!-- ============================================== -->
+<h2 id="flow">4. 전형적 워크플로우 — 한 cycle <a href="#flow" class="anchor-link">#</a></h2>
+
+<div class="phase-grid">
+  <div class="phase-card">
+    <span class="phase-tag">Phase A</span>
+    <h4>방향 정의</h4>
+    <div class="duration">≤ 5분</div>
+    <div class="body">
+      그날의 가설/탐색축을 정해 <code>/new-strategy</code>로 자유서술 주입.
+      예: "obi 외 채널 비중 ↑", "상한가 종목만 좁혀 보기".
+    </div>
+  </div>
+  <div class="phase-card">
+    <span class="phase-tag">Phase B</span>
+    <h4>Iteration 실행</h4>
+    <div class="duration">분 단위 (자동)</div>
+    <div class="body">
+      <code>/experiment</code> 한 번으로 chain1 cycle 자동 진행.
+      사용자는 진행만 모니터, 인터럽트 없음.
+    </div>
+  </div>
+  <div class="phase-card">
+    <span class="phase-tag">Phase C</span>
+    <h4>결과 회고</h4>
+    <div class="duration">5–15분</div>
+    <div class="body">
+      feedback-analyst 출력 + signal-improver의 ImprovementProposal 검토.
+      다음 iter 자동 제안 또는 Phase A로.
+    </div>
+  </div>
+  <div class="phase-card">
+    <span class="phase-tag">Phase D</span>
+    <h4>코드 변경 시</h4>
+    <div class="duration">간헐적</div>
+    <div class="body">
+      agent prompt 수정·schema 추가·reference 보강. 커밋 직전
+      <code>/co-review</code>로 Codex에 위임 검토. 설정은 <code>/update-config</code>.
+    </div>
+  </div>
+</div>
+
+<p class="muted">Phase A·B·C는 같은 세션 안에서 반복. Phase D는 cycle 사이에 간헐적으로 발생하는 메타 작업.</p>
+
+<!-- ============================================== -->
+<h2 id="skills">5. 진입점 Skill — 4개 + α <a href="#skills" class="anchor-link">#</a></h2>
+
+<h3>5.1 핵심 4개 (entry-point)</h3>
+
+<!-- /new-strategy -->
+<div class="skill-card entry">
+  <div><span class="tag">방향 주입</span><span class="tag">Phase A</span></div>
+  <div class="name">/new-strategy</div>
+  <div class="role">signal-generator에 "이번 iter는 이 가설/제약으로 가자"는 자연어 brief 전달</div>
+
+  <h4>관찰된 prompt 형식</h4>
+  <blockquote class="example">
+    Design a trading strategy that exploits price limit phenomena in KRX.
+    The strategy targets stocks that have hit the daily upper limit (+30%, 상한가) or lower limit (−30%, 하한가).
+    For upper limit cases, identify stocks with large queued buy orders at the limit price and predict next…
+  </blockquote>
+  <blockquote class="example">
+    KRX top-10 종목 전체를 대상으로 LOB signal 기반 데이터 주도형 전략을 설계하라.
+    각 종목별 signal brief를 확인하고, viable signal이 존재하는 종목에서만 전략을 생성하라.
+    Multi-symbol 전략도 허용. IS 기간: 20260305~20260320.
+  </blockquote>
+
+  <h4>패턴</h4>
+  <ul>
+    <li>한·영 혼용 자유서술. 의도(동사) → 제약(명사구) → 기간/심볼(끝)</li>
+    <li>KRX 도메인 용어(상한가, 하한가, top-10) 그대로 사용 — <code>_shared/references/cheat_sheets/krx_data_columns.md</code>가 컨텍스트에 자동 로드되므로 별도 설명 불요</li>
+    <li>"viable이 있을 때만" 같은 가드를 자연어로 표현 (LLM 판단 위임)</li>
+  </ul>
+</div>
+
+<!-- /experiment -->
+<div class="skill-card entry">
+  <div><span class="tag">Cycle 트리거</span><span class="tag">Phase B</span></div>
+  <div class="name">/experiment</div>
+  <div class="role">chain1 한 cycle (① ~ ⑤) 자동 진행 트리거. 이 셋업의 핵심 진입점.</div>
+
+  <h4>모드 1 — CLI flag (정밀 제어)</h4>
+<pre>/experiment --market crypto_lob --symbols BTCUSDT,ETHUSDT,SOLUSDT
+            --is-start  '2026-04-19T06:00:00' --is-end  '2026-04-20T02:00:00'
+            --oos-start '2026-04-20T02:00:00' --oos-end '2026-04-20T07:00:00'</pre>
+
+  <h4>모드 2 — Loose 한국어 (탐색)</h4>
+<pre>/experiment 수익률이 양수가 발생할 때까지</pre>
+
+  <p>둘 다 같은 슬래시 커맨드가 받음. (a)는 재현성·디버깅용, (b)는 LLM에 종료 조건 자체를 위임하는 탐색용.</p>
+
+  <h4>관련 정책 (commit 이력 기준)</h4>
+  <ul>
+    <li><code>c7f91e7</code> — <code>--n-iterations &gt;= 10</code> 정책 강제</li>
+    <li><code>8c136fa</code> — deterministic 10-iter run, mid-run 선택 금지</li>
+  </ul>
+</div>
+
+<!-- /co-review -->
+<div class="skill-card entry">
+  <div><span class="tag">코드 변경 검토</span><span class="tag">Phase D</span></div>
+  <div class="name">/co-review</div>
+  <div class="role">chain1 agent prompt·schema·engine 변경을 외부 Codex에 위임 검토. CLAUDE.md 정책상 Claude self-review 회피용.</div>
+
+  <h4>관찰된 prompt 형식 (한 줄)</h4>
+  <blockquote class="example">
+    chain1/_shared/schemas.py에 BacktestResult_v2 추가한 부분 봐줘
+  </blockquote>
+
+  <p><code>workspace CLAUDE.md</code>의 "리뷰 = co-review 위임" 정책이 실제 호출로 강제되고 있음 — pre-remake 13세션 중 4회 호출 (단일 skill 중 최다).</p>
+</div>
+
+<!-- /update-config -->
+<div class="skill-card entry">
+  <div><span class="tag">설정 변경</span><span class="tag">메타</span></div>
+  <div class="name">/update-config</div>
+  <div class="role">settings.json / settings.local.json 수정 (권한 추가, env var, hook 정의)</div>
+  <p>호출 빈도 매우 낮음 — 셋업이 안정됐다는 신호. 권한 모델은 <a href="#meta">§10 메타-도구</a> 참조.</p>
+</div>
+
+<h3>5.2 보조 (≤ 1회/주, 큰 의사결정에만)</h3>
+
+<div class="skill-card aux">
+  <div><span class="tag">외부 지식</span></div>
+  <div class="name">paper-search</div>
+  <div class="role">arXiv + OpenReview + Google Scholar에서 관련 논문 수집해 <code>./papers/</code> 디렉토리 구축</div>
+  <p>Pivot 세션 (Apr 22) 직전에 1회 호출 — remake 의사결정의 근거 자료 확보였을 가능성.</p>
+</div>
+
+<div class="skill-card aux">
+  <div><span class="tag">계획 작성</span></div>
+  <div class="name">superpowers:writing-plans</div>
+  <div class="role">멀티 step task의 implementation plan을 별도 파일로 작성</div>
+  <p>chain1 자체가 plan-driven 구조라 사용 빈도 낮음. 큰 refactor 직전에만.</p>
+</div>
+
+<div class="skill-card aux">
+  <div><span class="tag">요건 명확화</span></div>
+  <div class="name">ouroboros:interview</div>
+  <div class="role">Socratic interview로 vague requirement 명확화</div>
+  <p>chain1이 충분히 spec-driven이라 추가 interview needs 작음. 새 chain(chain2 활성화 등) 직전 정도에 적합.</p>
+</div>
+
+<!-- ============================================== -->
+<h2 id="agents">6. Sub-agent 구성 (chain1) <a href="#agents" class="anchor-link">#</a></h2>
+
+<p>chain1/ 디렉토리 안의 8 agent. 각각 자기 폴더에 <code>AGENTS.md</code>, <code>input_schema.py</code>,
+<code>output_schema.py</code>, <code>references/</code>를 가짐.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width:18%">Agent</th>
+      <th style="width:8%" class="center">Stage</th>
+      <th>책임</th>
+      <th>주 input → output</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="agent-pill">signal-generator</span></td>
+      <td class="center">①</td>
+      <td>SignalSpec 후보 N개 생성. OBI/OFI/microstructure primitive whitelist 안에서, reference 인용 강제.</td>
+      <td><code>GenerateInput</code> → <code>list[SignalSpec]</code></td>
+    </tr>
+    <tr>
+      <td><span class="agent-pill">signal-evaluator</span></td>
+      <td class="center">②</td>
+      <td>SignalSpec 정적 검증 — formula 합법성, primitive whitelist 준수, no-lookahead, threshold range</td>
+      <td><code>SignalSpec</code> → <code>EvaluationVerdict (pass/fail + reasons)</code></td>
+    </tr>
+    <tr>
+      <td><span class="agent-pill">code-generator</span></td>
+      <td class="center">②.5</td>
+      <td>SignalSpec → Python <code>signal()</code> 함수 합성. <code>signal_fn_template.py</code> 참조 강제.</td>
+      <td><code>SignalSpec</code> → <code>strategy.py</code></td>
+    </tr>
+    <tr>
+      <td><span class="agent-pill">fidelity-checker</span></td>
+      <td class="center">②.75</td>
+      <td>SignalSpec ↔ 코드 AST-level 정합성. formula·threshold·horizon·entry rule·execution=1·no-lookahead 6항목 게이트.</td>
+      <td><code>(SignalSpec, code)</code> → <code>FidelityVerdict</code></td>
+    </tr>
+    <tr>
+      <td><span class="agent-pill">backtest-runner</span></td>
+      <td class="center">③</td>
+      <td>결정론적 실행 (LLM 추론 없음). <code>signal()</code>를 KRX/crypto LOB 데이터에 against, execution=1 strict.</td>
+      <td><code>strategy.py + universe</code> → <code>BacktestResult</code></td>
+    </tr>
+    <tr>
+      <td><span class="agent-pill">feedback-analyst</span></td>
+      <td class="center">④</td>
+      <td>BacktestResult 분석. WR/expectancy/n_trades/regime별 분해. <code>recommended_next_direction</code> + retire 판정.</td>
+      <td><code>BacktestResult</code> → <code>Feedback</code></td>
+    </tr>
+    <tr>
+      <td><span class="agent-pill">signal-improver</span></td>
+      <td class="center">⑤</td>
+      <td>(Spec, Result, Feedback) 배치 → ImprovementProposal. Atomic·single-axis 변경 강제. budget-aware.</td>
+      <td><code>ImproveInput</code> → <code>list[ImprovementProposal]</code></td>
+    </tr>
+    <tr>
+      <td><span class="agent-pill">chain2-gate</span></td>
+      <td class="center">gate</td>
+      <td>활성화 조건 (WR ≥ 55%, n_trades ≥ 50, ≥ 3일 재현) 평가. 통과 시 chain2 hand-off 태그.</td>
+      <td><code>SignalSpec batch</code> → <code>Chain2GateVerdict</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="gold">
+<strong>주의:</strong> backtest-runner는 의도적으로 <em>LLM 추론을 갖지 않는</em> 결정론적 실행자.
+"백테스트 결과를 LLM이 fudge하지 않게 한다"는 정책 (CLAUDE.md §🚫 #2 근거 기반 원칙)의
+물리적 구현. 이 agent의 출력은 항상 같은 입력에 대해 같은 결과여야 함.
+</div>
+
+<!-- ============================================== -->
+<h2 id="agents-md">7. AGENTS.md 작성 규약 <a href="#agents-md" class="anchor-link">#</a></h2>
+
+<p>모든 chain1 agent는 동일 frontmatter + 6 섹션 구조를 강제로 따름. CLAUDE.md §모든 Agent의 필수 구성 요소가
+파일 레벨로 내려온 것.</p>
+
+<h3>7.1 Frontmatter</h3>
+<pre>---
+name: signal-generator
+version: 0.1.0
+last_updated: 2026-04-20
+owner_chain: chain1
+stage: "1_generation"
+input_schema:  "input_schema.py:GenerateInput"
+output_schema: "output_schema.py:GenerateOutput"
+required_components:
+  - system_prompt
+  - user_prompt
+  - reference
+  - input_schema
+  - output_schema
+  - reasoning_flow
+---</pre>
+
+<h3>7.2 본문 6 섹션</h3>
+
+<table>
+  <thead>
+    <tr><th style="width:18%">섹션</th><th>역할</th><th>스타일</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1. System Prompt</strong></td>
+      <td>역할 1문장 + 절대 제약 4–6개 (불릿)</td>
+      <td>"<code>**Evidence-based**: every proposed spec must cite…</code>"
+          bold + 콜론 패턴.</td>
+    </tr>
+    <tr>
+      <td><strong>2. User Prompt (template)</strong></td>
+      <td>오케스트레이터가 채울 변수 슬롯 명시</td>
+      <td><code>{iteration_idx}</code>, <code>{prior_feedback_summary_or_none}</code> 등.
+          Code block 안에 plain text.</td>
+    </tr>
+    <tr>
+      <td><strong>3. Reference</strong></td>
+      <td>읽어야 할 파일 경로 + 한 줄 요약</td>
+      <td>오케스트레이터가 invocation 시 자동 로드.
+          <code>../_shared/references/...</code>로 상대 경로.</td>
+    </tr>
+    <tr>
+      <td><strong>4. Input Schema</strong></td>
+      <td>Pydantic class 가리킴. 핵심 필드는 인라인 설명.</td>
+      <td><code>input_schema.py:GenerateInput</code></td>
+    </tr>
+    <tr>
+      <td><strong>5. Output Schema</strong></td>
+      <td>Pydantic class 가리킴. 강제 조건 명시.</td>
+      <td><code>measured_*</code> 필드는 None으로 emit, 등.</td>
+    </tr>
+    <tr>
+      <td><strong>6. Reasoning Flow</strong></td>
+      <td>번호 매긴 명령문 N단계. 마지막에 self-loop 명시.</td>
+      <td>"If step N fails, do not emit — iterate from step M".</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>7.3 추가 관찰된 작성 패턴</h3>
+<ul>
+  <li><strong>Dated policy block</strong> — 정책 변경을 prompt 안에 인라인으로 기입.
+      예: <code>**Diversity priority (Block C, 2026-04-21)**: explicitly seek specs that
+      exercise primitives OUTSIDE the pure OBI/OFI family…</code></li>
+  <li><strong>식별자 서식 강제</strong> — <code>spec_id</code> 같은 필드의 형식을 prompt에서 박음:
+      <code>iter{iteration_idx:03d}_{slug}</code></li>
+  <li><strong>Self-check 의무</strong> — Reasoning Flow의 끝 직전에 "Self-check against constraints"
+      step. 5~6개 항목 (no execution logic / references present / primitives whitelisted /
+      no lookahead / iteration_idx correct).</li>
+  <li><strong>Helper vs Primitive 구분</strong> — <code>primitives_used</code>에는 primitive 이름만
+      (obi_1, mid_px, ofi_proxy), helper(zscore, rolling_mean 등)는 formula string에서만 사용.
+      prompt에 명시적 경고 박혀 있음.</li>
+</ul>
+
+<details>
+<summary>예시: signal-generator의 Reasoning Flow 발췌</summary>
+<pre>1. Read references — summarize the key formula/claim from each reference you intend to cite.
+2. Identify lesson — if iteration_idx > 0, read prior_feedback and prior_improvement;
+                     extract ≥ 1 concrete lesson per spec.
+3. Choose primitive(s) — select from whitelist; justify.
+4. Compose formula — assemble; verify no lookahead; verify ops decompose into whitelisted ops.
+5. Hypothesis statement — ≥ 20 chars, articulate why WR > 50%.
+6. Self-check against constraints — confirm (a) no execution logic, (b) references present,
+                                    (c) primitives whitelisted, (d) no lookahead, (e) iter idx ok.
+7. Emit — serialize as SignalSpec JSON; assign spec_id = iter{idx:03d}_{slug}.
+
+If step 6 fails, do not emit the spec — iterate from step 3.</pre>
+</details>
+
+<details>
+<summary>예시: signal-improver의 Reasoning Flow 발췌</summary>
+<pre>1. Rank feedback batch — sort by (expectancy_bps desc, WR desc, n_trades desc).
+2. Prune retires — drop any spec whose Feedback is `retire`.
+3. Budget allocation — top spec 40%, second 30%, third 20%, tail 10%.
+4. Generate mutations per seed — look up Feedback's recommended_next_direction in
+                                  improvement_heuristics.md; apply recipe.
+5. Avoid previously-tried — cross-reference prior_iterations_index.md;
+                            if duplicate of RETIRED, pick next recipe.
+6. Formalize — each proposal: parent_spec_id, proposed_mutations (atomic), search_axes.
+7. Emit — list of ImprovementProposals, total ≤ budget.</pre>
+</details>
+
+<!-- ============================================== -->
+<h2 id="schemas">8. 데이터 계약 — <code>_shared/schemas.py</code> <a href="#schemas" class="anchor-link">#</a></h2>
+
+<p>agent 간 모든 통신은 Pydantic schema 강제. 자유 dict 금지. 파일 크기 ~531 라인.</p>
+
+<table>
+  <thead>
+    <tr><th>객체</th><th>역할</th><th>핵심 필드</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>SignalSpec</code></td>
+      <td>한 신호 후보의 전체 명세</td>
+      <td><code>spec_id</code> · <code>name</code> · <code>hypothesis</code> · <code>formula</code> ·
+          <code>primitives_used</code> · <code>threshold</code> · <code>direction</code> ·
+          <code>prediction_horizon_ticks</code> · <code>references</code> ·
+          <code>iteration_idx</code> · <code>measured_WR</code> · <code>measured_expectancy</code></td>
+    </tr>
+    <tr>
+      <td><code>BacktestResult</code></td>
+      <td>chain1 백테스트 결과 (execution=1)</td>
+      <td><code>WR</code> · <code>expectancy_bps</code> · <code>n_trades</code> ·
+          regime별 breakdown · per-symbol stats</td>
+    </tr>
+    <tr>
+      <td><code>BacktestResult_v2</code> <span class="muted">(chain2 예정)</span></td>
+      <td>chain2 net-PnL 결과 (fee/spread/tax 반영)</td>
+      <td>+ <code>net_pnl_bps_per_trade</code> · <code>sharpe</code> · <code>mdd</code> ·
+          <code>cost_breakdown</code> (spread/fee/tax/adverse_sel/slippage)</td>
+    </tr>
+    <tr>
+      <td><code>Feedback</code></td>
+      <td>한 (Spec, Result) 쌍에 대한 분석 결과</td>
+      <td><code>recommended_next_direction</code> (enum) · <code>retire</code> (bool) ·
+          weakness 요약</td>
+    </tr>
+    <tr>
+      <td><code>ImprovementProposal</code></td>
+      <td>다음 iter 종자 — atomic 변경 단위</td>
+      <td><code>parent_spec_id</code> · <code>proposed_mutations</code> (list[str]) ·
+          <code>search_axes</code> (enum list)</td>
+    </tr>
+    <tr>
+      <td><code>UniverseSpec</code></td>
+      <td>실행 대상 — symbols + 날짜 범위 + IS/OOS 분할</td>
+      <td><code>symbols</code> · <code>is_period</code> · <code>oos_period</code> · <code>top10</code> alias</td>
+    </tr>
+    <tr>
+      <td><code>GenerateInput / GenerateOutput</code></td>
+      <td>signal-generator I/O</td>
+      <td>iteration_idx · n_candidates · prior_feedback · prior_improvement · universe</td>
+    </tr>
+    <tr>
+      <td><code>ImproveInput / ImproveOutput</code></td>
+      <td>signal-improver I/O</td>
+      <td>(Spec, Result, Feedback) 배치 + budget</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="warn">
+<strong>중요:</strong> ②.75 fidelity-checker가 schema·코드·spec 3-way 정합성을 검사하므로
+schema 변경은 신중. 변경 시 (a) 8개 agent 모두에 영향, (b) <code>chain1/_shared/schemas.py</code>가
+deny list에 없어 Claude가 임의 수정 가능 — <code>/co-review</code>로 보호 권장.
+</div>
+
+<!-- ============================================== -->
+<h2 id="refs">9. Reference 인프라 <a href="#refs" class="anchor-link">#</a></h2>
+
+<p>chain1의 외장 지식. <code>signal-generator</code>는 spec 생성 전 이 파일들을 <strong>반드시 인용</strong>해야 함
+(system prompt에 강제). "근거 없는 추측 금지" 원칙(CLAUDE.md §🚫 #2)의 구체화.</p>
+
+<h3>9.1 Papers (학술 근거)</h3>
+<table>
+  <thead><tr><th style="width:38%">파일</th><th>제공하는 정의·결과</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>cont_kukanov_stoikov_2014_ofi.md</code></td>
+      <td>OFI의 정식 정의 + linear mid-price regression</td>
+    </tr>
+    <tr>
+      <td><code>stoikov_2018_microprice.md</code></td>
+      <td>microprice 수식, fair value 해석</td>
+    </tr>
+    <tr>
+      <td><code>lee_ready_1991_tick_rule.md</code></td>
+      <td>trade direction 추론 — <code>trade_imbalance_signed</code> 근거</td>
+    </tr>
+    <tr>
+      <td><code>bouchaud_mezard_potters_2002_book_shape.md</code></td>
+      <td>order book 형상 empirics — <code>bid/ask_depth_concentration</code> 근거</td>
+    </tr>
+    <tr>
+      <td><code>gould_bonart_2016_queue_imbalance.md</code></td>
+      <td>layer-wise queue imbalance — <code>obi_ex_bbo</code> 근거</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>9.2 Cheat sheets (primitive whitelist + 실무)</h3>
+<table>
+  <thead><tr><th style="width:38%">파일</th><th>제공하는 primitive·규칙</th></tr></thead>
+  <tbody>
+    <tr><td><code>obi_family_formulas.md</code></td>
+        <td>OBI primitive whitelist (obi_1, microprice, helpers)</td></tr>
+    <tr><td><code>ofi_family_formulas.md</code></td>
+        <td>OFI primitive whitelist (ofi_proxy, ofi_depth_5/10)</td></tr>
+    <tr><td><code>regime_primitives.md</code></td>
+        <td>Block A 2026-04-21 추가 — mid_px, minute_of_session, book_thickness, rolling_realized_vol, rolling_momentum</td></tr>
+    <tr><td><code>microstructure_advanced.md</code></td>
+        <td>Block C 2026-04-21 추가 — trade_imbalance_signed, bid/ask_depth_concentration, obi_ex_bbo</td></tr>
+    <tr><td><code>krx_data_columns.md</code></td>
+        <td>KRX H0STASP0 column 명세 + 가용성 제약</td></tr>
+  </tbody>
+</table>
+
+<h3>9.3 Per-agent references</h3>
+<ul>
+  <li><code>signal-generator/references/prior_iterations_index.md</code> — 과거 SignalSpec + 결과 누적 (iter ≥ 1 부터 채워짐)</li>
+  <li><code>signal-evaluator/references/formula_validity_rules.md</code> — formula 합법성 판정 규칙</li>
+  <li><code>fidelity-checker/references/ast_comparison_rules.md</code> — AST level 비교 기준</li>
+  <li><code>feedback-analyst/references/analysis_framework.md</code> — Feedback label 정의</li>
+  <li><code>signal-improver/references/improvement_heuristics.md</code> — feedback direction → mutation recipe 매핑</li>
+  <li><code>chain2-gate/references/scoring_flow.md</code>, <code>fee_scenarios.md</code>, <code>dominance_rules.md</code></li>
+</ul>
+
+<!-- ============================================== -->
+<h2 id="meta">10. 메타-도구 (auto-memory · 권한 모델 · MCP) <a href="#meta" class="anchor-link">#</a></h2>
+
+<h3>10.1 Auto-memory</h3>
+<p>위치: <code>~/.claude/projects/-home-dgu-tick-proj-claude-tick-finance/memory/</code>.
+세션 간 결정·근거를 전수. 호출은 시스템이 자동, 사용자 손 안 닿음.</p>
+<p>현재 인덱스(MEMORY.md) 항목:</p>
+<ul>
+  <li><code>project_standard_eval_universe.md</code> — top-10 liquid symbols default</li>
+  <li><code>project_market_making_session_findings.md</code> — best IS strat_0025 +0.597%, WR 66.7%</li>
+  <li><code>project_crypto_pivot.md</code> — KRX 21bps fee → Upbit crypto 전환 결정</li>
+  <li><code>project_paper_target.md</code> — EMNLP/NeurIPS 2026, spec-implementation fidelity</li>
+  <li><code>feedback_default_multi_symbol_evaluation.md</code> — 항상 <code>--symbols top10</code> default</li>
+  <li><code>project_framework_contribution_stance.md</code> — 2-layer 기여 분해</li>
+</ul>
+
+<h3>10.2 권한 모델</h3>
+
+<h4>Allowlist (전역 + 프로젝트)</h4>
+<ul>
+  <li>특정 Bash 패턴만 자동 허용: <code>python3:*</code>, <code>pytest --timeout=*</code>,
+      <code>pip install *</code>, 백테스트/학습 스크립트 정확 인자 패턴</li>
+  <li>전역 <code>bypassPermissions</code> + <code>skipDangerousModePermissionPrompt: true</code> —
+      자율성 ↑ 대신 deny list로 안전 확보</li>
+</ul>
+
+<h4>Deny list (프로젝트)</h4>
+<p>다음 핵심 engine 파일은 Claude가 수정 불가:</p>
+<ul>
+  <li><code>engine/simulator.py</code></li>
+  <li><code>engine/data_loader.py</code></li>
+  <li><code>engine/metrics.py</code></li>
+  <li><code>engine/audit_principles.py</code></li>
+</ul>
+<p class="muted">"위험한 자율성 + 핵심 파일 보호"의 조합. <code>chain1/_shared/schemas.py</code>는 현재 deny에 없음.</p>
+
+<h3>10.3 MCP — ouroboros</h3>
+<p>유일한 MCP 서버. evolutionary development framework. chain1과 직접 결합되지 않고, 큰 의사결정 직전
+<code>ouroboros:interview</code> 정도로 간헐적 사용.</p>
+
+<h3>10.4 Plugin marketplace 구성</h3>
+<table>
+  <thead><tr><th>Marketplace</th><th>제공</th></tr></thead>
+  <tbody>
+    <tr><td>superpowers (공식)</td><td>brainstorming, TDD, debugging, plans 등 generic SWE skill</td></tr>
+    <tr><td>understand-anything (공식)</td><td>코드 이해 보조</td></tr>
+    <tr><td>ai-research-skills (git)</td><td>ml-paper-writing, ideation, autoresearch, data-processing 등 vertical 도구</td></tr>
+    <tr><td>ouroboros (git)</td><td>위 MCP 서버 + 관련 skill 군</td></tr>
+    <tr><td>skill_lab_diary (git)</td><td>research-diary-plugin</td></tr>
+    <tr><td>snakeo-co-commands (git)</td><td><code>co-brainstorm</code>, <code>co-plan</code>, <code>co-validate</code> — Codex 위임 시리즈</td></tr>
+    <tr><td>paper-search (git, symlinked)</td><td>위 5.2의 <code>paper-search</code> skill</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================== -->
+<h2 id="prompt-style">11. Prompt 작성 스타일 관찰 <a href="#prompt-style" class="anchor-link">#</a></h2>
+
+<p>실 invocation log에서 추출한 사용자 prompt 패턴:</p>
+
+<h3>11.1 짧은 한국어 명령형 (가장 흔함)</h3>
+<blockquote class="example">
+  /experiment 수익률이 양수가 발생할 때까지<br>
+  chain2-gate AGENTS.md 봐줘<br>
+  iteration 회고 정리하고 다음 방향 제안해<br>
+  feedback에서 retire된 spec 빼고 살아남은 거 요약
+</blockquote>
+
+<h3>11.2 자연어 brief — 도메인 용어 그대로</h3>
+<blockquote class="example">
+  KRX top-10 종목 전체를 대상으로 LOB signal 기반 데이터 주도형 전략을 설계하라.
+  각 종목별 signal brief를 확인하고, viable signal이 존재하는 종목에서만 전략을 생성하라.
+  Multi-symbol 전략도 허용. IS 기간: 20260305~20260320.
+</blockquote>
+
+<h3>11.3 CLI flag (재현성·디버깅 시)</h3>
+<pre>/experiment --market crypto_lob --symbols BTCUSDT,ETHUSDT,SOLUSDT
+            --is-start  '2026-04-19T06:00:00' --is-end  '2026-04-20T02:00:00'
+            --oos-start '2026-04-20T02:00:00' --oos-end '2026-04-20T07:00:00'</pre>
+
+<h3>11.4 영어 spec-style (도메인 정의 강할 때)</h3>
+<blockquote class="example">
+  Design a trading strategy that exploits price limit phenomena in KRX.
+  The strategy targets stocks that have hit the daily upper limit (+30%, 상한가) or
+  lower limit (−30%, 하한가). For upper limit cases, identify stocks with large queued
+  buy orders at the limit price and predict next…
+</blockquote>
+
+<h3>11.5 패턴 종합</h3>
+<table>
+  <thead><tr><th>맥락</th><th>스타일</th><th>왜</th></tr></thead>
+  <tbody>
+    <tr><td>일상 cycle 트리거</td><td>짧은 한국어 + 슬래시 커맨드 한 줄</td><td>chain1이 알아서 함, 길게 쓸 필요 없음</td></tr>
+    <tr><td>새 가설 주입</td><td>자연어 brief, 한·영 혼용</td><td>signal-generator의 자유도를 살림</td></tr>
+    <tr><td>재현성 필요</td><td>CLI flag로 모든 파라미터 명시</td><td>이후 동일 결과 재생을 위해</td></tr>
+    <tr><td>도메인 정의가 강할 때</td><td>영어 spec 문체</td><td>학술 reference와 매칭하기 쉬움</td></tr>
+    <tr><td>코드 변경 검토</td><td>한 줄 — 대상 파일만 지정</td><td>Codex가 컨텍스트를 직접 읽음</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================== -->
+<h2 id="summary-line">12. 한 줄 요약 <a href="#summary-line" class="anchor-link">#</a></h2>
+
+<div class="info">
+<p style="font-size:1.05em; margin:0">
+<strong>"진입점 skill 4개로 chain1 8-agent를 운전하고, 모든 agent 내부 의사결정은
+6-section AGENTS.md + Pydantic schema + <code>_shared/references/</code> 인용으로 강제된다."</strong>
+</p>
+</div>
+
+<p>매일 사용자 손이 닿는 표면적은 좁음 — <code>/new-strategy</code>로 의도 주입, <code>/experiment</code>로 한 cycle,
+결과 보고 다시 <code>/new-strategy</code> 또는 다음 <code>/experiment</code>. 코드 변경 시 <code>/co-review</code>.
+그 외는 chain1이 알아서.</p>
+
+<hr>
+
+<div class="footer">
+  <p>Generated 2026-04-23 · chain1 structure as of commit <code>1465dc7 remake</code> ·
+     Document scope: descriptive workflow + skill/prompt patterns. 진단·권고는 별도 문서.</p>
+  <p>관련 문서:
+     <a href="chain1_research_report.html">chain1_research_report.html</a> ·
+     <a href="chain1_blockC_report.html">chain1_blockC_report.html</a> ·
+     <a href="obi_ofi_primer.html">obi_ofi_primer.html</a> ·
+     <code>chain2_design.md</code></p>
+</div>
+
+</body>
+</html>

@@ -262,19 +262,16 @@ class LLMClient:
 
     # ---- Call ------------------------------------------------------------
 
-    def call_agent(
+    def _prepare_call(
         self,
         agent_name: str,
         user_message: str,
         response_model: Type[T],
-        extra_system: str = "",
-        include_references: bool = True,
-        model_override: str | None = None,
-    ) -> T:
-        """Invoke an agent's LLM with its AGENTS.md system prompt + user message.
-
-        Raises RuntimeError if no valid API key is present for the selected model's provider.
-        """
+        extra_system: str,
+        include_references: bool,
+        model_override: str | None,
+    ):
+        """Build (model, params) for a litellm call. Shared between sync and async."""
         model = canonicalize_model(model_override or self.config.model_for(agent_name))
 
         if not self.is_live(model):
@@ -298,17 +295,57 @@ class LLMClient:
 
         system_prompt = self._augment_system(system_prompt, response_model)
 
-        # Deferred import — litellm pulls large transitive deps
-        import litellm  # noqa: F401 (imported for side-effect of .completion())
-
         params = self._build_completion_params(model, response_model)
         params["messages"] = [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
         ]
+        return model, params
+
+    def call_agent(
+        self,
+        agent_name: str,
+        user_message: str,
+        response_model: Type[T],
+        extra_system: str = "",
+        include_references: bool = True,
+        model_override: str | None = None,
+    ) -> T:
+        """Invoke an agent's LLM with its AGENTS.md system prompt + user message.
+
+        Raises RuntimeError if no valid API key is present for the selected model's provider.
+        """
+        model, params = self._prepare_call(
+            agent_name, user_message, response_model,
+            extra_system, include_references, model_override,
+        )
+
+        # Deferred import — litellm pulls large transitive deps
+        import litellm  # noqa: F401 (imported for side-effect of .completion())
 
         resp = litellm.completion(**params)
+        return self._parse_response(resp, agent_name, model, response_model)
 
+    async def call_agent_async(
+        self,
+        agent_name: str,
+        user_message: str,
+        response_model: Type[T],
+        extra_system: str = "",
+        include_references: bool = True,
+        model_override: str | None = None,
+    ) -> T:
+        """Async version of call_agent — uses litellm.acompletion. Same return shape."""
+        model, params = self._prepare_call(
+            agent_name, user_message, response_model,
+            extra_system, include_references, model_override,
+        )
+        import litellm  # noqa: F401
+        resp = await litellm.acompletion(**params)
+        return self._parse_response(resp, agent_name, model, response_model)
+
+    def _parse_response(self, resp, agent_name: str, model: str, response_model: Type[T]) -> T:
+        """Shared response parsing logic (sync + async)."""
         # LiteLLM normalizes the response shape (OpenAI-style)
         try:
             text_out = resp["choices"][0]["message"]["content"]

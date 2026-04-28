@@ -1,7 +1,7 @@
 {
   "agent_name": "chain2-gate",
   "agent_version": "0.1.0",
-  "timestamp": "2026-04-22T01:51:29.197207",
+  "timestamp": "2026-04-28T08:23:33.543943",
   "iteration_idx": 12,
   "iterations_scanned": [
     12
@@ -13,9 +13,9 @@
       "fee_rt_bps": 23.0,
       "top_candidates": [],
       "excluded": {
-        "iter012_ask_conc_low_vol": "gate_failed:G1_density:43.3<300.0",
-        "iter012_mega_consensus": "gate_failed:G1_density:0.0<300.0",
-        "iter012_deep_book_vs_bbo_reversal": "gate_failed:G2_wr:0.0904<0.55"
+        "iter012_extreme_trade_flow_reversion": "gate_failed:G2_wr:0.5114<0.55",
+        "iter012_sticky_ofi_long_hold": "gate_failed:G2_wr:0.4898<0.55",
+        "iter012_conviction_at_closing": "gate_failed:G1_density:0.0<300.0"
       }
     },
     {
@@ -23,16 +23,19 @@
       "fee_rt_bps": 5.0,
       "top_candidates": [],
       "excluded": {
-        "iter012_ask_conc_low_vol": "gate_failed:G1_density:43.3<300.0",
-        "iter012_mega_consensus": "gate_failed:G1_density:0.0<300.0",
-        "iter012_deep_book_vs_bbo_reversal": "gate_failed:G2_wr:0.0904<0.55"
+        "iter012_extreme_trade_flow_reversion": "gate_failed:G2_wr:0.5114<0.55",
+        "iter012_sticky_ofi_long_hold": "gate_failed:G2_wr:0.4898<0.55",
+        "iter012_conviction_at_closing": "gate_failed:G1_density:0.0<300.0"
       }
     }
   ],
   "cross_scenario_consensus": [],
   "warnings": [
     "no candidates passed gates under krx_cash_23bps",
-    "no candidates passed gates under hypothetical_low_fee_5bps"
+    "no candidates passed gates under hypothetical_low_fee_5bps",
+    "no-positive-post-fee-under-krx_cash_23bps — all specs fail G3 under this scenario; ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)",
+    "no-positive-post-fee-under-hypothetical_low_fee_5bps — all specs fail G3 under this scenario; ranking preserved via fee_absorption_ratio (soft-G3 mode, priorities capped at STRONG/MARGINAL)",
+    "DSR-computable specs: 0/3 (others lack trace data; their priority capped at STRONG)"
   ],
   "meta_narrative_kr": "**시나리오별 요약**\n- **krx_cash_23bps**: 통과 후보 없음\n- **hypothetical_low_fee_5bps**: 통과 후보 없음"
 }

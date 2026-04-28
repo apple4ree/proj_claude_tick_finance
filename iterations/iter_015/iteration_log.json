@@ -1,40 +1,44 @@
 {
   "iteration_idx": 15,
-  "started_at": "2026-04-22T02:09:41.264590",
-  "finished_at": "2026-04-22T02:15:27.426149",
+  "started_at": "2026-04-28T09:15:37.234298",
+  "finished_at": "2026-04-28T09:46:57.655472",
   "signal_specs": [
-    "iter015_wall_break_closing_filter",
-    "iter015_book_divergence_spread_filter",
-    "iter015_trade_flow_exhaustion_short",
-    "iter015_deep_book_vs_tradeflow_divergence"
+    "iter015_smoothed_velocity_consensus",
+    "iter015_extreme_trade_flow_reversion",
+    "iter015_long_horizon_pressure_consensus",
+    "iter015_closing_burst_reversion"
   ],
   "spec_evaluations": [
-    "iterations/iter_015/evaluations/iter015_wall_break_closing_filter.json",
-    "iterations/iter_015/evaluations/iter015_book_divergence_spread_filter.json",
-    "iterations/iter_015/evaluations/iter015_trade_flow_exhaustion_short.json",
-    "iterations/iter_015/evaluations/iter015_deep_book_vs_tradeflow_divergence.json"
+    "iterations/iter_015/evaluations/iter015_smoothed_velocity_consensus.json",
+    "iterations/iter_015/evaluations/iter015_extreme_trade_flow_reversion.json",
+    "iterations/iter_015/evaluations/iter015_long_horizon_pressure_consensus.json",
+    "iterations/iter_015/evaluations/iter015_closing_burst_reversion.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_015/code/iter015_trade_flow_exhaustion_short.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_015/code/iter015_deep_book_vs_tradeflow_divergence.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_015/code/iter015_extreme_trade_flow_reversion.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_015/code/iter015_long_horizon_pressure_consensus.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_015/code/iter015_closing_burst_reversion.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_015/fidelity/iter015_trade_flow_exhaustion_short.json",
-    "iterations/iter_015/fidelity/iter015_deep_book_vs_tradeflow_divergence.json"
+    "iterations/iter_015/fidelity/iter015_extreme_trade_flow_reversion.json",
+    "iterations/iter_015/fidelity/iter015_long_horizon_pressure_consensus.json",
+    "iterations/iter_015/fidelity/iter015_closing_burst_reversion.json"
   ],
   "backtest_results": [
-    "iterations/iter_015/results/iter015_trade_flow_exhaustion_short.json",
-    "iterations/iter_015/results/iter015_deep_book_vs_tradeflow_divergence.json"
+    "iterations/iter_015/results/iter015_extreme_trade_flow_reversion.json",
+    "iterations/iter_015/results/iter015_long_horizon_pressure_consensus.json",
+    "iterations/iter_015/results/iter015_closing_burst_reversion.json"
   ],
   "feedback": [
-    "iterations/iter_015/feedback/iter015_trade_flow_exhaustion_short.json",
-    "iterations/iter_015/feedback/iter015_deep_book_vs_tradeflow_divergence.json"
+    "iterations/iter_015/feedback/iter015_extreme_trade_flow_reversion.json",
+    "iterations/iter_015/feedback/iter015_long_horizon_pressure_consensus.json",
+    "iterations/iter_015/feedback/iter015_closing_burst_reversion.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_015/improvements/iter015_trade_flow_exhaustion_short.json",
-    "iterations/iter_015/improvements/iter015_deep_book_vs_tradeflow_divergence.json",
-    "iterations/iter_015/improvements/iter015_deep_book_vs_tradeflow_divergence_v1.json",
-    "iterations/iter_015/improvements/iter015_deep_book_vs_tradeflow_divergence_v2.json"
+    "iterations/iter_015/improvements/iter015_extreme_trade_flow_reversion.json",
+    "iterations/iter_015/improvements/iter015_extreme_trade_flow_reversion_v1.json",
+    "iterations/iter_015/improvements/iter015_long_horizon_pressure_consensus.json",
+    "iterations/iter_015/improvements/iter015_closing_burst_reversion.json"
   ],
   "stop_reason": null
 }

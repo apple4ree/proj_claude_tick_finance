@@ -1,48 +1,40 @@
 {
   "iteration_idx": 17,
-  "started_at": "2026-04-22T02:21:41.315108",
-  "finished_at": "2026-04-22T02:31:06.608462",
+  "started_at": "2026-04-28T10:10:43.848858",
+  "finished_at": "2026-04-28T10:27:23.060403",
   "signal_specs": [
-    "iter017_exhaustion_extreme",
-    "iter017_deep_book_absorption_extreme",
-    "iter017_bbo_divergence_trade_confirm",
-    "iter017_fragile_ask_exhaustion"
+    "iter017_consensus_velocity_smoothed",
+    "iter017_long_horizon_sticky_pressure",
+    "iter017_trade_flow_exhaustion_reversal",
+    "iter017_closing_burst_consensus"
   ],
   "spec_evaluations": [
-    "iterations/iter_017/evaluations/iter017_exhaustion_extreme.json",
-    "iterations/iter_017/evaluations/iter017_deep_book_absorption_extreme.json",
-    "iterations/iter_017/evaluations/iter017_bbo_divergence_trade_confirm.json",
-    "iterations/iter_017/evaluations/iter017_fragile_ask_exhaustion.json"
+    "iterations/iter_017/evaluations/iter017_consensus_velocity_smoothed.json",
+    "iterations/iter_017/evaluations/iter017_long_horizon_sticky_pressure.json",
+    "iterations/iter_017/evaluations/iter017_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_017/evaluations/iter017_closing_burst_consensus.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_017/code/iter017_exhaustion_extreme.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_017/code/iter017_deep_book_absorption_extreme.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_017/code/iter017_bbo_divergence_trade_confirm.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_017/code/iter017_fragile_ask_exhaustion.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_017/code/iter017_trade_flow_exhaustion_reversal.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_017/code/iter017_closing_burst_consensus.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_017/fidelity/iter017_exhaustion_extreme.json",
-    "iterations/iter_017/fidelity/iter017_deep_book_absorption_extreme.json",
-    "iterations/iter_017/fidelity/iter017_bbo_divergence_trade_confirm.json",
-    "iterations/iter_017/fidelity/iter017_fragile_ask_exhaustion.json"
+    "iterations/iter_017/fidelity/iter017_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_017/fidelity/iter017_closing_burst_consensus.json"
   ],
   "backtest_results": [
-    "iterations/iter_017/results/iter017_exhaustion_extreme.json",
-    "iterations/iter_017/results/iter017_deep_book_absorption_extreme.json",
-    "iterations/iter_017/results/iter017_bbo_divergence_trade_confirm.json",
-    "iterations/iter_017/results/iter017_fragile_ask_exhaustion.json"
+    "iterations/iter_017/results/iter017_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_017/results/iter017_closing_burst_consensus.json"
   ],
   "feedback": [
-    "iterations/iter_017/feedback/iter017_exhaustion_extreme.json",
-    "iterations/iter_017/feedback/iter017_deep_book_absorption_extreme.json",
-    "iterations/iter_017/feedback/iter017_bbo_divergence_trade_confirm.json",
-    "iterations/iter_017/feedback/iter017_fragile_ask_exhaustion.json"
+    "iterations/iter_017/feedback/iter017_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_017/feedback/iter017_closing_burst_consensus.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_017/improvements/iter017_bbo_divergence_trade_confirm.json",
-    "iterations/iter_017/improvements/iter017_exhaustion_extreme.json",
-    "iterations/iter_017/improvements/iter017_fragile_ask_exhaustion.json",
-    "iterations/iter_017/improvements/iter017_deep_book_absorption_extreme.json"
+    "iterations/iter_017/improvements/iter017_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_017/improvements/iter017_trade_flow_exhaustion_reversal_v1.json",
+    "iterations/iter_017/improvements/iter017_trade_flow_exhaustion_reversal_v2.json",
+    "iterations/iter_017/improvements/iter017_closing_burst_consensus.json"
   ],
   "stop_reason": null
 }

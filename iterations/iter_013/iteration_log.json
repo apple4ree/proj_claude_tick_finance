@@ -1,48 +1,44 @@
 {
   "iteration_idx": 13,
-  "started_at": "2026-04-22T01:51:55.034457",
-  "finished_at": "2026-04-22T02:00:43.705714",
+  "started_at": "2026-04-28T08:23:34.120428",
+  "finished_at": "2026-04-28T08:54:56.037024",
   "signal_specs": [
-    "iter013_ask_conc_low_vol_h50",
-    "iter013_mega_consensus_loosened",
-    "iter013_book_divergence_inverted",
-    "iter013_tradeflow_into_favorable_shape"
+    "iter013_smoothed_trade_flow_reversal",
+    "iter013_full_book_conviction_long_hold",
+    "iter013_closing_burst_pressure_relaxed",
+    "iter013_ask_wall_reversion_in_high_vol"
   ],
   "spec_evaluations": [
-    "iterations/iter_013/evaluations/iter013_ask_conc_low_vol_h50.json",
-    "iterations/iter_013/evaluations/iter013_mega_consensus_loosened.json",
-    "iterations/iter_013/evaluations/iter013_book_divergence_inverted.json",
-    "iterations/iter_013/evaluations/iter013_tradeflow_into_favorable_shape.json"
+    "iterations/iter_013/evaluations/iter013_smoothed_trade_flow_reversal.json",
+    "iterations/iter_013/evaluations/iter013_full_book_conviction_long_hold.json",
+    "iterations/iter_013/evaluations/iter013_closing_burst_pressure_relaxed.json",
+    "iterations/iter_013/evaluations/iter013_ask_wall_reversion_in_high_vol.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_013/code/iter013_ask_conc_low_vol_h50.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_013/code/iter013_mega_consensus_loosened.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_013/code/iter013_book_divergence_inverted.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_013/code/iter013_tradeflow_into_favorable_shape.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_013/code/iter013_full_book_conviction_long_hold.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_013/code/iter013_closing_burst_pressure_relaxed.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_013/code/iter013_ask_wall_reversion_in_high_vol.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_013/fidelity/iter013_ask_conc_low_vol_h50.json",
-    "iterations/iter_013/fidelity/iter013_mega_consensus_loosened.json",
-    "iterations/iter_013/fidelity/iter013_book_divergence_inverted.json",
-    "iterations/iter_013/fidelity/iter013_tradeflow_into_favorable_shape.json"
+    "iterations/iter_013/fidelity/iter013_full_book_conviction_long_hold.json",
+    "iterations/iter_013/fidelity/iter013_closing_burst_pressure_relaxed.json",
+    "iterations/iter_013/fidelity/iter013_ask_wall_reversion_in_high_vol.json"
   ],
   "backtest_results": [
-    "iterations/iter_013/results/iter013_ask_conc_low_vol_h50.json",
-    "iterations/iter_013/results/iter013_mega_consensus_loosened.json",
-    "iterations/iter_013/results/iter013_book_divergence_inverted.json",
-    "iterations/iter_013/results/iter013_tradeflow_into_favorable_shape.json"
+    "iterations/iter_013/results/iter013_full_book_conviction_long_hold.json",
+    "iterations/iter_013/results/iter013_closing_burst_pressure_relaxed.json",
+    "iterations/iter_013/results/iter013_ask_wall_reversion_in_high_vol.json"
   ],
   "feedback": [
-    "iterations/iter_013/feedback/iter013_ask_conc_low_vol_h50.json",
-    "iterations/iter_013/feedback/iter013_mega_consensus_loosened.json",
-    "iterations/iter_013/feedback/iter013_book_divergence_inverted.json",
-    "iterations/iter_013/feedback/iter013_tradeflow_into_favorable_shape.json"
+    "iterations/iter_013/feedback/iter013_full_book_conviction_long_hold.json",
+    "iterations/iter_013/feedback/iter013_closing_burst_pressure_relaxed.json",
+    "iterations/iter_013/feedback/iter013_ask_wall_reversion_in_high_vol.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_013/improvements/iter013_ask_conc_low_vol_h50.json",
-    "iterations/iter_013/improvements/iter013_mega_consensus_loosened.json",
-    "iterations/iter_013/improvements/iter013_book_divergence_inverted.json",
-    "iterations/iter_013/improvements/iter013_tradeflow_into_favorable_shape.json"
+    "iterations/iter_013/improvements/iter013_full_book_conviction_long_hold.json",
+    "iterations/iter_013/improvements/iter013_full_book_conviction_long_hold_v1.json",
+    "iterations/iter_013/improvements/iter013_ask_wall_reversion_in_high_vol.json",
+    "iterations/iter_013/improvements/iter013_ask_wall_reversion_in_high_vol_v1.json"
   ],
   "stop_reason": null
 }

@@ -1,48 +1,48 @@
 {
   "iteration_idx": 2,
-  "started_at": "2026-04-21T09:55:55.748744",
-  "finished_at": "2026-04-21T10:03:47.113195",
+  "started_at": "2026-04-28T03:42:58.586970",
+  "finished_at": "2026-04-28T04:10:54.961933",
   "signal_specs": [
-    "iter002_ask_concentration_zscore_contra_h20",
-    "iter002_obi_deepbook_consensus_filtered_h5",
-    "iter002_tradeflow_plus_obi_tight_h20",
-    "iter002_full_consensus_contra_ask_h10"
+    "iter002_persistent_pressure_long_hold",
+    "iter002_trade_flow_exhaustion_reversal",
+    "iter002_conviction_in_high_vol",
+    "iter002_ask_wall_reversion"
   ],
   "spec_evaluations": [
-    "iterations/iter_002/evaluations/iter002_ask_concentration_zscore_contra_h20.json",
-    "iterations/iter_002/evaluations/iter002_obi_deepbook_consensus_filtered_h5.json",
-    "iterations/iter_002/evaluations/iter002_tradeflow_plus_obi_tight_h20.json",
-    "iterations/iter_002/evaluations/iter002_full_consensus_contra_ask_h10.json"
+    "iterations/iter_002/evaluations/iter002_persistent_pressure_long_hold.json",
+    "iterations/iter_002/evaluations/iter002_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_002/evaluations/iter002_conviction_in_high_vol.json",
+    "iterations/iter_002/evaluations/iter002_ask_wall_reversion.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_002/code/iter002_ask_concentration_zscore_contra_h20.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_002/code/iter002_obi_deepbook_consensus_filtered_h5.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_002/code/iter002_tradeflow_plus_obi_tight_h20.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_002/code/iter002_full_consensus_contra_ask_h10.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_002/code/iter002_persistent_pressure_long_hold.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_002/code/iter002_trade_flow_exhaustion_reversal.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_002/code/iter002_conviction_in_high_vol.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_002/code/iter002_ask_wall_reversion.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_002/fidelity/iter002_ask_concentration_zscore_contra_h20.json",
-    "iterations/iter_002/fidelity/iter002_obi_deepbook_consensus_filtered_h5.json",
-    "iterations/iter_002/fidelity/iter002_tradeflow_plus_obi_tight_h20.json",
-    "iterations/iter_002/fidelity/iter002_full_consensus_contra_ask_h10.json"
+    "iterations/iter_002/fidelity/iter002_persistent_pressure_long_hold.json",
+    "iterations/iter_002/fidelity/iter002_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_002/fidelity/iter002_conviction_in_high_vol.json",
+    "iterations/iter_002/fidelity/iter002_ask_wall_reversion.json"
   ],
   "backtest_results": [
-    "iterations/iter_002/results/iter002_ask_concentration_zscore_contra_h20.json",
-    "iterations/iter_002/results/iter002_obi_deepbook_consensus_filtered_h5.json",
-    "iterations/iter_002/results/iter002_tradeflow_plus_obi_tight_h20.json",
-    "iterations/iter_002/results/iter002_full_consensus_contra_ask_h10.json"
+    "iterations/iter_002/results/iter002_persistent_pressure_long_hold.json",
+    "iterations/iter_002/results/iter002_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_002/results/iter002_conviction_in_high_vol.json",
+    "iterations/iter_002/results/iter002_ask_wall_reversion.json"
   ],
   "feedback": [
-    "iterations/iter_002/feedback/iter002_ask_concentration_zscore_contra_h20.json",
-    "iterations/iter_002/feedback/iter002_obi_deepbook_consensus_filtered_h5.json",
-    "iterations/iter_002/feedback/iter002_tradeflow_plus_obi_tight_h20.json",
-    "iterations/iter_002/feedback/iter002_full_consensus_contra_ask_h10.json"
+    "iterations/iter_002/feedback/iter002_persistent_pressure_long_hold.json",
+    "iterations/iter_002/feedback/iter002_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_002/feedback/iter002_conviction_in_high_vol.json",
+    "iterations/iter_002/feedback/iter002_ask_wall_reversion.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_002/improvements/iter002_full_consensus_contra_ask_h10.json",
-    "iterations/iter_002/improvements/iter002_ask_concentration_zscore_contra_h20.json",
-    "iterations/iter_002/improvements/iter002_tradeflow_plus_obi_tight_h20.json",
-    "iterations/iter_002/improvements/iter001_obi_deepbook_consensus_tight_h5.json"
+    "iterations/iter_002/improvements/iter002_conviction_in_high_vol.json",
+    "iterations/iter_002/improvements/iter002_conviction_in_high_vol_v1.json",
+    "iterations/iter_002/improvements/iter002_trade_flow_exhaustion_reversal.json",
+    "iterations/iter_002/improvements/iter002_persistent_pressure_long_hold.json"
   ],
   "stop_reason": null
 }

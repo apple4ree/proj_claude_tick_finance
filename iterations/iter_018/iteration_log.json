@@ -1,48 +1,44 @@
 {
   "iteration_idx": 18,
-  "started_at": "2026-04-22T02:31:27.827240",
-  "finished_at": "2026-04-22T02:39:57.068181",
+  "started_at": "2026-04-28T10:27:23.613678",
+  "finished_at": "2026-04-28T10:41:51.260465",
   "signal_specs": [
-    "iter018_exhaustion_pinnacle",
-    "iter018_bbo_divergence_tight",
-    "iter018_stable_deep_book_absorption",
-    "iter018_contra_consensus"
+    "iter018_smoothed_trade_flow_reversal",
+    "iter018_persistent_imbalance_acceleration",
+    "iter018_closing_burst_deep_book_pressure",
+    "iter018_fragile_book_flow_break"
   ],
   "spec_evaluations": [
-    "iterations/iter_018/evaluations/iter018_exhaustion_pinnacle.json",
-    "iterations/iter_018/evaluations/iter018_bbo_divergence_tight.json",
-    "iterations/iter_018/evaluations/iter018_stable_deep_book_absorption.json",
-    "iterations/iter_018/evaluations/iter018_contra_consensus.json"
+    "iterations/iter_018/evaluations/iter018_smoothed_trade_flow_reversal.json",
+    "iterations/iter_018/evaluations/iter018_persistent_imbalance_acceleration.json",
+    "iterations/iter_018/evaluations/iter018_closing_burst_deep_book_pressure.json",
+    "iterations/iter_018/evaluations/iter018_fragile_book_flow_break.json"
   ],
   "generated_codes": [
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_018/code/iter018_exhaustion_pinnacle.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_018/code/iter018_bbo_divergence_tight.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_018/code/iter018_stable_deep_book_absorption.py",
-    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_018/code/iter018_contra_consensus.py"
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_018/code/iter018_persistent_imbalance_acceleration.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_018/code/iter018_closing_burst_deep_book_pressure.py",
+    "/home/dgu/tick/proj_claude_tick_finance/iterations/iter_018/code/iter018_fragile_book_flow_break.py"
   ],
   "fidelity_reports": [
-    "iterations/iter_018/fidelity/iter018_exhaustion_pinnacle.json",
-    "iterations/iter_018/fidelity/iter018_bbo_divergence_tight.json",
-    "iterations/iter_018/fidelity/iter018_stable_deep_book_absorption.json",
-    "iterations/iter_018/fidelity/iter018_contra_consensus.json"
+    "iterations/iter_018/fidelity/iter018_persistent_imbalance_acceleration.json",
+    "iterations/iter_018/fidelity/iter018_closing_burst_deep_book_pressure.json",
+    "iterations/iter_018/fidelity/iter018_fragile_book_flow_break.json"
   ],
   "backtest_results": [
-    "iterations/iter_018/results/iter018_exhaustion_pinnacle.json",
-    "iterations/iter_018/results/iter018_bbo_divergence_tight.json",
-    "iterations/iter_018/results/iter018_stable_deep_book_absorption.json",
-    "iterations/iter_018/results/iter018_contra_consensus.json"
+    "iterations/iter_018/results/iter018_persistent_imbalance_acceleration.json",
+    "iterations/iter_018/results/iter018_closing_burst_deep_book_pressure.json",
+    "iterations/iter_018/results/iter018_fragile_book_flow_break.json"
   ],
   "feedback": [
-    "iterations/iter_018/feedback/iter018_exhaustion_pinnacle.json",
-    "iterations/iter_018/feedback/iter018_bbo_divergence_tight.json",
-    "iterations/iter_018/feedback/iter018_stable_deep_book_absorption.json",
-    "iterations/iter_018/feedback/iter018_contra_consensus.json"
+    "iterations/iter_018/feedback/iter018_persistent_imbalance_acceleration.json",
+    "iterations/iter_018/feedback/iter018_closing_burst_deep_book_pressure.json",
+    "iterations/iter_018/feedback/iter018_fragile_book_flow_break.json"
   ],
   "improvement_proposals": [
-    "iterations/iter_018/improvements/iter018_contra_consensus.json",
-    "iterations/iter_018/improvements/iter018_contra_consensus_v1.json",
-    "iterations/iter_018/improvements/iter018_bbo_divergence_tight.json",
-    "iterations/iter_018/improvements/iter018_exhaustion_pinnacle.json"
+    "iterations/iter_018/improvements/iter018_fragile_book_flow_break.json",
+    "iterations/iter_018/improvements/iter018_fragile_book_flow_break_v1.json",
+    "iterations/iter_018/improvements/iter018_closing_burst_deep_book_pressure.json",
+    "iterations/iter_018/improvements/iter018_persistent_imbalance_acceleration.json"
   ],
   "stop_reason": null
 }

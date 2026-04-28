@@ -35,3 +35,26 @@ literature/papers/*.pdf
 
 # Paper-search scratch
 papers/.project_analysis.json
+deep/knowledge-graph.json
+
+# Iteration outputs — generated per run (specs/code/results/traces/report.html, multi-GB)
+# Each run produces ~80 specs × multiple artifacts. Recreatable from inputs.
+iterations/
+iterations_archive_*/
+iterations_v3_archive/
+iterations_v4_archive/
+iterations_v5_archive_*/
+
+# Per-run logs / lock files
+.claude/scheduled_tasks.lock
+*.output
+
+# Per-run analysis figures (regeneratable from analysis/figures/gen_*.py)
+analysis/figures/*.png
+
+# wiki-sync generated index (regenerated from code by ResearchWiki tooling)
+index/
+
+# Old prior_iterations backups (kept locally only — historical, not paper-grade)
+.claude/agents/chain1/signal-generator/references/prior_iterations_index.md.archive_*
+.claude/agents/chain1/signal-generator/references/prior_iterations_index.md.v3v4_archive
